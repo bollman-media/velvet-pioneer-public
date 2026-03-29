@@ -1,0 +1,1142 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   OPTION 2 — Time Machine Immersive Gallery
+   Elite Motion Systems Designer + Hyper-Opinionated Design Critic
+
+   Architecture:
+   - Perspective-driven depth stack inspired by macOS Time Machine
+   - Cards stacked in Z-space with scale, opacity, and translateY
+   - Current card: hero scale (1.0), full brightness, z:0
+   - Previous cards: progressively recede — smaller, dimmer, shifted up
+   - Next card: off-screen below, invisible, ready to enter
+   - Crossfade between cards uses choreographed CSS transitions
+   - bg-stage: two panels crossfade the blurry environment
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Cards container: fills phone content, scrollable ─────────────────────── */
+/* This is the INITIAL state (style picker). MUST be flex:1 to fill the phone. */
+#lum3-cards-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    z-index: 1;
+}
+#lum3-cards-container::-webkit-scrollbar { display: none; }
+
+/* ── Chat overlay ─────────────────────────────────────────────────────────── */
+/* Covers the cards container when a generation is in progress or complete.   */
+.lum3-chat-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: none;
+    flex-direction: column;
+    background: #fff;
+}
+.lum3-chat-overlay.is-active {
+    display: flex;
+}
+.lum3-chat-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+.lum3-chat-scroll::-webkit-scrollbar { display: none; }
+.lum3-chat-history {
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 120px;
+    min-height: 100%;
+}
+
+/* Chat toolbar at top of chat view */
+.lum3-chat-overlay .lum-chat-toolbar {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    gap: 8px;
+    padding: 16px 16px 8px;
+    background: linear-gradient(to bottom, rgba(255,255,255,1) 50%, rgba(255,255,255,0));
+    pointer-events: auto;
+}
+
+/* ── Expand button on chat images ─────────────────────────────────────────── */
+.lum3-expand-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 44px;         /* 44px = minimum touch target (WCAG 2.5.5) */
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.38);
+    backdrop-filter: blur(10px) saturate(1.4);
+    -webkit-backdrop-filter: blur(10px) saturate(1.4);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition:
+        transform  180ms cubic-bezier(0.0, 0.0, 0.2, 1),
+        background 180ms cubic-bezier(0.0, 0.0, 0.2, 1),
+        opacity    180ms cubic-bezier(0.0, 0.0, 0.2, 1);
+    will-change: transform;
+    /* Pulse once on first appearance — teaches the user this is tappable */
+    animation: lum3-expand-pulse 600ms cubic-bezier(0.2, 0.8, 0.2, 1) 400ms 1 both;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.28), inset 0 0 0 0.5px rgba(255,255,255,0.14);
+}
+@keyframes lum3-expand-pulse {
+    0%   { transform: scale(0.86); opacity: 0; }
+    60%  { transform: scale(1.06); opacity: 1; }
+    100% { transform: scale(1);    opacity: 1; }
+}
+.lum3-expand-btn:hover {
+    transform: scale(1.08);
+    background: rgba(0,0,0,0.52);
+}
+.lum3-expand-btn:active {
+    transform: scale(0.90);
+    transition:
+        transform  80ms cubic-bezier(0.4, 0.0, 1, 1),
+        background 80ms cubic-bezier(0.4, 0.0, 1, 1);
+}
+.lum3-expand-btn .material-symbols-outlined { font-size: 22px; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   IMMERSIVE OVERLAY — Time Machine Depth Gallery
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ENTER: decelerate (cubic enter) — element arrives with physical weight     */
+.lum3-immersive {
+    position: absolute;
+    inset: -1px;           /* -1px kills sub-pixel gap at rounded corners */
+    background: #080808;   /* Near-black, not pure black — feels richer */
+    z-index: 100;
+    opacity: 0;
+    transform: scale(0.97);
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: inherit;
+    transition:
+        opacity   480ms cubic-bezier(0.0, 0.0, 0.2, 1),
+        transform 480ms cubic-bezier(0.0, 0.0, 0.2, 1);
+    will-change: opacity, transform;
+}
+.lum3-immersive.is-active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+    /* Disable browser-native pan/zoom so our pinch handler fires cleanly */
+    touch-action: none;
+}
+/* EXIT: accelerate (cubic exit) — element leaves quickly, no lingering       */
+.lum3-immersive.is-closing {
+    opacity: 0;
+    transform: scale(0.96);
+    pointer-events: none;
+    transition:
+        opacity   220ms cubic-bezier(0.4, 0.0, 1, 1),
+        transform 220ms cubic-bezier(0.4, 0.0, 1, 1);
+}
+
+/* ── Cinematic vignette — gradients burn in at top and bottom, concealing
+   the hard edge where the blurred bg meets the frame edge. Top gradient
+   also creates a safe zone for the close button to read. Bottom gradient
+   creates a base for the action pill. Both are z:3 — above bg, below cards. */
+.lum3-immersive::before,
+.lum3-immersive::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    pointer-events: none;
+}
+.lum3-immersive::before {
+    top: 0;
+    height: 180px;
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.72) 0%,
+        rgba(0,0,0,0.38) 40%,
+        transparent 100%
+    );
+}
+.lum3-immersive::after {
+    bottom: 0;
+    height: 220px;
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.82) 0%,
+        rgba(0,0,0,0.48) 45%,
+        transparent 100%
+    );
+}
+
+/* ── Nav bar ──────────────────────────────────────────────────────────────── */
+.lum3-immersive-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    pointer-events: none;
+}
+.lum3-immersive.is-active .lum3-header-elements {
+    pointer-events: auto;
+}
+/* Close button: dark glass pill — matches the action pill design language.
+   White on dark, not dark on frosted-white. Reads cleanly over any image. */
+.lum3-btn-back {
+    position: absolute;
+    top: 68px;
+    left: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+        transform  120ms cubic-bezier(0.4, 0.0, 1, 1),
+        background 180ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.lum3-btn-back .material-symbols-outlined {
+    font-size: 22px;
+    font-weight: 300;
+}
+.lum3-btn-back:active {
+    transform: scale(0.86);
+    transition: transform 80ms cubic-bezier(0.4, 0.0, 1, 1);
+    background: rgba(255, 255, 255, 0.7);
+}
+
+/* ── bg-stage ─────────────────────────────────────────────────────────────── */
+.lum3-bg-stage {
+    position: absolute;
+    inset: -1px;           /* match immersive inset to prevent bg bleed */
+    z-index: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    background: #000;
+}
+.lum3-bg-stage__layer {
+    position: absolute;
+    inset: -20%;
+    background-size: cover;
+    background-position: 50% 50%;
+    filter: blur(40px) brightness(0.78) saturate(1.35);
+    opacity: 0;
+    animation: lum3-bg-drift 24s ease-in-out infinite alternate;
+    will-change: opacity, transform;
+}
+
+@keyframes lum3-bg-drift {
+    0%   { transform: scale(1) translate(0%, 0%); }
+    33%  { transform: scale(1.04) translate(-1%, 2%); }
+    66%  { transform: scale(1.08) translate(2%, -1%); }
+    100% { transform: scale(1.02) translate(-2%, -2%); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   HORIZONTAL FILM-STRIP SCRUB — Lens Container
+   Cards sit side-by-side on an X-axis track. JS drives translateX per card.
+   overflow: hidden clips the adjacent cards so only slices peek through.
+   ══════════════════════════════════════════════════════════════════════════════ */
+.lum3-lens-container {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    overflow: hidden;        /* clips adjacent cards; their edges still peek in */
+    /* No perspective — horizontal translate only */
+}
+
+/* ── Film-strip dot scrubber ──────────────────────────────────────────────── */
+/* Sits above the action pill. Communicates position and implies swipe nav. */
+.lum3-dots {
+    position: absolute;
+    bottom: 76px;          /* sits directly below the images (which end at 100px inset) */
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    z-index: 25;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 360ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+.lum3-dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    /* transform driven by JS (scale). Active dot: 8px via scale(1.6) */
+    transition: background 240ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    will-change: transform, opacity;
+}
+
+
+/* ── Individual card — absolutely positioned, film-strip layout ──────────── */
+.lum3-card {
+    position: absolute;
+    inset: 0;
+    /*
+     * JS (RAF) drives ALL transforms. CSS transitions must be NONE here or they
+     * will fight the real-time scrub and create lag/jank.
+     * The JS engine explicitly sets el.style.transition = 'none' per-frame.
+     */
+    will-change: transform, opacity, filter;
+    transition: none;
+
+    /* Default: off-screen right (waiting for JS to position it) */
+    transform: translateX(110%) scale(0.8);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/*
+ * ── LEGACY CSS CLASS STATES (tombstoned) ─────────────────────────────────────
+ * The horizontal film-strip engine (JS) drives all card positions via inline
+ * style transforms. These classes are NEVER set by the new engine.
+ * Left in place for reference only — they do NOT apply.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/* ── Card viewport + image ────────────────────────────────────────────────── */
+
+.lum3-card__viewport {
+    position: absolute;
+    /* Equalized top/bottom to center vertically while clearing UI boundaries */
+    inset: 129px 0 129px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;   /* Allow shadow to bleed outside without clipping */
+}
+
+.lum3-card__img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 92%;      /* 4% margin each side — image doesn't bleed to frame */
+    max-height: 100%;
+    border-radius: 24px; /* Tighter than 32px — matches the image content style */
+    box-shadow:
+        0 32px 96px rgba(0,0,0,0.65),
+        0 12px 32px rgba(0,0,0,0.40),
+        0 2px 8px  rgba(0,0,0,0.30);
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    /* Promote GPU layer so pinch-zoom is composited, not rasterised */
+    will-change: transform;
+}
+
+/* ── Loading card ─────────────────────────────────────────────────────────── */
+.lum3-card.is-loading-card {
+    pointer-events: none;
+}
+.lum3-card.is-loading-card .lum3-card__viewport {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;  /* Transparent to show the blurred previous image */
+}
+/* When loading card is current, keep the previous card at the front but blur/fade it */
+.lum3-lens-container:has(.lum3-card.is-loading-card.is-current) .lum3-card.is-prev {
+    transform: translateY(0) translateZ(0px) scale(1) !important;
+    opacity: 0.5 !important;
+    filter: blur(16px) brightness(0.6) !important;
+    z-index: 4 !important;
+}
+.lum3-lens-container:has(.lum3-card.is-loading-card.is-current) .lum3-card.is-deep-past {
+    opacity: 0.1 !important;
+}
+/* Ensure the loading card itself doesn't drop a shadow on the blurred background */
+.lum3-card.is-loading-card.is-current {
+    filter: none !important;
+}
+.lum3-loading-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.lum3-loading-label-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.lum3-loading-label {
+    display: block;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+    /* Shimmer inside letterforms */
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image: linear-gradient(
+        110deg,
+        rgba(255, 255, 255, 0.3) 0%,
+        rgba(255, 255, 255, 0.3) 40%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(255, 255, 255, 0.3) 60%,
+        rgba(255, 255, 255, 0.3) 100%
+    );
+    background-size: 250% 100%;
+    animation: lum3-text-shimmer 2.4s cubic-bezier(0.2, 0.0, 0.2, 1) infinite;
+}
+
+@keyframes lum3-text-shimmer {
+    0%   { background-position: 100% center; }
+    100% { background-position: -50% center; }
+}
+
+/* ── Action pill — enter: decelerate, exit: accelerate ───────────────────── */
+.lum3-action-pill {
+    transition:
+        opacity   300ms cubic-bezier(0.0, 0.0, 0.2, 1),
+        transform 300ms cubic-bezier(0.0, 0.0, 0.2, 1);
+    will-change: opacity, transform;
+    transform: translateX(-50%) translateY(0);
+    /* Strengthen the pill so it reads over the vignette perfectly */
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(28px) saturate(1.8);
+    -webkit-backdrop-filter: blur(28px) saturate(1.8);
+    border: 0.5px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.32), 0 1px 4px rgba(0,0,0,0.20);
+}
+.lum3-action-pill.is-hidden {
+    opacity: 0 !important;
+    transform: translateX(-50%) translateY(12px);
+    transition:
+        opacity   180ms cubic-bezier(0.4, 0.0, 1, 1),
+        transform 180ms cubic-bezier(0.4, 0.0, 1, 1);
+}
+
+/* ── Position indicator ───────────────────────────────────────────────────── */
+.lum3-position-indicator {
+    position: absolute;
+    top: 64px;             /* vertically aligned with close button */
+    right: 16px;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.72);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+        opacity   240ms cubic-bezier(0.0, 0.0, 0.2, 1),
+        transform 240ms cubic-bezier(0.0, 0.0, 0.2, 1);
+    pointer-events: none;
+    z-index: 31;           /* above vignette pseudo-elements (z:3) */
+    /* Give numerals a pill backing so they're legible over any bg */
+    background: rgba(0,0,0,0.42);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 5px 10px;
+    border-radius: 20px;
+    box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.12);
+}
+.lum3-position-indicator.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* ── Prompt label — redefined as a right-aligned glass bubble ────────────── */
+.lum3-prompt-label {
+    position: absolute;
+    top: 104px;            /* Sits just above the image layer */
+    left: 20px;
+    right: 20px;           /* Constrain bounds */
+    display: flex;
+    justify-content: flex-end; /* Right align the bubble */
+    align-items: flex-start;
+    z-index: 31;
+    pointer-events: none;
+    opacity: 0;
+    will-change: opacity, transform;
+}
+.lum3-prompt-label__text {
+    /* Glass Bubble Material */
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 8px 16px;
+    
+    /* Typography */
+    font-family: 'Google Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    color: #fff;
+    text-align: right;
+    
+    /* Clamping & Layout */
+    max-width: 85%;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    max-height: 94px;
+    
+    /* Subtle polish */
+    text-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+
+/* ── Swiper compatibility stubs ────────────────────────────────────────────── */
+.lum3-swiper { display: none !important; }
+.lum3-slide-wrap { display: none !important; }
+.lum3-prev-echo { display: none !important; }
+
+/* ── Suppress template toolbar when overlays take over ─────────────────────── */
+#phone-shell-option3:has(.lum3-chat-overlay.is-active) .toolbar,
+#phone-shell-option3:has(.lum3-immersive.is-active) .toolbar {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 200ms cubic-bezier(0.4, 0.0, 1, 1);
+}
+
+
+
+
+
+/* ── Reduced motion: suppress all non-essential animations ──────────────────
+   Per WCAG 2.3 and elite-frontend-engineer accessibility standard.           */
+@media (prefers-reduced-motion: reduce) {
+    .lum3-expand-btn {
+        animation: none !important;
+    }
+    .lum3-loading-orb,
+    .lum3-loading-orb::before,
+    .lum3-loading-orb .material-symbols-outlined {
+        animation: none !important;
+    }
+    .lum3-action-pill,
+    .lum3-action-pill.is-hidden,
+    .lum3-position-indicator,
+    .lum3-btn-back {
+        transition: none !important;
+    }
+}
+.video-floating-input__morph-container #lum3-float-record {
+    position: absolute;
+    inset: 0;
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    transition:
+        opacity   160ms cubic-bezier(0.4, 0.0, 1, 1),
+        transform 200ms cubic-bezier(0.4, 0.0, 1, 1);
+}
+.video-floating-input__input-row.has-text .video-floating-input__morph-container #lum3-float-record {
+    opacity: 0;
+    transform: scale(0.5) rotate(-30deg);
+    pointer-events: none;
+}
+.video-floating-input__input-row.has-text .video-floating-input__send-btn {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+    transition:
+        opacity   200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+        transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ── Chat Loading Shimmer (Sovereign Motion Spec) ────────────────────────── */
+.lum-chat-shimmer-label {
+    display: block;
+    align-self: flex-start;
+    margin: 16px 0 12px 16px;
+    
+    font-family: 'Google Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    
+    /* Text loading animation (Darker variation for light chat background) */
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image: linear-gradient(
+        110deg,
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.3) 40%,
+        rgba(0, 0, 0, 0.9) 50%,
+        rgba(0, 0, 0, 0.3) 60%,
+        rgba(0, 0, 0, 0.3) 100%
+    );
+    background-size: 250% 100%;
+    animation: lum-chat-text-shimmer 2.4s cubic-bezier(0.2, 0.0, 0.2, 1) infinite;
+}
+
+@keyframes lum-chat-text-shimmer {
+    0%   { background-position: 100% center; }
+    100% { background-position: -50% center; }
+}
+
+.lum-chat-shimmer-box {
+    position: relative;
+    width: 100%;
+    max-width: 370px;
+    background: #F2F3F5; /* Muted architectural gray for skeleton */
+    border-radius: 40px;
+    align-self: flex-start;
+    margin: 0 0 16px 16px;
+    overflow: hidden;
+    border: none;
+    /* Blend out the edges perfectly into the background for an amorphous feel */
+    box-shadow: inset 0 0 120px 60px white; 
+    filter: blur(32px);
+    /* Default 1:1 — JS overrides via inline style when prompt specifies a ratio */
+    aspect-ratio: 1 / 1;
+    transition: aspect-ratio 400ms cubic-bezier(0.19, 1, 0.22, 1);
+    /* Cinematic smoke entrance (Elite Motion spec) */
+    transform: translateZ(0);
+    will-change: opacity, transform, filter;
+    animation: lum-smoke-enter 1.2s cubic-bezier(0.0, 0.0, 0.2, 1) forwards;
+}
+
+@keyframes lum-smoke-enter {
+    0% {
+        opacity: 0.01;
+        filter: blur(64px);
+        transform: translateY(24px) scale(0.92) translateZ(0);
+    }
+    100% {
+        opacity: 1;
+        filter: blur(32px);
+        transform: translateY(0) scale(1) translateZ(0);
+    }
+}
+
+/* Physical specular wave: translates over the surface (GPU-accelerated) */
+.lum-chat-shimmer-mesh {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.lum-chat-shimmer-mesh::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.0) 0%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0.0) 100%
+    );
+    animation: lum-skeleton-wave 2.1s cubic-bezier(0.2, 0.0, 0.2, 1) infinite;
+}
+
+@keyframes lum-skeleton-wave {
+    0%   { transform: translateX(0%); }
+    100% { transform: translateX(200%); }
+}
+
+@keyframes lum-text-breath {
+    0%   { opacity: 0.8; }
+    100% { opacity: 0.4; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   OPTION 3 — DISCOVERY END CARD
+   ─────────────────────────────────────────────────────────────────────────────
+   Design: The last generated image blurs in place and becomes the background.
+   The discovery surface lives ON the atmosphere — continuous with the immersive
+   film strip experience. No white. No jarring context break.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.lum3-discovery-card {
+    border-radius: 24px;
+    overflow: hidden;
+    background: #0a0a10;  /* fallback only — real bg is the blurred image */
+}
+
+/* ── Blurred image background — set via JS as background-image ────────────── */
+.lum3-discovery-bg {
+    position: absolute;
+    inset: -20px;
+    background-size: cover;
+    background-position: center;
+    filter: blur(28px) brightness(0.72) saturate(1.3);
+    transform: scale(1.08);
+    will-change: filter;
+}
+
+/* Atmospheric depth gradient */
+.lum3-discovery-atmosphere {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.30) 0%,
+            rgba(0, 0, 0, 0.18) 25%,
+            rgba(0, 0, 0, 0.42) 70%,
+            rgba(0, 0, 0, 0.64) 100%
+        );
+    pointer-events: none;
+}
+
+/* ── Scrollable content layer ─────────────────────────────────────────────── */
+.lum3-discovery-scroll {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+        opacity  400ms cubic-bezier(0.16, 1, 0.3, 1),
+        transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lum3-discovery-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.lum3-discovery-scroll::-webkit-scrollbar { display: none; }
+
+/* ── Header — white text directly on the atmospheric backdrop ─────────────── */
+.lum3-discovery-header {
+    padding: 28px 20px 20px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+        opacity  320ms cubic-bezier(0.0, 0.0, 0.2, 1),
+        transform 320ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+.lum3-discovery-scroll.is-visible .lum3-discovery-header {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 40ms;
+}
+
+.lum3-discovery-headline {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 40px;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.2px;
+    text-shadow: 0 1px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* ── 2-col grid — transparent, tiles float on the blur ───────────────────── */
+.lum3-discovery-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 0 16px 36px;
+    background: transparent;
+}
+
+/* Individual disco card  */
+/* Motion: starts hidden; JS adds .is-entered with per-card stagger */
+.lum3-disco-card {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    aspect-ratio: 181 / 136;
+    cursor: pointer;
+    display: block;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+    will-change: opacity, transform;
+    transition:
+        transform 480ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        opacity   480ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.14) inset,
+                0 4px 24px rgba(0,0,0,0.28);
+}
+.lum3-disco-card.is-entered {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.lum3-disco-card.is-entered.is-settled {
+    transition: transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.lum3-disco-card.is-entered.is-settled:active {
+    transform: scale(0.93);
+    transition-duration: 80ms;
+}
+
+.lum3-disco-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.lum3-disco-card__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.0) 40%,
+        rgba(0,0,0,0.52) 100%
+    );
+    pointer-events: none;
+}
+
+.lum3-disco-card__label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 14px;
+    font-family: 'Google Sans Text', 'Google Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 22px;
+    color: #fff;
+    letter-spacing: 0.01em;
+}
+
+/* ── Suppress pill + prompt when on discovery card ───────────────────────── */
+.lum3-immersive.is-discovery .lum-action-pill,
+.lum3-immersive.is-discovery .lum3-action-pill {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 200ms ease !important;
+}
+.lum3-immersive.is-discovery .lum3-prompt-label {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 200ms ease !important;
+}
+
+
+.lum3-discovery-card {
+    border-radius: 24px;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* Scrollable inner wrapper */
+.lum3-discovery-scroll {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+        opacity  400ms cubic-bezier(0.16, 1, 0.3, 1),
+        transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lum3-discovery-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.lum3-discovery-scroll::-webkit-scrollbar { display: none; }
+
+/* Dark header band */
+.lum3-discovery-header {
+    position: relative;
+    padding: 24px 16px 16px;
+    background: rgba(0,0,0,0.72);
+}
+
+.lum3-discovery-headline {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 44px;
+    color: #fff;
+    margin: 0;
+    letter-spacing: 0;
+}
+
+/* 2-column grid */
+.lum3-discovery-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 8px 16px 32px;
+    background: #fff;
+}
+
+/* Individual disco card */
+.lum3-disco-card {
+    position: relative;
+    border-radius: 32px;
+    overflow: hidden;
+    aspect-ratio: 181 / 136;
+    cursor: pointer;
+    display: block;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.lum3-disco-card:active { transform: scale(0.93); transition-duration: 90ms; }
+
+.lum3-disco-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.lum3-disco-card__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.24) 100%);
+    pointer-events: none;
+}
+
+.lum3-disco-card__label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    font-family: 'Google Sans Text', 'Google Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    color: #fff;
+    background: linear-gradient(to top, rgba(0,0,0,0.44) 0%, transparent 100%);
+}
+
+/* Suppress pill + prompt when on discovery card */
+.lum3-immersive.is-discovery .lum-action-pill,
+.lum3-immersive.is-discovery .lum3-action-pill {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+.lum3-immersive.is-discovery .lum3-prompt-label {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+
+.lum3-discovery-card {
+    border-radius: 24px;
+    overflow: hidden;
+    background: #0a0a0e;
+}
+
+/* ── Mosaic: 2×2 image grid fills the card ───────────────────────────────── */
+.lum3-discovery-mosaic {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    z-index: 1;
+}
+.lum3-discovery-mosaic__cell {
+    position: relative;
+    overflow: hidden;
+}
+.lum3-discovery-mosaic__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    animation: lum3-mosaic-breathe 14s ease-in-out infinite alternate;
+}
+.lum3-discovery-mosaic__cell:nth-child(1) .lum3-discovery-mosaic__img { animation-delay: 0s;    animation-duration: 16s; transform-origin: 60% 40%; }
+.lum3-discovery-mosaic__cell:nth-child(2) .lum3-discovery-mosaic__img { animation-delay: -4s;   animation-duration: 13s; transform-origin: 40% 60%; }
+.lum3-discovery-mosaic__cell:nth-child(3) .lum3-discovery-mosaic__img { animation-delay: -8s;   animation-duration: 18s; transform-origin: 70% 30%; }
+.lum3-discovery-mosaic__cell:nth-child(4) .lum3-discovery-mosaic__img { animation-delay: -2.5s; animation-duration: 15s; transform-origin: 30% 70%; }
+
+@keyframes lum3-mosaic-breathe {
+    0%   { transform: scale(1.08); }
+    100% { transform: scale(1.18); }
+}
+
+/* ── Atmospheric overlay ─────────────────────────────────────────────────── */
+.lum3-discovery-atmosphere {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    backdrop-filter: blur(1px) brightness(0.52) saturate(1.4);
+    -webkit-backdrop-filter: blur(1px) brightness(0.52) saturate(1.4);
+    background: linear-gradient(
+        155deg,
+        rgba(8, 6, 20, 0.45) 0%,
+        rgba(14, 10, 34, 0.62) 50%,
+        rgba(6, 4, 16, 0.82) 100%
+    );
+}
+.lum3-discovery-atmosphere::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.38) 0%,
+        transparent 30%,
+        transparent 52%,
+        rgba(0,0,0,0.72) 100%
+    );
+}
+
+/* ── Content panel ───────────────────────────────────────────────────────── */
+.lum3-discovery-content {
+    position: absolute;
+    /* Match lum3-card__viewport inset so content clears nav + input areas */
+    inset: 129px 0 129px;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px;
+    text-align: center;
+    gap: 0;
+}
+
+/* Eyebrow */
+.lum3-discovery-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.46);
+}
+.lum3-discovery-eyebrow .material-symbols-outlined {
+    font-size: 14px;
+    color: rgba(255,255,255,0.34);
+}
+
+/* Main headline */
+.lum3-discovery-headline {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.22;
+    letter-spacing: -0.3px;
+    color: rgba(255, 255, 255, 0.96);
+    margin: 0 0 8px;
+    max-width: 250px;
+}
+
+/* Sub */
+.lum3-discovery-sub {
+    font-family: 'Google Sans Text', 'Google Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.48);
+    margin: 0 0 26px;
+    max-width: 210px;
+}
+
+/* ── Suggestion chip rail ────────────────────────────────────────────────── */
+.lum3-discovery-chips {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 8px;
+    margin: 0 -24px;
+    width: calc(100% + 48px);
+    justify-content: center;
+}
+.lum3-discovery-chips::-webkit-scrollbar { display: none; }
+
+.lum3-discovery-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 9px 16px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(20px) saturate(1.6);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    border: 0.5px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08);
+    font-family: 'Google Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.88);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+        transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1),
+        background 160ms ease,
+        opacity 200ms ease;
+    will-change: opacity, transform;
+}
+.lum3-discovery-chip.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.lum3-discovery-chip:hover {
+    background: rgba(255, 255, 255, 0.17);
+    transform: scale(1.03);
+}
+.lum3-discovery-chip:active {
+    background: rgba(255, 255, 255, 0.24);
+    transform: scale(0.96);
+}
+.lum3-discovery-chip .material-symbols-outlined {
+    font-size: 15px;
+    color: rgba(255,255,255,0.55);
+}
+
+/* ── Chip stagger ────────────────────────────────────────────────────────── */
+.lum3-discovery-chip:nth-child(1) { transition-delay: 80ms; }
+.lum3-discovery-chip:nth-child(2) { transition-delay: 140ms; }
+.lum3-discovery-chip:nth-child(3) { transition-delay: 200ms; }
+.lum3-discovery-chip:nth-child(4) { transition-delay: 260ms; }
+.lum3-discovery-chip:nth-child(5) { transition-delay: 320ms; }
+
+/* ── Suppress pill + prompt when on discovery card ───────────────────────── */
+.lum3-immersive.is-discovery .lum-action-pill,
+.lum3-immersive.is-discovery .lum3-action-pill {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+.lum3-immersive.is-discovery .lum3-prompt-label {
+    opacity: 0 !important;
+}

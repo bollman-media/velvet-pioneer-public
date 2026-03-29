@@ -1,0 +1,695 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   OPTION 2 — Time Machine Immersive Gallery
+   Elite Motion Systems Designer + Hyper-Opinionated Design Critic
+
+   Architecture:
+   - Perspective-driven depth stack inspired by macOS Time Machine
+   - Cards stacked in Z-space with scale, opacity, and translateY
+   - Current card: hero scale (1.0), full brightness, z:0
+   - Previous cards: progressively recede — smaller, dimmer, shifted up
+   - Next card: off-screen below, invisible, ready to enter
+   - Crossfade between cards uses choreographed CSS transitions
+   - bg-stage: two panels crossfade the blurry environment
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Cards container: fills phone content, scrollable ─────────────────────── */
+/* This is the INITIAL state (style picker). MUST be flex:1 to fill the phone. */
+#lum-loading-cards-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    z-index: 1;
+}
+#lum-loading-cards-container::-webkit-scrollbar { display: none; }
+
+/* ── Chat overlay ─────────────────────────────────────────────────────────── */
+/* Covers the cards container when a generation is in progress or complete.   */
+.lum-loading-chat-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: none;
+    flex-direction: column;
+    background: #fff;
+}
+.lum-loading-chat-overlay.is-active {
+    display: flex;
+}
+.lum-loading-chat-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+.lum-loading-chat-scroll::-webkit-scrollbar { display: none; }
+.lum-loading-chat-history {
+    display: flex;
+    flex-direction: column;
+    padding: 64px 0 120px; /* Make up for the absolute toolbar height so first message clears */
+    min-height: 100%;
+}
+
+/* Chat toolbar - exactly matches .toolbar from index.html (template page) */
+.lum-loading-chat-overlay .lum-chat-toolbar {
+    position: absolute !important;
+    top: 62px !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 999 !important;
+    display: flex;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0 16px !important;
+    height: 64px !important;
+    background: transparent !important;
+    pointer-events: auto !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+}
+
+/* ── Expand button on chat images ─────────────────────────────────────────── */
+.lum-loading-expand-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.32);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition:
+        transform  120ms cubic-bezier(0.4, 0.0, 0.2, 1),
+        background 120ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    will-change: transform;
+}
+.lum-loading-expand-btn:hover {
+    transform: scale(1.04);
+    background: rgba(0,0,0,0.48);
+}
+.lum-loading-expand-btn:active {
+    transform: scale(0.92);
+    transition:
+        transform  80ms cubic-bezier(0.4, 0.0, 0.2, 1),
+        background 80ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.lum-loading-expand-btn .material-symbols-outlined { font-size: 20px; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   IMMERSIVE OVERLAY — Time Machine Depth Gallery
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ENTER: decelerate (cubic enter) — element arrives with physical weight     */
+.lum-loading-immersive {
+    position: absolute;
+    inset: -1px;           /* -1px kills sub-pixel gap at rounded corners */
+    background: #000;
+    z-index: 100;
+    opacity: 0;
+    transform: scale(0.97);
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: inherit;
+    transition:
+        opacity   480ms cubic-bezier(0.0, 0.0, 0.2, 1),
+        transform 480ms cubic-bezier(0.0, 0.0, 0.2, 1);
+    will-change: opacity, transform;
+}
+.lum-loading-immersive.is-active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+    /* Disable browser-native pan/zoom so our pinch handler fires cleanly */
+    touch-action: none;
+}
+/* EXIT: accelerate (cubic exit) — element leaves quickly, no lingering       */
+.lum-loading-immersive.is-closing {
+    opacity: 0;
+    transform: scale(0.96);
+    pointer-events: none;
+    transition:
+        opacity   220ms cubic-bezier(0.4, 0.0, 1, 1),
+        transform 220ms cubic-bezier(0.4, 0.0, 1, 1);
+}
+
+/* ── Nav bar ──────────────────────────────────────────────────────────────── */
+.lum-loading-immersive-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    pointer-events: none;
+}
+.lum-loading-immersive.is-active .lum-loading-header-elements {
+    pointer-events: auto;
+}
+.lum-loading-btn-back {
+    position: absolute;
+    top: 68px;
+    left: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+        transform  120ms cubic-bezier(0.4, 0.0, 1, 1),
+        background 180ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.lum-loading-btn-back .material-symbols-outlined {
+    font-size: 22px;
+    font-weight: 300;
+}
+.lum-loading-btn-back:active {
+    transform: scale(0.86);
+    transition: transform 80ms cubic-bezier(0.4, 0.0, 1, 1);
+    background: rgba(255, 255, 255, 0.7);
+}
+
+/* ── bg-stage ─────────────────────────────────────────────────────────────── */
+.lum-loading-bg-stage {
+    position: absolute;
+    inset: -1px;           /* match immersive inset to prevent bg bleed */
+    z-index: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    background: #000;
+}
+.lum-loading-bg-stage__layer {
+    position: absolute;
+    inset: -20%;
+    background-size: cover;
+    background-position: 50% 50%;
+    filter: blur(40px) brightness(0.78) saturate(1.35);
+    opacity: 0;
+    animation: lum-loading-bg-drift 24s ease-in-out infinite alternate;
+    will-change: opacity, transform;
+}
+
+@keyframes lum-loading-bg-drift {
+    0%   { transform: scale(1) translate(0%, 0%); }
+    33%  { transform: scale(1.04) translate(-1%, 2%); }
+    66%  { transform: scale(1.08) translate(2%, -1%); }
+    100% { transform: scale(1.02) translate(-2%, -2%); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   TIME MACHINE CARD THEATER
+   — Perspective container with z-stacked depth illusion.
+   — No scroll. JS manages card positions via CSS classes + inline transforms.
+   — perspective: 1200px creates the vanishing-point tunnel.
+   ══════════════════════════════════════════════════════════════════════════════ */
+.lum-loading-card-theater {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    /* Perspective creates the 3D tunnel — cards shrink as they recede */
+    perspective: 1200px;
+    perspective-origin: 50% 50%;  /* centered vanishing point — neutral for bidirectional nav */
+    overflow: hidden;
+    /* No scroll — JS drives all positioning */
+}
+
+/* ── Individual card — absolutely positioned, z-stacked ──────────────────── */
+.lum-loading-card {
+    position: absolute;
+    inset: 0;
+    /* GPU layer promotion for transform compositing */
+    will-change: transform, opacity, filter;
+    /* Default transition for class-driven state changes (settle) */
+    transition:
+        transform 620ms cubic-bezier(0.16, 1, 0.3, 1),    /* spring-out settle */
+        opacity   520ms cubic-bezier(0.0, 0.0, 0.2, 1),    /* smooth fade       */
+        filter    520ms cubic-bezier(0.0, 0.0, 0.2, 1);    /* brightness morph   */
+    /* Default: hidden below viewport (waiting position) */
+    transform: translateY(110%) translateZ(0px) scale(1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ── CARD STATES — Time Machine Depth Positions ──────────────────────────── */
+
+/* DEEP PAST: 2+ cards back — tiny, far away, invisible
+   Prevents DOM overflow while keeping elements ready                         */
+/* Deep past: perspective scale at Z:-600px = 1200/(1200+600) = 0.667.
+   Explicit scale matches projection. Card is invisible but positioned
+   correctly so it animates smoothly when emerging as prev.              */
+.lum-loading-card.is-deep-past {
+    transform: translateY(-28%) translateZ(-600px) scale(0.667);
+    opacity: 0;
+    filter: brightness(0.12);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* PREVIOUS: the card you came from — visible, dimmed, receded
+   Smaller scale + negative Y = floats above & behind the hero.
+   translateZ pushes it into the tunnel. brightness dims it.                  */
+/* Previous: perspective scale at Z:-280px = 1200/(1200+280) ≈ 0.811.
+   Explicit scale(0.81) aligns with projection — no optical mismatch.
+   translateY(-12%) peeks JUST behind the hero — tight stack, not floating.
+   brightness(0.52) keeps it visible as a genuine depth cue.               */
+.lum-loading-card.is-prev {
+    transform: translateY(-12%) translateZ(-280px) scale(0.81);
+    opacity: 0.88;
+    filter: brightness(0.52);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* CURRENT: the hero image — full presence, the star of the show              */
+/* Current: hero. Full scale, full brightness, z:0.
+   Drop shadow creates visual separation from the prev card behind it.
+   IMPORTANT: pointer-events stays none here. Enabled ONLY when immersive
+   is active (below) to prevent invisible cards from blocking clicks
+   on the chat layer underneath when the immersive is closed.              */
+.lum-loading-card.is-current {
+    transform: translateY(0) translateZ(0px) scale(1);
+    opacity: 1;
+    filter: brightness(1) drop-shadow(0 -8px 32px rgba(0,0,0,0.5));
+    pointer-events: none;
+    z-index: 5;
+}
+/* Only enable pointer-events on the current card when immersive is open.
+   Without this, the invisible card (opacity:0) at z-index:100 eats clicks
+   meant for the chat overlay at z-index:6 — CSS spec says descendants with
+   pointer-events:auto pierce through ancestor's pointer-events:none.      */
+.lum-loading-immersive.is-active .lum-loading-card.is-current {
+    pointer-events: auto;
+}
+
+/* NEXT: staged below viewport, ready to enter on swipe up                    */
+.lum-loading-card.is-next {
+    transform: translateY(110%) translateZ(0px) scale(1);
+    opacity: 0;
+    filter: brightness(1);
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* FUTURE: 2+ cards ahead — even further below, invisible                     */
+.lum-loading-card.is-future {
+    transform: translateY(120%) translateZ(0px) scale(1);
+    opacity: 0;
+    filter: brightness(1);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ── Gesture-active: disable CSS transitions during finger tracking ──────── */
+.lum-loading-card.is-dragging {
+    transition: none !important;
+}
+
+/* ── Card viewport + image ────────────────────────────────────────────────── */
+.lum-loading-card__viewport {
+    position: absolute;
+    inset: 120px 0 80px;
+    display: flex;
+    align-items: center;           /* standard — anchor-center has no support */
+    justify-content: center;
+    overflow: hidden;
+}
+/* When a zoom is active, switch viewport to overflow:visible so the zoomed
+   image can bleed outside without being clipped by the card boundary. */
+.lum-loading-immersive._zoom-active .lum-loading-card__viewport,
+.lum-loading-card--zoomed .lum-loading-card__viewport {
+    overflow: visible;
+}
+
+.lum-loading-card__img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 32px;
+    box-shadow:
+        0 24px 80px rgba(0,0,0,0.55),
+        0 8px 24px rgba(0,0,0,0.35);
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    /* Ensure GPU layer is promoted so pinch-zoom is composited */
+    will-change: transform;
+}
+
+/* ── Loading card ─────────────────────────────────────────────────────────── */
+.lum-loading-card.is-loading-card {
+    pointer-events: none;
+}
+.lum-loading-card.is-loading-card .lum-loading-card__viewport {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;  /* Transparent to show the blurred previous image */
+}
+/* When loading card is current, keep the previous card at the front but blur/fade it */
+.lum-loading-card-theater:has(.lum-loading-card.is-loading-card.is-current) .lum-loading-card.is-prev {
+    transform: translateY(0) translateZ(0px) scale(1) !important;
+    opacity: 0.5 !important;
+    filter: blur(16px) brightness(0.6) !important;
+    z-index: 4 !important;
+}
+.lum-loading-card-theater:has(.lum-loading-card.is-loading-card.is-current) .lum-loading-card.is-deep-past {
+    opacity: 0.1 !important;
+}
+/* Ensure the loading card itself doesn't drop a shadow on the blurred background */
+.lum-loading-card.is-loading-card.is-current {
+    filter: none !important;
+}
+.lum-loading-loading-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.lum-loading-loading-label-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.lum-loading-loading-label {
+    display: block;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+    /* Shimmer inside letterforms */
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image: linear-gradient(
+        110deg,
+        rgba(255, 255, 255, 0.3) 0%,
+        rgba(255, 255, 255, 0.3) 40%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(255, 255, 255, 0.3) 60%,
+        rgba(255, 255, 255, 0.3) 100%
+    );
+    background-size: 250% 100%;
+    animation: lum-loading-text-shimmer 2.4s cubic-bezier(0.2, 0.0, 0.2, 1) infinite;
+}
+
+@keyframes lum-loading-text-shimmer {
+    0%   { background-position: 100% center; }
+    100% { background-position: -50% center; }
+}
+
+/* ── Prompt label — glass bubble ────────────── */
+.lum-loading-prompt-label {
+    position: absolute;
+    /* top, left, right, bottom are controlled inline via JS / Spatial Layout Engine */
+    display: flex;
+    justify-content: flex-end; /* Right align the bubble */
+    align-items: flex-start;
+    z-index: 31;
+    pointer-events: none;
+    opacity: 1; /* Inherits fade perfectly from parent card opacity */
+    transition: filter 620ms cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: filter;
+}
+.lum-loading-card.is-deep-past .lum-loading-prompt-label {
+    filter: blur(8px);
+}
+.lum-loading-card.is-prev .lum-loading-prompt-label {
+    filter: blur(4px);
+}
+.lum-loading-card.is-current .lum-loading-prompt-label,
+.lum-loading-card.is-next .lum-loading-prompt-label,
+.lum-loading-card.is-future .lum-loading-prompt-label {
+    filter: none;
+    -webkit-filter: none;
+}
+.lum-loading-card.is-dragging .lum-loading-prompt-label {
+    transition: none !important;
+}
+.lum-loading-prompt-label__text {
+    /* Glass Bubble Material */
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 8px 16px;
+    
+    /* Typography */
+    font-family: 'Google Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    color: #fff;
+    text-align: right;
+    
+    /* Clamping & Layout */
+    max-width: 85%;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    max-height: 94px;
+    
+    /* Subtle polish */
+    text-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+
+/* ── Action pill — enter: decelerate, exit: accelerate ───────────────────── */
+.lum-loading-action-pill {
+    transition:
+        opacity   300ms cubic-bezier(0.0, 0.0, 0.2, 1),
+        transform 300ms cubic-bezier(0.0, 0.0, 0.2, 1);
+    will-change: opacity, transform;
+    transform: translateX(-50%) translateY(0);
+}
+.lum-loading-action-pill.is-hidden {
+    opacity: 0 !important;
+    transform: translateX(-50%) translateY(10px);
+    transition:
+        opacity   180ms cubic-bezier(0.4, 0.0, 1, 1),
+        transform 180ms cubic-bezier(0.4, 0.0, 1, 1);
+}
+
+/* ── Position indicator ───────────────────────────────────────────────────── */
+.lum-loading-position-indicator {
+    display: none !important; /* Removed per user request */
+    position: absolute;
+    top: 72px;
+    right: 20px;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: rgba(255,255,255,0.9);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+        opacity   240ms cubic-bezier(0.0, 0.0, 0.2, 1),
+        transform 240ms cubic-bezier(0.0, 0.0, 0.2, 1);
+    pointer-events: none;
+    z-index: 20;
+}
+.lum-loading-position-indicator.is-visible {
+    opacity: 0; /* Forced to 0 just in case */
+    transform: translateY(0);
+}
+
+
+/* ── Swiper compatibility stubs ────────────────────────────────────────────── */
+.lum-loading-swiper { display: none !important; }
+.lum-loading-slide-wrap { display: none !important; }
+.lum-loading-prev-echo { display: none !important; }
+
+/* ── Suppress template toolbar when overlays take over ─────────────────────── */
+#phone-shell-loading:has(.lum-loading-chat-overlay.is-active) .toolbar,
+#phone-shell-loading:has(.lum-loading-immersive.is-active) .toolbar {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 200ms cubic-bezier(0.4, 0.0, 1, 1);
+}
+
+
+/* ── Loading State Floating Input — send morph ────────────────────────────────── */
+.video-floating-input__morph-container #lum-loading-float-record {
+    position: absolute;
+    inset: 0;
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    transition:
+        opacity   160ms cubic-bezier(0.4, 0.0, 1, 1),
+        transform 200ms cubic-bezier(0.4, 0.0, 1, 1);
+}
+.video-floating-input__input-row.has-text .video-floating-input__morph-container #lum-loading-float-record {
+    opacity: 0;
+    transform: scale(0.5) rotate(-30deg);
+    pointer-events: none;
+}
+.video-floating-input__input-row.has-text .video-floating-input__send-btn {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+    transition:
+        opacity   200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+        transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ── Chat Loading Shimmer (Sovereign Motion Spec) ────────────────────────── */
+.lum-chat-shimmer-label {
+    display: block;
+    align-self: flex-start;
+    margin: 16px 0 12px 16px;
+    
+    font-family: 'Google Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    
+    /* Text loading animation (Darker variation for light chat background) */
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image: linear-gradient(
+        110deg,
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.3) 40%,
+        rgba(0, 0, 0, 0.9) 50%,
+        rgba(0, 0, 0, 0.3) 60%,
+        rgba(0, 0, 0, 0.3) 100%
+    );
+    background-size: 250% 100%;
+    animation: lum-chat-text-shimmer 2.4s cubic-bezier(0.2, 0.0, 0.2, 1) infinite;
+}
+
+@keyframes lum-chat-text-shimmer {
+    0%   { background-position: 100% center; }
+    100% { background-position: -50% center; }
+}
+
+.lum-chat-shimmer-box {
+    position: relative;
+    width: 100%;
+    max-width: 370px;
+    background: #F2F3F5; /* Muted architectural gray for skeleton */
+    border-radius: 40px;
+    align-self: flex-start;
+    margin: 0 0 16px 16px;
+    overflow: hidden;
+    border: none;
+    /* Blend out the edges perfectly into the background for an amorphous feel */
+    box-shadow: inset 0 0 120px 60px white; 
+    filter: blur(32px);
+    /* Default 1:1 — JS overrides via inline style when prompt specifies a ratio */
+    aspect-ratio: 1 / 1;
+    transition: aspect-ratio 400ms cubic-bezier(0.19, 1, 0.22, 1);
+    /* Cinematic smoke entrance (Elite Motion spec) */
+    transform: translateZ(0);
+    will-change: opacity, transform, filter;
+    animation: lum-smoke-enter 1.2s cubic-bezier(0.0, 0.0, 0.2, 1) forwards;
+}
+
+@keyframes lum-smoke-enter {
+    0% {
+        opacity: 0.01;
+        filter: blur(64px);
+        transform: translateY(24px) scale(0.92) translateZ(0);
+    }
+    100% {
+        opacity: 1;
+        filter: blur(32px);
+        transform: translateY(0) scale(1) translateZ(0);
+    }
+}
+
+/* Physical specular wave: translates over the surface (GPU-accelerated) */
+.lum-chat-shimmer-mesh {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.lum-chat-shimmer-mesh::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.0) 0%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0.0) 100%
+    );
+    animation: lum-skeleton-wave 2.1s cubic-bezier(0.2, 0.0, 0.2, 1) infinite;
+}
+
+@keyframes lum-skeleton-wave {
+    0%   { transform: translateX(0%); }
+    100% { transform: translateX(200%); }
+}
+
+@keyframes lum-text-breath {
+    0%   { opacity: 0.8; }
+    100% { opacity: 0.4; }
+}
+
+/* ── Blur-in Generation Image Transition ── */
+img.lum-loading-gen {
+    filter: blur(25px) brightness(1.3);
+    opacity: 0.6;
+    transform: scale(1.08);
+    transition: 
+        filter 1.8s cubic-bezier(0.2, 0.8, 0.2, 1),
+        opacity 1.2s ease,
+        transform 1.8s ease;
+}
+
+img.lum-loading-gen.loaded {
+    filter: blur(0) brightness(1);
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ── Dynamic Blurry AI Movement ── */
+.lum-loading-movement {
+    position: absolute;
+    inset: 0;
+    /* Inherits border-radius directly from JS based on parent element */
+    background: linear-gradient(135deg, rgba(140, 150, 250, 0.6), rgba(80, 200, 220, 0.4), rgba(220, 100, 180, 0.5));
+    background-size: 200% 200%;
+    filter: blur(28px) saturate(1.4);
+    animation: lum-ai-movement 3s ease-in-out infinite alternate;
+    z-index: 10;
+    pointer-events: none;
+    mix-blend-mode: hard-light;
+}
+
+@keyframes lum-ai-movement {
+    0% { background-position: 0% 50%; opacity: 0.8; transform: scale(0.96) rotate(-1deg); }
+    100% { background-position: 100% 50%; opacity: 0.95; transform: scale(1.04) rotate(1deg); }
+}

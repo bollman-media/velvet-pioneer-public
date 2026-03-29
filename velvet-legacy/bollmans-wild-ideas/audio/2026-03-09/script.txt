@@ -1,0 +1,14 @@
+Alex: Welcome back to Bollman's Wild Ideas, it's Monday, March 9th!
+Sarah: And today’s pitches are all about generative AI for Gen Z, focusing on creative collaboration and self-expression.
+Alex: First up, Vibe Weave! This sounds amazing – a multiplayer creative canvas where Gen Z friends collaboratively craft ephemeral music videos and soundscapes together. It’s all about collective process over polished output.
+Sarah: Exactly. It leverages Gemini's multimodal capabilities for seamless real-time blending of media, targeting Gen Z casual creators who value shared identity and low friction in their digital expression.
+Alex: Then we have Aura Labs, where fans don't just follow artists, they *become* part of their mythology! Co-creating lore and even AI personas for emerging artists.
+Sarah: It's a smart contrarian bet, moving from artist-controlled branding to participatory fandom, driving engagement by empowering fans to co-own the narrative.
+Alex: And Audioloop offers ephemeral audio micro-expressions. Imagine posting fleeting, AI-generated audio "loops" of your thoughts and feelings. So raw and authentic!
+Sarah: A direct challenge to visually-perfected content, tapping into Gen Z’s desire for low-pressure, emotionally resonant communication, powered by Gemini’s multimodal input and Lyria.
+Alex: Up next, Beat Battles! This is a total game changer: teams of friends competitively co-composing and remixing songs. Music creation as a team sport!
+Sarah: It gamifies a traditionally solitary activity, transforming it into a highly social, accessible experience with Gemini’s Lyria handling the complex real-time co-creation.
+Alex: Finally, Mood Bloom. This blows my mind – a social ecosystem where your profile isn't just static, it’s a *living*, evolving AI-generated "vibe playlist." Your identity, but sonic and dynamic!
+Sarah: It capitalizes on Gen Z’s demand for fluid, adaptive self-expression, blurring lines between self and generative media through Gemini's full multimodal stack.
+Alex: Phew! What a lineup. For me, it’s got to be Mood Bloom. A dynamic sound identity? Revolutionary!
+Sarah: I’m most intrigued by Aura Labs. Shifting power to fans for artist branding is a truly disruptive idea.

@@ -1,0 +1,17 @@
+Alex: Welcome back to Bollman's Wild Ideas! Sunday, February 22nd, and we’re diving into some wild music reinvention pitches today.
+Sarah: Indeed, Alex. Five concepts leveraging Gemini’s multimodal power to change how Gen Z interacts with music.
+
+Alex: First, SONIC CANVAS! Imagine a spontaneous, multiplayer music video jam session with your friends, disappearing after an hour.
+Sarah: The contrarian bet is Gen Z desires active, ephemeral co-creation around music. Gemini's Veo/Imagen and 2M token context enable these real-time visual remixes.
+
+Alex: Then RIFFREALM, the Micro-Genre Battle Arena! Define "K-Pop Demon Hunter Trap," make a beat, then roast your friends' visual interpretations. Epic!
+Sarah: This taps into Gen Z’s drive for playful, hyper-niche cultural artifacts. Lyria with Imagen/Veo empowers rapid sound and visual generation from abstract prompts.
+
+Alex: ECHODAO is next, Fan-Owned Track Evolution. Become a co-creator, earn a piece of the next breakout track before it hits the mainstream. So cool!
+Sarah: This challenges traditional artist support, moving to incentivized co-creation. Gemini’s 2M token context and Lyria support AI-guided collective composition, bypassing labels.
+
+Alex: And finally, LYRICLENS — Live AR Performance Layer! Turn any song into your personal, ephemeral music video starring you and your friends. Instant stardom!
+Sarah: It shifts music appreciation to active, augmented performance. Gemini Live’s real-time streaming and Imagen/Veo allow instantaneous analysis and dynamic AR overlays.
+
+Alex: Wow, what a lineup. For me, SONIC CANVAS really captures that immediate, social creativity Gen Z craves.
+Sarah: ECHODAO’s potential to democratize the creator economy through fan-owned IP is arguably the most disruptive.

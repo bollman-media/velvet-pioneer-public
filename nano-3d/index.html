@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nano 3D — Virtual Orchestra</title>
+  <meta name="description" content="Hyper-stylized spatial virtual orchestra. Drag instruments to modulate pitch, pan, and energy in 3D space.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23000000%22/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/three@0.146.0/build/three.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #f8f8f8;
+      --glass-bg: rgba(255,255,255,0.5);
+      --glass-border: rgba(0,0,0,0.07);
+      --text-primary: #111;
+      --text-secondary: rgba(0,0,0,0.45);
+      --accent: #ccff00;
+      --accent-text: #6a8500;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      color: var(--text-primary);
+    }
+
+    #canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%; height: 100%;
+      cursor: default;
+    }
+
+    /* ── UI OVERLAY ── */
+    #ui {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      display: grid;
+      grid-template-columns: 300px 1fr 280px;
+      padding: 28px;
+      gap: 20px;
+      z-index: 10;
+    }
+
+    .panel {
+      pointer-events: auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(36px) saturate(1.8);
+      -webkit-backdrop-filter: blur(36px) saturate(1.8);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+
+    #left-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .panel-title {
+      font-size: 22px;
+      font-weight: 400;
+      letter-spacing: -0.04em;
+      color: var(--text-primary);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 14px;
+      padding: 6px 12px;
+      border-radius: 100px;
+      background: rgba(204,255,0,0.14);
+      border: 1px solid rgba(180,230,0,0.35);
+      align-self: flex-start;
+    }
+
+    .pulse-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #aadd00;
+      box-shadow: 0 0 8px #aadd00;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.75); }
+    }
+
+    .status-text {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--accent-text);
+    }
+
+    /* Instruments List */
+    #instruments-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #instruments-panel .panel-label {
+      margin-bottom: 14px;
+    }
+
+    #instruments-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex: 1;
+    }
+
+    .inst-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      background: rgba(0,0,0,0.025);
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-primary);
+      text-align: left;
+      transition: background 0.2s, border-color 0.2s, transform 0.18s;
+    }
+
+    .inst-btn:hover:not(:disabled) {
+      background: rgba(0,0,0,0.055);
+      border-color: rgba(0,0,0,0.1);
+      transform: translateX(3px);
+    }
+
+    .inst-btn:disabled { opacity: 0.5; cursor: default; }
+
+    .inst-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.15);
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .inst-btn:hover:not(:disabled) .inst-dot { background: #000; }
+
+    .inst-spinner {
+      width: 11px; height: 11px;
+      border: 1.5px solid rgba(0,0,0,0.12);
+      border-top-color: #333;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Telemetry */
+    #right-col { display: flex; flex-direction: column; }
+
+    .tele-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: rgba(0,0,0,0.04);
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 14px;
+    }
+
+    .tele-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.65);
+    }
+
+    .tele-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tele-value {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.05em;
+    }
+
+    /* Hint bar */
+    #hint {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      padding: 9px 22px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      pointer-events: none;
+      z-index: 10;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    /* Auth gate */
+    #auth-gate {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      background: var(--bg);
+      z-index: 100;
+    }
+
+    #auth-gate h1 {
+      font-size: 20px;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+    }
+
+    #auth-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    #api-key-input {
+      width: 260px;
+      padding: 11px 16px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 10px;
+      font-family: var(--font);
+      font-size: 13px;
+      background: rgba(0,0,0,0.02);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #api-key-input:focus { border-color: rgba(0,0,0,0.3); }
+
+    #auth-submit {
+      padding: 11px 22px;
+      background: #111;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+
+    #auth-submit:hover { background: #333; }
+
+    /* Instrument name tooltip that floats in 3D space */
+    .inst-label {
+      position: fixed;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.5);
+      pointer-events: none;
+      z-index: 5;
+      transform: translate(-50%, -100%);
+      margin-top: -8px;
+      white-space: nowrap;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pulse-dot, .inst-spinner { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Auth Gate -->
+<div id="auth-gate">
+  <h1>Virtual Orchestra</h1>
+  <form id="auth-form">
+    <input type="password" id="api-key-input" placeholder="Gemini API Key" autocomplete="off" />
+    <button type="submit" id="auth-submit">Unlock</button>
+  </form>
+  <p style="font-size:11px;color:rgba(0,0,0,0.3)">Key is stored locally — never sent to any server other than Google</p>
+</div>
+
+<!-- 3D Canvas -->
+<canvas id="canvas" aria-label="3D Interactive Orchestra Stage" role="img" tabindex="0"></canvas>
+
+<!-- UI Overlay -->
+<div id="ui" aria-hidden="true">
+  <!-- Left column -->
+  <div id="left-col">
+    <div class="panel">
+      <div class="panel-label">Temporal Sequence</div>
+      <div class="panel-title">Orchestrator</div>
+      <div class="status-badge">
+        <div class="pulse-dot"></div>
+        <span class="status-text">SYS ONLINE</span>
+      </div>
+    </div>
+
+    <div class="panel" id="instruments-panel">
+      <div class="panel-label">Organisms Array</div>
+      <div id="instruments-list">
+        <button class="inst-btn" data-instrument="Electric Guitar">
+          <div class="inst-dot"></div>Electric Guitar
+        </button>
+        <button class="inst-btn" data-instrument="Grand Piano">
+          <div class="inst-dot"></div>Grand Piano
+        </button>
+        <button class="inst-btn" data-instrument="Synthesizer">
+          <div class="inst-dot"></div>Synthesizer
+        </button>
+        <button class="inst-btn" data-instrument="Acoustic Cello">
+          <div class="inst-dot"></div>Acoustic Cello
+        </button>
+        <button class="inst-btn" data-instrument="Drum Kit">
+          <div class="inst-dot"></div>Drum Kit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Center (empty) -->
+  <div></div>
+
+  <!-- Right column -->
+  <div id="right-col">
+    <div class="panel">
+      <div class="panel-label">Acoustic Integrity</div>
+      <div class="tele-grid">
+        <div class="tele-row">
+          <span class="tele-label">Pitch</span>
+          <span class="tele-value" id="tel-pitch">—</span>
+        </div>
+        <div class="tele-row">
+          <span class="tele-label">Spatial Pan</span>
+          <span class="tele-value" id="tel-pan">—</span>
+        </div>
+        <div class="tele-row">
+          <span class="tele-label">Instability</span>
+          <span class="tele-value" id="tel-energy">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="hint">Spawn an instrument → drag it across the stage</div>
+
+<script>
+'use strict';
+
+// ───────────────────────────────────────────────────────────────────────────
+// STATE
+// ───────────────────────────────────────────────────────────────────────────
+let apiKey = '';
+let audioCtx = null;
+let scene, camera, renderer, clock;
+let animId = null;
+const instruments = [];
+
+// DOM references
+const authGate  = document.getElementById('auth-gate');
+const canvas    = document.getElementById('canvas');
+const telPitch  = document.getElementById('tel-pitch');
+const telPan    = document.getElementById('tel-pan');
+const telEnergy = document.getElementById('tel-energy');
+
+// ───────────────────────────────────────────────────────────────────────────
+// AUTH
+// ───────────────────────────────────────────────────────────────────────────
+(function checkSavedKey() {
+  const saved = localStorage.getItem('NANO_GEMINI_KEY');
+  if (saved && saved.length > 10) {
+    apiKey = saved;
+    authGate.style.display = 'none';
+    initScene();
+  }
+})();
+
+document.getElementById('auth-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const val = document.getElementById('api-key-input').value.trim();
+  if (val.length > 6) {
+    apiKey = val;
+    localStorage.setItem('NANO_GEMINI_KEY', val);
+    authGate.style.display = 'none';
+    initScene();
+  }
+});
+
+// ───────────────────────────────────────────────────────────────────────────
+// AUDIO — lazy init on first user gesture
+// ───────────────────────────────────────────────────────────────────────────
+function getAudio() {
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e) {
+      console.warn('AudioContext failed:', e);
+      return null;
+    }
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// THREE.JS SCENE
+// ───────────────────────────────────────────────────────────────────────────
+function initScene() {
+  const THREE = window.THREE;
+
+  // ── Renderer ──────────────────────────────────────────────────────────────
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setClearColor(0xf8f8f8, 1);
+
+  // ── Scene ─────────────────────────────────────────────────────────────────
+  scene = new THREE.Scene();
+
+  // ── Camera ────────────────────────────────────────────────────────────────
+  camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 200);
+  camera.position.set(0, 9, 16);
+  camera.lookAt(0, 0, 0);
+
+  // ── Lights ────────────────────────────────────────────────────────────────
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const key = new THREE.PointLight(0xccff00, 14, 40);
+  key.position.set(4, 6, 4);
+  scene.add(key);
+  const fill = new THREE.PointLight(0xff4488, 10, 40);
+  fill.position.set(-4, 6, -4);
+  scene.add(fill);
+
+  // Slight grid guide
+  const grid = new THREE.GridHelper(30, 30, 0xdddddd, 0xeeeeee);
+  grid.position.y = 0;
+  scene.add(grid);
+
+  clock = new THREE.Clock();
+
+  // ── Interaction ───────────────────────────────────────────────────────────
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.5);
+  const dragPoint = new THREE.Vector3();
+  let dragging = null;
+
+  function toNDC(e) {
+    const x = (e.clientX || e.touches?.[0]?.clientX) ?? 0;
+    const y = (e.clientY || e.touches?.[0]?.clientY) ?? 0;
+    mouse.set(
+      (x / innerWidth)  *  2 - 1,
+      (y / innerHeight) * -2 + 1
+    );
+  }
+
+  canvas.addEventListener('pointerdown', function(e) {
+    getAudio(); // wake AudioContext on first touch
+    toNDC(e);
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects(instruments.map(i => i.hitbox));
+    if (hits.length) {
+      dragging = hits[0].object.userData.parent;
+      dragging.energy = Math.min(dragging.energy + 1, 4);
+      canvas.setPointerCapture(e.pointerId);
+      canvas.style.cursor = 'crosshair';
+    }
+  });
+
+  canvas.addEventListener('pointermove', function(e) {
+    toNDC(e);
+    raycaster.setFromCamera(mouse, camera);
+    if (dragging) {
+      raycaster.ray.intersectPlane(dragPlane, dragPoint);
+      dragging.target.set(dragPoint.x, 0.5, dragPoint.z);
+      dragging.energy = Math.min(dragging.energy + 0.08, 4);
+
+      // Telemetry
+      telPitch.textContent  = (1 + dragging.energy * 0.1).toFixed(2) + '×';
+      telPan.textContent    = (dragPoint.x / 5).toFixed(2);
+      telEnergy.textContent = dragging.energy.toFixed(2);
+
+      // Live audio modulation
+      const ac = audioCtx;
+      if (ac && dragging.osc) {
+        const base = dragging.baseFreq;
+        dragging.osc.frequency.setTargetAtTime(base * (1 + dragging.energy * 0.1), ac.currentTime, 0.08);
+      }
+      if (ac && dragging.panner) {
+        dragging.panner.positionX.setTargetAtTime(dragPoint.x * 2, ac.currentTime, 0.08);
+        dragging.panner.positionZ.setTargetAtTime(dragPoint.z * 2, ac.currentTime, 0.08);
+      }
+    } else {
+      const hits = raycaster.intersectObjects(instruments.map(i => i.hitbox));
+      canvas.style.cursor = hits.length ? 'grab' : 'default';
+    }
+  });
+
+  canvas.addEventListener('pointerup', function() {
+    if (dragging) {
+      dragging = null;
+      canvas.style.cursor = 'default';
+      telPitch.textContent = telPan.textContent = telEnergy.textContent = '—';
+    }
+  });
+
+  // ── Resize ────────────────────────────────────────────────────────────────
+  window.addEventListener('resize', function() {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+
+  // ── Render loop ───────────────────────────────────────────────────────────
+  (function loop() {
+    animId = requestAnimationFrame(loop);
+    const dt = Math.min(clock.getDelta(), 0.05);
+    const t  = clock.getElapsedTime();
+    const lf = 1 - Math.pow(0.001, dt);
+
+    // Orbit lights
+    key.position.set(Math.sin(t * 0.6) * 8, 7, Math.cos(t * 0.6) * 8);
+    fill.position.set(Math.sin(t * 0.6 + Math.PI) * 8, 7, Math.cos(t * 0.6 + Math.PI) * 8);
+    key.intensity = 14 + Math.sin(t * 7) * 4;
+
+    instruments.forEach(function(inst, idx) {
+      // Positional lerp
+      inst.group.position.lerp(inst.target, lf * 1.5);
+
+      // Energy decay
+      if (!inst.isDragging) {
+        inst.energy = Math.max(0.2, inst.energy - 0.006);
+        inst.target.y = 0.5 + Math.sin(t * 1.8 + idx) * 0.12;
+      }
+
+      // Scale pulse
+      const sc = 1 + inst.energy * 0.06 + Math.sin(t * 4 + idx) * 0.01 * inst.energy;
+      inst.group.scale.setScalar(sc);
+
+      // Rotation destabilize
+      const spin = Math.max(0, inst.energy - 0.5);
+      inst.group.rotation.y += Math.sin(t * 3 + idx) * 0.04 * spin;
+      inst.group.rotation.z += Math.cos(t * 2.5 + idx) * 0.015 * spin;
+
+      // Particle chaos
+      if (inst.pts) {
+        const pos = inst.pts.geometry.attributes.position;
+        const base = inst.pts.geometry.attributes.basePos;
+        const chaos = Math.max(0, inst.energy - 0.2);
+        for (let i = 0; i < pos.count; i++) {
+          const bx = base.getX(i), by = base.getY(i), bz = base.getZ(i);
+          if (chaos > 0.1) {
+            const g = (Math.random() - 0.5) * chaos * 0.18;
+            pos.setXYZ(i,
+              bx + g,
+              by + g * 0.5 + Math.sin(t * 6 + i) * 0.04 * chaos,
+              bz + g
+            );
+          } else {
+            pos.setXYZ(i,
+              bx + (pos.getX(i) - bx) * 0.8,
+              by + (pos.getY(i) - by) * 0.8,
+              bz + (pos.getZ(i) - bz) * 0.8
+            );
+          }
+        }
+        pos.needsUpdate = true;
+        inst.pts.material.size = 0.018 + inst.energy * 0.012;
+        inst.pts.material.opacity = 0.9 - inst.energy * 0.08;
+      }
+
+      // Float label
+      if (inst.label) {
+        const v = inst.group.position.clone().project(camera);
+        const lx = (v.x *  0.5 + 0.5) * innerWidth;
+        const ly = (v.y * -0.5 + 0.5) * innerHeight;
+        inst.label.style.left = lx + 'px';
+        inst.label.style.top  = (ly - 60) + 'px';
+      }
+    });
+
+    renderer.render(scene, camera);
+  })();
+
+  // ── Spawn buttons ─────────────────────────────────────────────────────────
+  document.querySelectorAll('.inst-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const name = btn.dataset.instrument;
+      btn.disabled = true;
+      const dot = btn.querySelector('.inst-dot');
+      const spinner = document.createElement('div');
+      spinner.className = 'inst-spinner';
+      dot.replaceWith(spinner);
+      spawnInstrument(name, function() {
+        btn.disabled = false;
+        spinner.replaceWith(dot);
+      });
+    });
+  });
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// SPAWN INSTRUMENT
+// ───────────────────────────────────────────────────────────────────────────
+function spawnInstrument(name, onDone) {
+  const THREE = window.THREE;
+
+  // Determine color per instrument for procedural fallback
+  const colorMap = {
+    'Electric Guitar': { hue: 0.22,  particle: 0x99dd00 },
+    'Grand Piano':     { hue: 0.0,   particle: 0x111111 },
+    'Synthesizer':     { hue: 0.6,   particle: 0x0088ff },
+    'Acoustic Cello':  { hue: 0.08,  particle: 0xff8800 },
+    'Drum Kit':        { hue: 0.95,  particle: 0xff0055 },
+  };
+  const cfg = colorMap[name] || { hue: 0.5, particle: 0x888888 };
+
+  // Build the instrument group
+  const group = new THREE.Group();
+  const startY = 14 + Math.random() * 2;
+  const tx = (Math.random() - 0.5) * 8;
+  const tz = (Math.random() - 0.5) * 5;
+  group.position.set(tx, startY, tz);
+
+  // Invisible hitbox for raycasting
+  const hitGeo  = new THREE.BoxGeometry(2, 2.5, 0.6);
+  const hitMat  = new THREE.MeshBasicMaterial({ visible: false });
+  const hitbox  = new THREE.Mesh(hitGeo, hitMat);
+  hitbox.position.y = 1;
+  group.add(hitbox);
+
+  // Procedural particle cloud (always shown, even when no image)
+  const ptCount = 600;
+  const ptPos   = new Float32Array(ptCount * 3);
+  const ptBase  = new Float32Array(ptCount * 3);
+  const ptCol   = new Float32Array(ptCount * 3);
+  const r = new THREE.Color(cfg.particle);
+
+  for (let i = 0; i < ptCount; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi   = Math.acos(2 * Math.random() - 1);
+    const rad   = 0.6 + Math.random() * 0.8;
+    const x = rad * Math.sin(phi) * Math.cos(theta);
+    const y = rad * Math.sin(phi) * Math.sin(theta) + 1;
+    const z = rad * Math.cos(phi) * 0.4;
+    ptPos [i*3]=x; ptPos [i*3+1]=y; ptPos [i*3+2]=z;
+    ptBase[i*3]=x; ptBase[i*3+1]=y; ptBase[i*3+2]=z;
+    const bright = 0.4 + Math.random() * 0.6;
+    ptCol[i*3]=r.r*bright; ptCol[i*3+1]=r.g*bright; ptCol[i*3+2]=r.b*bright;
+  }
+
+  const ptGeo = new THREE.BufferGeometry();
+  ptGeo.setAttribute('position', new THREE.BufferAttribute(ptPos, 3));
+  ptGeo.setAttribute('basePos',  new THREE.BufferAttribute(ptBase, 3));
+  ptGeo.setAttribute('color',    new THREE.BufferAttribute(ptCol, 3));
+
+  const ptMat = new THREE.PointsMaterial({
+    size: 0.022,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.9,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+
+  const pts = new THREE.Points(ptGeo, ptMat);
+  group.add(pts);
+
+  hitbox.userData.parent = null; // will be set after instrument record is built
+
+  scene.add(group);
+
+  // Floating label
+  const label = document.createElement('div');
+  label.className = 'inst-label';
+  label.textContent = name;
+  document.body.appendChild(label);
+
+  // Audio — procedural synth
+  const ac = getAudio();
+  let osc = null, gainNode = null, panner = null;
+  if (ac) {
+    panner = ac.createPanner();
+    panner.panningModel = 'HRTF';
+    panner.positionX.value = tx * 2;
+    panner.positionZ.value = tz * 2;
+
+    const filter = ac.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 3000;
+
+    gainNode = ac.createGain();
+    gainNode.gain.value = 0.08;
+
+    const freqMap = {
+      'Electric Guitar': 220,
+      'Grand Piano':     261,
+      'Synthesizer':     330,
+      'Acoustic Cello':  146,
+      'Drum Kit':        80,
+    };
+    const baseFreq = freqMap[name] || 220;
+
+    osc = ac.createOscillator();
+    osc.type = name.includes('Guitar') ? 'sawtooth'
+             : name.includes('Drum')   ? 'square'
+             : name.includes('Synth')  ? 'square'
+             : 'sine';
+    osc.frequency.value = baseFreq;
+
+    // LFO vibrato
+    const lfo = ac.createOscillator();
+    lfo.frequency.value = name.includes('Drum') ? 0.5 : 5;
+    const lfoGain = ac.createGain();
+    lfoGain.gain.value = name.includes('Drum') ? 8 : 2;
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc.frequency);
+    lfo.start();
+
+    osc.connect(gainNode);
+    gainNode.connect(filter);
+    filter.connect(panner);
+    panner.connect(ac.destination);
+    osc.start();
+
+    // Record
+    const inst = {
+      name, group, pts, hitbox, label,
+      target: new THREE.Vector3(tx, 0.5, tz),
+      energy: 2.0,
+      osc, gainNode, panner,
+      baseFreq,
+      isDragging: false,
+    };
+    hitbox.userData.parent = inst;
+    instruments.push(inst);
+    onDone();
+
+    // Now try to fetch a Gemini image and replace with real particle cloud
+    fetchImageParticles(name, group, pts, ptGeo, cfg.particle);
+    return;
+  }
+
+  // No audio path
+  const inst = {
+    name, group, pts, hitbox, label,
+    target: new THREE.Vector3(tx, 0.5, tz),
+    energy: 2.0,
+    osc: null, gainNode: null, panner: null,
+    baseFreq: 220,
+    isDragging: false,
+  };
+  hitbox.userData.parent = inst;
+  instruments.push(inst);
+  onDone();
+  fetchImageParticles(name, group, pts, ptGeo, cfg.particle);
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// GEMINI IMAGE → PARTICLE CLOUD
+// ───────────────────────────────────────────────────────────────────────────
+async function fetchImageParticles(name, group, pts, ptGeo, fallbackColor) {
+  const THREE = window.THREE;
+  const prompt = `A single ${name}, isolated on a pure white background, stark minimal, high contrast studio photo, no shadows, no text, centered object only. Professional product photography.`;
+
+  let base64 = null;
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { responseModalities: ['IMAGE'] }
+        })
+      }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      base64 = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+    }
+  } catch(e) {
+    console.warn('Image generation skipped:', e.message);
+  }
+
+  if (!base64) return; // keep the procedural cloud
+
+  // Decode image into canvas → extract non-white pixels → update particle positions
+  const img = new Image();
+  img.onload = function() {
+    const cvs = document.createElement('canvas');
+    const size = 512;
+    cvs.width = cvs.height = size;
+    const ctx = cvs.getContext('2d');
+    ctx.drawImage(img, 0, 0, size, size);
+    const px = ctx.getImageData(0, 0, size, size).data;
+
+    const newPos = [];
+    const newCol = [];
+    const step = 8;
+    const W = 2.2, H = 2.2;
+
+    for (let y = 0; y < size; y += step) {
+      for (let x = 0; x < size; x += step) {
+        const i = (y * size + x) * 4;
+        const r = px[i], g = px[i+1], b = px[i+2];
+        if (r + g + b < 680) { // non-white
+          newPos.push(
+            (x / size - 0.5) * W,
+            -(y / size - 0.5) * H + H * 0.5,
+            ((255 - (r+g+b)/3) / 255) * 0.3
+          );
+          newCol.push(r/255, g/255, b/255);
+        }
+      }
+    }
+
+    if (newPos.length < 6) return;
+
+    const posArr = new Float32Array(newPos);
+    const colArr = new Float32Array(newCol);
+    const newGeo = new THREE.BufferGeometry();
+    newGeo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+    newGeo.setAttribute('basePos',  new THREE.BufferAttribute(posArr.slice(), 3));
+    newGeo.setAttribute('color',    new THREE.BufferAttribute(colArr, 3));
+
+    // Swap out particle system
+    group.remove(pts);
+    pts.geometry.dispose();
+    pts.material.dispose();
+
+    const newPts = new THREE.Points(newGeo, new THREE.PointsMaterial({
+      size: 0.016,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.92,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }));
+    group.add(newPts);
+
+    // Point the instrument record to the new pts
+    const inst = instruments.find(i => i.group === group);
+    if (inst) inst.pts = newPts;
+  };
+  img.src = 'data:image/png;base64,' + base64;
+}
+</script>
+</body>
+</html>

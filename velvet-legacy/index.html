@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini MediaGen — 2026 Projects</title>
+    <meta name="description" content="Gemini MediaGen prototype projects — Gemini Editing Studio, Luminous, and Concepts. Designed by Eric Bollman.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23000000%22/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           GEMINI MEDIAGEN INDEX
+           Architectural grid · Joshua Davis generative animation
+           Designed by Eric Bollman
+           ============================================================ */
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #060606;
+            --surface: #0a0a0a;
+            --surface-hover: #0f0f0f;
+            --line: rgba(255, 255, 255, 0.07);
+            --line-hover: rgba(255, 255, 255, 0.14);
+            --text-primary: #e8e8e8;
+            --text-secondary: #666;
+            --text-tertiary: #3a3a3a;
+            --text-muted: #262626;
+            --accent-green: #4ade80;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+            /* Motion tokens */
+            --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+            --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+            --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --dur-fast: 140ms;
+            --dur-ui: 200ms;
+            --dur-medium: 280ms;
+            --dur-panel: 360ms;
+            --dur-screen: 420ms;
+            --dur-slow: 600ms;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font);
+            min-height: 100vh;
+            overflow-y: auto;
+            cursor: default;
+        }
+
+        ::selection {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        /* ---- PAGE WRAPPER ---- */
+        .page-wrap {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        /* ---- HERO SECTION ---- */
+        .hero {
+            padding: clamp(24px, 4vh, 56px) clamp(24px, 4vw, 48px) clamp(16px, 2vh, 32px);
+            border-bottom: 1px solid var(--line);
+            opacity: 0;
+            animation: slideUp 0.9s var(--ease-emphasized) 0.2s forwards;
+            flex-shrink: 0;
+        }
+
+        .hero__title {
+            font-size: clamp(2.5rem, 6vw, 6rem);
+            font-weight: 400; /* Reverted to editorial/Pentagram Swiss style */
+            letter-spacing: -0.04em;
+            line-height: 0.9;
+            color: var(--text-primary);
+        }
+
+        .hero__title span {
+            display: block;
+        }
+
+        .hero__year {
+            font-size: clamp(0.6rem, 1vw, 0.75rem);
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-bottom: 6px;
+        }
+
+        /* Designer credit line — below the title */
+        .hero__designer-line {
+            display: block;
+            font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+            font-weight: 400;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-top: 20px;
+            transition: color var(--dur-ui) var(--ease-standard);
+        }
+
+        .hero__designer-line:hover {
+            color: var(--text-primary);
+        }
+
+        /* ---- PROJECT GRID ---- */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            flex: 1;
+            align-content: start;
+            opacity: 0;
+            animation: fadeIn 0.5s var(--ease-decelerate) 0.5s forwards;
+        }
+
+        /* ---- PROJECT CARD ---- */
+        .project-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            overflow: hidden;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+            transform: scale(1);
+            /* Exit: slow decelerate for graceful settle */
+            transition:
+                background var(--dur-medium) var(--ease-standard),
+                transform 0.5s cubic-bezier(0, 0, 0.2, 1);
+        }
+
+        .project-card:nth-child(3n) {
+            border-right: none;
+        }
+
+        .project-card:nth-child(n+4) {
+            border-bottom: none;
+        }
+
+        .project-card--disabled {
+            cursor: default;
+        }
+
+        /* Hover — active cards only */
+        .project-card:not(.project-card--disabled):hover {
+            background: var(--surface-hover);
+            transform: scale(1.025);
+            z-index: 2;
+            /* Entrance: fast spring with slight overshoot */
+            transition:
+                background var(--dur-medium) var(--ease-standard),
+                transform 0.35s cubic-bezier(0.2, 0, 0, 1.08);
+        }
+
+        .project-card:not(.project-card--disabled):hover .card-symbol__img {
+            transform: scale(1.06);
+            filter: brightness(1.2);
+        }
+
+        .project-card:not(.project-card--disabled):hover .card-symbol__lines {
+            opacity: 0.18;
+            transition: opacity 0.5s cubic-bezier(0.2, 0, 0, 1) 0.1s;
+        }
+
+        .project-card:not(.project-card--disabled):hover .card-info__title {
+            color: #fff;
+        }
+
+        /* Luminous — coral hover tint */
+        #card-luminous:not(.project-card--disabled):hover .card-symbol {
+            animation: colorBloomLuminous 0.7s cubic-bezier(0.2, 0, 0, 1) forwards;
+        }
+
+        @keyframes colorBloomLuminous {
+            0%   { filter: grayscale(1) brightness(0.85); }
+            45%  { filter: grayscale(0) brightness(1.15) saturate(1.4) hue-rotate(-10deg); }
+            70%  { filter: grayscale(0) brightness(1.06) saturate(1.15); }
+            100% { filter: grayscale(0) brightness(1.08) saturate(1.1); }
+        }
+
+        #card-luminous:not(.project-card--disabled):hover .card-info__title {
+            color: #FF7B65;
+        }
+
+        #card-luminous:not(.project-card--disabled):hover .card-info__status {
+            color: #FF9E8A;
+            border-color: rgba(255, 123, 101, 0.3);
+        }
+
+        #card-luminous:not(.project-card--disabled):hover {
+            background: rgba(255, 100, 75, 0.04);
+        }
+
+        .project-card:not(.project-card--disabled):hover .card-info__arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .project-card:not(.project-card--disabled):active .card-symbol__img {
+            transform: scale(1.02);
+            transition-duration: 80ms;
+        }
+
+        /* Staggered entrance */
+        .project-card:nth-child(1) { animation: cardReveal 0.8s var(--ease-emphasized) 0.55s both; }
+        .project-card:nth-child(2) { animation: cardReveal 0.8s var(--ease-emphasized) 0.65s both; }
+        .project-card:nth-child(3) { animation: cardReveal 0.8s var(--ease-emphasized) 0.75s both; }
+        .project-card:nth-child(4) { animation: cardReveal 0.8s var(--ease-emphasized) 0.85s both; }
+        .project-card:nth-child(5) { animation: cardReveal 0.8s var(--ease-emphasized) 0.95s both; }
+        .project-card:nth-child(6) { animation: cardReveal 0.8s var(--ease-emphasized) 1.05s both; }
+
+        /* ---- BOLLMAN'S WILD IDEAS — CARD 05 ---- */
+        /* Standard vertical card layout — same as cards 01–04 */
+        .card-preview { display: none; }
+
+        /* Amber hover treatment */
+        @keyframes colorBloomIdeas {
+            0%   { filter: grayscale(1) brightness(0.85); }
+            45%  { filter: grayscale(0) brightness(1.2) saturate(1.5); }
+            70%  { filter: grayscale(0) brightness(1.08) saturate(1.2); }
+            100% { filter: grayscale(0) brightness(1.1) saturate(1.1); }
+        }
+
+        #card-ideas:not(.project-card--disabled):hover .card-symbol {
+            animation: colorBloomIdeas 0.7s cubic-bezier(0.2,0,0,1) forwards;
+        }
+
+        #card-ideas:not(.project-card--disabled):hover .card-info__title { color: #F59E0B; }
+
+        #card-ideas:not(.project-card--disabled):hover .card-info__status {
+            color: #FDE68A;
+            border-color: rgba(245,158,11,0.3);
+        }
+
+        #card-ideas:not(.project-card--disabled):hover {
+            background: rgba(245,158,11,0.025);
+        }
+
+        .card-info__status--live {
+            color: #F59E0B;
+            border: 1px solid rgba(245,158,11,0.22);
+        }
+
+        /* ---- DESIGN TEMPO — CARD 06 ---- */
+        @keyframes colorBloomTempo {
+            0%   { filter: grayscale(1) brightness(0.85); }
+            45%  { filter: grayscale(0) brightness(1.2) saturate(1.5); }
+            70%  { filter: grayscale(0) brightness(1.08) saturate(1.2); }
+            100% { filter: grayscale(0) brightness(1.1) saturate(1.1); }
+        }
+
+        #card-tempo:not(.project-card--disabled):hover .card-symbol {
+            animation: colorBloomTempo 0.7s cubic-bezier(0.2,0,0,1) forwards;
+        }
+
+        #card-tempo:not(.project-card--disabled):hover .card-info__title { color: #A855F7; }
+
+        #card-tempo:not(.project-card--disabled):hover .card-info__status {
+            color: #D8B4FE;
+            border-color: rgba(168,85,247,0.3);
+        }
+
+        #card-tempo:not(.project-card--disabled):hover {
+            background: rgba(168,85,247,0.025);
+        }
+
+        /* ---- CARD SYMBOL AREA ---- */
+        .card-symbol {
+            position: relative;
+            aspect-ratio: 16/10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(20px, 3vw, 40px);
+            border-bottom: 1px solid var(--line);
+            overflow: hidden;
+            /* Resting state: desaturated, slightly dimmed */
+            filter: grayscale(1) brightness(0.85);
+            transform: scale(1);
+            /* Exit motion: slower decelerate for graceful fade-out */
+            transition:
+                filter 0.8s cubic-bezier(0, 0, 0.2, 1),
+                transform 0.6s cubic-bezier(0, 0, 0.2, 1);
+        }
+
+        /* Color reveal on hover — choreographed entrance */
+        .project-card:not(.project-card--disabled):hover .card-symbol {
+            filter: grayscale(0) brightness(1.08);
+            transform: scale(1.015);
+            /* Entrance motion: emphasized curve with overshoot feel */
+            transition:
+                filter 0.5s cubic-bezier(0.2, 0, 0, 1),
+                transform 0.45s cubic-bezier(0.2, 0, 0, 1.1);
+            /* Saturation bloom — overshoots then settles */
+            animation: colorBloom 0.7s cubic-bezier(0.2, 0, 0, 1) forwards;
+        }
+
+        @keyframes colorBloom {
+            0%   { filter: grayscale(1) brightness(0.85); }
+            45%  { filter: grayscale(0) brightness(1.15) saturate(1.3); }
+            70%  { filter: grayscale(0) brightness(1.05) saturate(1.08); }
+            100% { filter: grayscale(0) brightness(1.08) saturate(1); }
+        }
+
+        /* Canvas glow pulse on hover */
+        .project-card:not(.project-card--disabled):hover .card-symbol__canvas {
+            animation: canvasAwaken 0.6s cubic-bezier(0.2, 0, 0, 1) forwards;
+        }
+
+        @keyframes canvasAwaken {
+            0%   { opacity: 0.7; transform: translate(-50%, -50%) scale(0.97); }
+            50%  { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Generative canvas for active card — 50% size, centered */
+        .card-symbol__canvas {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+
+        .card-symbol__img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: relative;
+            z-index: 2;
+            transition: transform var(--dur-panel) var(--ease-spring),
+                        filter var(--dur-medium) var(--ease-standard);
+            will-change: transform;
+        }
+
+        /* Hide static image on active card — canvas replaces it */
+        .project-card--animated .card-symbol__img {
+            display: none;
+        }
+
+        /* Architectural radiating lines */
+        .card-symbol__lines {
+            position: absolute;
+            inset: 0;
+            opacity: 0.03;
+            transition: opacity 0.7s cubic-bezier(0, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ---- CARD INFO AREA ---- */
+        .card-info {
+            padding: clamp(20px, 3vw, 32px);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .card-info__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-info__number {
+            font-size: 0.55rem;
+            font-weight: 500;
+            letter-spacing: 0.16em;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .card-info__status {
+            font-size: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 1px;
+        }
+
+        .card-info__status--active {
+            color: var(--accent-green);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+
+        .card-info__status--coming {
+            color: var(--text-tertiary);
+            border: 1px solid var(--line);
+        }
+
+        .card-info__title {
+            font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.15;
+            color: var(--text-primary);
+            transition: color var(--dur-ui) var(--ease-standard);
+        }
+
+        .project-card--disabled .card-info__title {
+            color: var(--text-tertiary);
+        }
+
+        .card-info__desc {
+            font-size: clamp(0.6rem, 0.85vw, 0.72rem);
+            font-weight: 400;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+
+        .project-card--disabled .card-info__desc {
+            color: var(--text-muted);
+        }
+
+        .card-info__tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: auto;
+            padding-top: 12px;
+        }
+
+        .card-info__tag {
+            font-size: 0.48rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            padding: 3px 8px;
+            border: 1px solid var(--line);
+            border-radius: 1px;
+        }
+
+        .project-card--disabled .card-info__tag {
+            color: var(--text-muted);
+            border-color: rgba(255,255,255,0.03);
+        }
+
+        /* Arrow indicator */
+        .card-info__arrow {
+            font-size: 1.1rem;
+            font-weight: 200;
+            color: var(--text-secondary);
+            opacity: 0;
+            transform: translateX(-8px);
+            transition: opacity var(--dur-medium) var(--ease-emphasized),
+                        transform var(--dur-panel) var(--ease-spring);
+            align-self: flex-end;
+            margin-top: 8px;
+        }
+
+        /* ---- FOOTER ---- */
+        .page-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px clamp(24px, 4vw, 48px);
+            border-top: 1px solid var(--line);
+            flex-shrink: 0;
+            opacity: 0;
+            animation: fadeIn 0.5s var(--ease-decelerate) 1.2s forwards;
+        }
+
+        .footer-label {
+            font-size: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .footer-label--designer {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* ---- ANIMATIONS ---- */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(28px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes cardReveal {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Page leave */
+        .page-wrap.is-leaving {
+            animation: pageLeave 0.45s var(--ease-emphasized) forwards;
+        }
+
+        @keyframes pageLeave {
+            to {
+                opacity: 0;
+                transform: scale(0.98);
+                filter: blur(3px);
+            }
+        }
+
+        /* Film grain */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.02;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 200px 200px;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-delay: 0ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 960px) {
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+            .project-card {
+                border-right: none;
+                border-bottom: 1px solid var(--line);
+            }
+            .project-card:last-child {
+                border-bottom: none;
+            }
+            .card-symbol {
+                aspect-ratio: 16/10;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .top-bar__meta {
+                gap: 16px;
+            }
+            .card-symbol {
+                aspect-ratio: 4/3;
+                padding: 32px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-wrap" id="page-wrap">
+
+        <!-- Hero -->
+        <section class="hero" id="hero">
+            <h1 class="hero__title">
+                <span class="hero__year">2026</span>
+                <span>Gemini</span>
+                <span>MediaGen</span>
+            </h1>
+            <a href="https://moma.corp.google.com/person/bollman" target="_blank" class="hero__designer-line">Designed by Eric Bollman</a>
+        </section>
+
+        <!-- Project Grid -->
+        <div class="project-grid" id="project-grid">
+
+            <!-- Card 1: Gemini Editing Studio — ANIMATED -->
+            <a href="studio/" class="project-card project-card--animated" id="card-studio">
+                <div class="card-symbol" id="card-symbol-studio">
+                    <canvas class="card-symbol__canvas" id="generative-canvas"></canvas>
+                    <img class="card-symbol__img" src="assets/symbol-studio.png" alt="Gemini Editing Studio" loading="eager">
+                    <svg class="card-symbol__lines" viewBox="0 0 400 400" preserveAspectRatio="none" aria-hidden="true">
+                        <line x1="0" y1="400" x2="400" y2="0" stroke="#FF8200" stroke-width="0.5"/>
+                        <line x1="0" y1="400" x2="300" y2="0" stroke="#FF9E40" stroke-width="0.5"/>
+                        <line x1="0" y1="400" x2="200" y2="0" stroke="#FF56CB" stroke-width="0.5"/>
+                        <line x1="0" y1="400" x2="100" y2="0" stroke="#FF7DD8" stroke-width="0.5"/>
+                        <line x1="0" y1="400" x2="0" y2="0" stroke="#FF8200" stroke-width="0.5"/>
+                        <line x1="0" y1="400" x2="400" y2="100" stroke="#FF56CB" stroke-width="0.5"/>
+                        <line x1="0" y1="400" x2="400" y2="200" stroke="#FFB060" stroke-width="0.5"/>
+                        <line x1="0" y1="400" x2="400" y2="300" stroke="#FF7DD8" stroke-width="0.5"/>
+                        <rect x="240" y="20" width="140" height="100" fill="none" stroke="#FF9E40" stroke-width="0.5"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-info__header">
+                        <span class="card-info__number">01</span>
+                        <span class="card-info__status card-info__status--active">Exploration</span>
+                    </div>
+                    <h2 class="card-info__title">Gemini<br>Editing Studio</h2>
+                    <p class="card-info__desc">AI-powered image, music, and video editing with real-time generative workflows.</p>
+                    <div class="card-info__tags">
+                        <span class="card-info__tag">Image</span>
+                        <span class="card-info__tag">Music</span>
+                        <span class="card-info__tag">Video</span>
+                        <span class="card-info__tag">Gemini</span>
+                    </div>
+                    <span class="card-info__arrow">↗</span>
+                </div>
+            </a>
+
+            <!-- Card 2: Music Album Covers — ACTIVE ANIMATED -->
+            <a href="music-covers/" class="project-card project-card--animated" id="card-music-covers">
+                <div class="card-symbol" id="card-symbol-music-covers">
+                    <canvas class="card-symbol__canvas" id="generative-canvas-music-covers"></canvas>
+                    <img class="card-symbol__img" src="assets/symbol-luminous.png" alt="Music Album Covers" loading="lazy">
+                    <svg class="card-symbol__lines" viewBox="0 0 400 400" preserveAspectRatio="none" aria-hidden="true">
+                        <line x1="200" y1="0" x2="0" y2="200" stroke="#0A84FF" stroke-width="0.5"/>
+                        <line x1="200" y1="0" x2="400" y2="200" stroke="#5856D6" stroke-width="0.5"/>
+                        <line x1="0" y1="200" x2="200" y2="400" stroke="#3B82F6" stroke-width="0.5"/>
+                        <line x1="400" y1="200" x2="200" y2="400" stroke="#7B8CFF" stroke-width="0.5"/>
+                        <circle cx="200" cy="200" r="80" fill="none" stroke="#0A84FF" stroke-width="0.5"/>
+                        <circle cx="200" cy="200" r="40" fill="none" stroke="#5856D6" stroke-width="0.5"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-info__header">
+                        <span class="card-info__number">02</span>
+                        <span class="card-info__status card-info__status--active">Exploration</span>
+                    </div>
+                    <h2 class="card-info__title">Music<br>Album Covers</h2>
+                    <p class="card-info__desc">Generate album art + 30s tracks from a single music prompt using Lyria.</p>
+                    <div class="card-info__tags">
+                        <span class="card-info__tag">Lyria</span>
+                        <span class="card-info__tag">Music</span>
+                        <span class="card-info__tag">Art Gen</span>
+                    </div>
+                    <span class="card-info__arrow">↗</span>
+                </div>
+            </a>
+
+            <!-- Card 3: DJ Lyria — ACTIVE ANIMATED -->
+            <a href="dj-lyria/" class="project-card project-card--animated" id="card-dj-lyria">
+                <div class="card-symbol" id="card-symbol-dj-lyria">
+                    <canvas class="card-symbol__canvas" id="generative-canvas-dj-lyria"></canvas>
+                    <img class="card-symbol__img" src="assets/symbol-concepts.png" alt="DJ Lyria" loading="lazy">
+                    <svg class="card-symbol__lines" viewBox="0 0 400 400" preserveAspectRatio="none" aria-hidden="true">
+                        <line x1="200" y1="0" x2="0" y2="400" stroke="#10B981" stroke-width="0.5"/>
+                        <line x1="200" y1="0" x2="100" y2="400" stroke="#34D399" stroke-width="0.5"/>
+                        <line x1="200" y1="0" x2="200" y2="400" stroke="#059669" stroke-width="0.5"/>
+                        <line x1="200" y1="0" x2="300" y2="400" stroke="#6EE7B7" stroke-width="0.5"/>
+                        <line x1="200" y1="0" x2="400" y2="400" stroke="#10B981" stroke-width="0.5"/>
+                        <rect x="300" y="300" width="80" height="80" fill="none" stroke="#34D399" stroke-width="0.5"/>
+                        <line x1="0" y1="320" x2="280" y2="320" stroke="#059669" stroke-width="0.5"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-info__header">
+                        <span class="card-info__number">03</span>
+                        <span class="card-info__status card-info__status--active">Experiment</span>
+                    </div>
+                    <h2 class="card-info__title">DJ Lyria</h2>
+                    <p class="card-info__desc">AI-powered DJ mixing and live music generation with Lyria real-time synthesis.</p>
+                    <div class="card-info__tags">
+                        <span class="card-info__tag">Lyria</span>
+                        <span class="card-info__tag">DJ</span>
+                        <span class="card-info__tag">Live Mix</span>
+                    </div>
+                    <span class="card-info__arrow">↗</span>
+                </div>
+            </a>
+
+            <!-- Card 4: Luminous — ANIMATED -->
+            <a href="luminous/" class="project-card project-card--animated" id="card-luminous">
+                <div class="card-symbol" id="card-symbol-luminous">
+                    <canvas class="card-symbol__canvas" id="generative-canvas-luminous"></canvas>
+                    <img class="card-symbol__img" src="assets/symbol-luminous.png" alt="Luminous" loading="lazy">
+                    <svg class="card-symbol__lines" viewBox="0 0 400 400" preserveAspectRatio="none" aria-hidden="true">
+                        <line x1="400" y1="400" x2="0" y2="0" stroke="#FF6B50" stroke-width="0.5"/>
+                        <line x1="400" y1="400" x2="100" y2="0" stroke="#FF8870" stroke-width="0.5"/>
+                        <line x1="400" y1="400" x2="200" y2="0" stroke="#FF7B65" stroke-width="0.5"/>
+                        <line x1="400" y1="400" x2="300" y2="0" stroke="#E05A42" stroke-width="0.5"/>
+                        <line x1="400" y1="400" x2="0" y2="100" stroke="#FF6B50" stroke-width="0.5"/>
+                        <line x1="400" y1="400" x2="0" y2="200" stroke="#FF9E8A" stroke-width="0.5"/>
+                        <line x1="400" y1="400" x2="0" y2="300" stroke="#FF7B65" stroke-width="0.5"/>
+                        <rect x="20" y="20" width="100" height="80" fill="none" stroke="#FF6B50" stroke-width="0.5"/>
+                        <rect x="30" y="30" width="60" height="40" fill="none" stroke="#E05A42" stroke-width="0.5"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-info__header">
+                        <span class="card-info__number">04</span>
+                        <span class="card-info__status card-info__status--coming">Coming Soon</span>
+                    </div>
+                    <h2 class="card-info__title">Luminous</h2>
+                    <p class="card-info__desc">Next-generation style transfer and lighting engine with cinematic rendering.</p>
+                    <div class="card-info__tags">
+                        <span class="card-info__tag">Style Transfer</span>
+                        <span class="card-info__tag">Lighting</span>
+                        <span class="card-info__tag">Rendering</span>
+                    </div>
+                    <span class="card-info__arrow">↗</span>
+                </div>
+            </a>
+
+            <!-- Card 5: Bollman's Wild Ideas — ANIMATED WIDE STRIP -->
+            <a href="bollmans-wild-ideas/" class="project-card project-card--animated" id="card-ideas">
+                <div class="card-symbol" id="card-symbol-ideas">
+                    <canvas class="card-symbol__canvas" id="generative-canvas-ideas"></canvas>
+                    <svg class="card-symbol__lines" viewBox="0 0 400 400" preserveAspectRatio="none" aria-hidden="true">
+                        <!-- Radial burst from center — idea/insight motif -->
+                        <line x1="200" y1="200" x2="0"   y2="0"   stroke="#F59E0B" stroke-width="0.5"/>
+                        <line x1="200" y1="200" x2="400" y2="0"   stroke="#FBBF24" stroke-width="0.5"/>
+                        <line x1="200" y1="200" x2="400" y2="400" stroke="#D97706" stroke-width="0.5"/>
+                        <line x1="200" y1="200" x2="0"   y2="400" stroke="#F59E0B" stroke-width="0.5"/>
+                        <line x1="200" y1="200" x2="200" y2="0"   stroke="#FDE68A" stroke-width="0.5"/>
+                        <line x1="200" y1="200" x2="400" y2="200" stroke="#F59E0B" stroke-width="0.5"/>
+                        <line x1="200" y1="200" x2="200" y2="400" stroke="#FBBF24" stroke-width="0.5"/>
+                        <line x1="200" y1="200" x2="0"   y2="200" stroke="#D97706" stroke-width="0.5"/>
+                        <circle cx="200" cy="200" r="55"  fill="none" stroke="#F59E0B" stroke-width="0.5"/>
+                        <circle cx="200" cy="200" r="110" fill="none" stroke="#FBBF24" stroke-width="0.5"/>
+                        <circle cx="200" cy="200" r="165" fill="none" stroke="#D97706" stroke-width="0.5"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-info__header">
+                        <span class="card-info__number">05</span>
+                        <span class="card-info__status card-info__status--live">Live Daily</span>
+                    </div>
+                    <h2 class="card-info__title">Bollman's<br>Wild Ideas</h2>
+                    <p class="card-info__desc">Five bold product pitches, generated every morning from live trends + Gemini.</p>
+                    <div class="card-info__tags">
+                        <span class="card-info__tag">AI Agent</span>
+                        <span class="card-info__tag">Daily</span>
+                        <span class="card-info__tag">Product Design</span>
+                    </div>
+                    <span class="card-info__arrow">↗</span>
+                </div>
+                <div class="card-preview">
+                    <div class="card-preview__eyebrow">Today's Lead Pitch</div>
+                    <div class="card-preview__title" id="ideas-preview-title">Loading…</div>
+                    <div class="card-preview__date"  id="ideas-preview-date">—</div>
+                </div>
+            </a>
+
+            <!-- Card 6: Design Tempo — ANIMATED -->
+            <a href="http://localhost:3000/design-tempo/" class="project-card project-card--animated" id="card-tempo">
+                <div class="card-symbol" id="card-symbol-tempo">
+                    <canvas class="card-symbol__canvas" id="generative-canvas-tempo"></canvas>
+                    <svg class="card-symbol__lines" viewBox="0 0 400 400" preserveAspectRatio="none" aria-hidden="true">
+                        <line x1="200" y1="0" x2="200" y2="400" stroke="#A855F7" stroke-width="0.5"/>
+                        <line x1="0" y1="200" x2="400" y2="200" stroke="#C084FC" stroke-width="0.5"/>
+                        <circle cx="200" cy="200" r="80" fill="none" stroke="#D8B4FE" stroke-width="0.5"/>
+                        <rect x="120" y="120" width="160" height="160" fill="none" stroke="#A855F7" stroke-width="0.5"/>
+                        <circle cx="200" cy="200" r="40" fill="none" stroke="#9333EA" stroke-width="0.5"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-info__header">
+                        <span class="card-info__number">06</span>
+                        <span class="card-info__status card-info__status--active" style="color:#D8B4FE;border-color:rgba(168,85,247,0.3);">Live</span>
+                    </div>
+                    <h2 class="card-info__title">Design<br>Tempo</h2>
+                    <p class="card-info__desc">Data-driven command center for real-time prototyping activity.</p>
+                    <div class="card-info__tags">
+                        <span class="card-info__tag">Analytics</span>
+                        <span class="card-info__tag">Figma API</span>
+                        <span class="card-info__tag">Dashboard</span>
+                    </div>
+                    <span class="card-info__arrow">↗</span>
+                </div>
+            </a>
+
+            <!-- Card 7: Lyria Spatial Instruments — ANIMATED -->
+            <a href="/lyria-spatial-instruments/" class="project-card project-card--animated" id="card-nano">
+                <div class="card-symbol" id="card-symbol-nano" style="filter: grayscale(1) brightness(0.85); transition: filter 0.8s, transform 0.6s;">
+                    <svg class="card-symbol__lines" viewBox="0 0 400 400" preserveAspectRatio="none" aria-hidden="true" style="opacity: 0.1;">
+                        <circle cx="200" cy="200" r="100" fill="none" stroke="#00ffa8" stroke-width="0.5"/>
+                        <circle cx="200" cy="200" r="140" fill="none" stroke="#00ccff" stroke-width="0.5"/>
+                        <line x1="200" y1="0" x2="200" y2="400" stroke="#00ffa8" stroke-width="0.5"/>
+                        <line x1="0" y1="200" x2="400" y2="200" stroke="#00ccff" stroke-width="0.5"/>
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <div class="card-info__header">
+                        <span class="card-info__number">07</span>
+                        <span class="card-info__status card-info__status--active" style="color:#00ffa8;border-color:rgba(0,255,168,0.3);">Live Prototype</span>
+                    </div>
+                    <h2 class="card-info__title" style="transition: color 0.2s;">Lyria Spatial Instruments</h2>
+                    <p class="card-info__desc">Gemini Pro & Nano Banana Engine 3D generation module.</p>
+                    <div class="card-info__tags">
+                        <span class="card-info__tag">Gen-3D</span>
+                        <span class="card-info__tag">WebGL</span>
+                        <span class="card-info__tag">Alpha Masking</span>
+                    </div>
+                    <span class="card-info__arrow">↗</span>
+                </div>
+                
+                <style>
+                    #card-nano:hover .card-symbol {
+                        filter: grayscale(0) brightness(1.2) !important;
+                    }
+                    #card-nano:hover .card-info__title {
+                        color: #00ffa8 !important;
+                    }
+                    #card-nano:hover {
+                        background: rgba(0, 255, 168, 0.05) !important;
+                    }
+                </style>
+            </a>
+
+        </div><!-- end project-grid -->
+
+        <!-- Footer -->
+        <footer class="page-footer" id="page-footer">
+            <span class="footer-label"><em style="font-style:normal;color:var(--text-tertiary)">Gemini</em> MediaGen Prototypes</span>
+            <a href="https://moma.corp.google.com/person/bollman" target="_blank" class="footer-label footer-label--designer" style="text-decoration:none;">Designed by Eric Bollman</a>
+            <span class="footer-label">2026</span>
+        </footer>
+
+    </div>
+
+    <script>
+        // ============================================================
+        // JOSHUA DAVIS–INSPIRED GENERATIVE ANIMATION SYSTEM
+        // Shared engine with per-canvas speed/opacity configuration
+        // Active = full speed. Disabled = slow, muted, dormant.
+        // ============================================================
+
+        (function() {
+            const TWO_PI = Math.PI * 2;
+
+            // Canvas configurations: [canvasId, speedMultiplier, opacityMultiplier, shapeCount, seed]
+            const configs = [
+                { id: 'generative-canvas',               speed: 1.0,  opacity: 1.0,  shapes: 18, seed: 42,  palette: ['#FF8200','#FF9E40','#FF56CB','#FF7DD8','#FFB060'] },
+                { id: 'generative-canvas-music-covers',   speed: 0.8,  opacity: 0.9,  shapes: 16, seed: 99,  palette: ['#0A84FF','#3B82F6','#5856D6','#7B8CFF','#60A5FA'] },
+                { id: 'generative-canvas-dj-lyria',       speed: 0.7,  opacity: 0.85, shapes: 14, seed: 271, palette: ['#10B981','#34D399','#059669','#6EE7B7','#A7F3D0'] },
+                { id: 'generative-canvas-luminous',       speed: 0.25, opacity: 0.35, shapes: 14, seed: 137, palette: ['#FF6B50','#FF8870','#FF7B65','#E05A42','#FF9E8A'] },
+                { id: 'generative-canvas-ideas',          speed: 0.55, opacity: 0.55, shapes: 12, seed: 512, palette: ['#F59E0B','#FBBF24','#D97706','#FDE68A','#B45309'] },
+                { id: 'generative-canvas-tempo',          speed: 0.45, opacity: 0.65, shapes: 12, seed: 888, palette: ['#A855F7','#C084FC','#D8B4FE','#E9D5FF','#9333EA'] },
+            ];
+
+            // Seeded pseudo-random for deterministic shape generation per card
+            function seededRandom(seed) {
+                let s = seed;
+                return function() {
+                    s = (s * 16807 + 0) % 2147483647;
+                    return (s - 1) / 2147483646;
+                };
+            }
+
+            // Shared drawing functions
+            function drawPolygon(ctx, x, y, r, sides, rot) {
+                ctx.beginPath();
+                for (let i = 0; i <= sides; i++) {
+                    const angle = (i / sides) * TWO_PI + rot;
+                    const px = x + Math.cos(angle) * r;
+                    const py = y + Math.sin(angle) * r;
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+            }
+
+            function drawRing(ctx, x, y, rOuter, rInner) {
+                ctx.beginPath();
+                ctx.arc(x, y, rOuter, 0, TWO_PI);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(x, y, rInner, 0, TWO_PI);
+                ctx.stroke();
+            }
+
+            function drawBurst(ctx, x, y, r, rays, rot) {
+                for (let i = 0; i < rays; i++) {
+                    const angle = (i / rays) * TWO_PI + rot;
+                    const innerR = r * 0.15;
+                    ctx.beginPath();
+                    ctx.moveTo(x + Math.cos(angle) * innerR, y + Math.sin(angle) * innerR);
+                    ctx.lineTo(x + Math.cos(angle) * r, y + Math.sin(angle) * r);
+                    ctx.stroke();
+                }
+            }
+
+            function drawDotMatrix(ctx, x, y, r, rot, t, opacityMul) {
+                const gridSize = Math.floor(r / 6);
+                if (gridSize < 2) return;
+                const step = (r * 2) / gridSize;
+                for (let gx = 0; gx < gridSize; gx++) {
+                    for (let gy = 0; gy < gridSize; gy++) {
+                        const px = x - r + gx * step + step / 2;
+                        const py = y - r + gy * step + step / 2;
+                        const dist = Math.sqrt((px - x) ** 2 + (py - y) ** 2);
+                        if (dist > r) continue;
+                        const wave = Math.sin(dist * 0.04 - t * 0.02 + rot) * 0.5 + 0.5;
+                        if (wave > 0.45) {
+                            const dotSize = 1 + wave * 2;
+                            ctx.globalAlpha = wave * 0.3 * opacityMul;
+                            ctx.fillRect(px - dotSize/2, py - dotSize/2, dotSize, dotSize);
+                        }
+                    }
+                }
+            }
+
+            // Create an animation instance for each canvas
+            const instances = [];
+
+            configs.forEach(cfg => {
+                const canvas = document.getElementById(cfg.id);
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const rng = seededRandom(cfg.seed);
+
+                const inst = {
+                    canvas, ctx, cfg,
+                    w: 0, h: 0, cx: 0, cy: 0,
+                    frame: 0,
+                    shapes: [],
+                };
+
+                // Resize
+                inst.resize = function() {
+                    const rect = canvas.parentElement.getBoundingClientRect();
+                    const dpr = window.devicePixelRatio || 1;
+                    canvas.width = rect.width * dpr;
+                    canvas.height = rect.height * dpr;
+                    canvas.style.width = rect.width + 'px';
+                    canvas.style.height = rect.height + 'px';
+                    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                    inst.w = rect.width;
+                    inst.h = rect.height;
+                    inst.cx = rect.width / 2;
+                    inst.cy = rect.height / 2;
+                };
+
+                // Init shapes with seeded random for unique-per-card geometry
+                inst.initShapes = function() {
+                    const r = seededRandom(cfg.seed);
+                    inst.shapes = [];
+                    for (let i = 0; i < cfg.shapes; i++) {
+                        inst.shapes.push({
+                            type: r() < 0.35 ? 'polygon' : (r() < 0.5 ? 'ring' : 'burst'),
+                            radius: 30 + r() * (Math.min(inst.w, inst.h) * 0.32),
+                            sides: Math.floor(3 + r() * 6),
+                            rotSpeed: (r() - 0.5) * 0.008 * cfg.speed,
+                            rotOffset: r() * TWO_PI,
+                            orbitRadius: r() * Math.min(inst.w, inst.h) * 0.18,
+                            orbitSpeed: (r() - 0.5) * 0.003 * cfg.speed,
+                            orbitOffset: r() * TWO_PI,
+                            scalePhase: r() * TWO_PI,
+                            scaleSpeed: (0.003 + r() * 0.006) * cfg.speed,
+                            scaleRange: 0.3 + r() * 0.7,
+                            lineWidth: 0.5 + r() * 1.5,
+                            alpha: (0.06 + r() * 0.18) * cfg.opacity,
+                            filled: r() < 0.2,
+                            rays: Math.floor(6 + r() * 14),
+                        });
+                    }
+                };
+
+                inst.resize();
+                inst.initShapes();
+                instances.push(inst);
+            });
+
+            // Single shared animation loop for all canvases
+            function drawAll() {
+                for (const inst of instances) {
+                    const { ctx, cfg, shapes } = inst;
+                    const w = inst.w, h = inst.h, cx = inst.cx, cy = inst.cy;
+                    inst.frame++;
+                    const t = inst.frame;
+
+                    ctx.clearRect(0, 0, w, h);
+
+                    // Parse primary color for glow
+                    const _p = cfg.palette;
+                    const _hexToRgb = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+                    const _glowRgb = _hexToRgb(_p[0]);
+                    const glowPulse = Math.sin(t * 0.005 * cfg.speed) * 0.5 + 0.5;
+                    const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.5);
+                    gradient.addColorStop(0, `rgba(${_glowRgb[0]},${_glowRgb[1]},${_glowRgb[2]},${(0.015 + glowPulse * 0.01) * cfg.opacity})`);
+                    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, w, h);
+
+                    ctx.strokeStyle = _p[0];
+                    ctx.fillStyle = _p[0];
+
+                    // Draw shapes
+                    for (let i = 0; i < shapes.length; i++) {
+                        const s = shapes[i];
+                        const rot = s.rotOffset + t * s.rotSpeed;
+                        const ox = Math.cos(s.orbitOffset + t * s.orbitSpeed) * s.orbitRadius;
+                        const oy = Math.sin(s.orbitOffset + t * s.orbitSpeed) * s.orbitRadius;
+                        const scl = 0.5 + Math.sin(s.scalePhase + t * s.scaleSpeed) * s.scaleRange * 0.5;
+                        const r = s.radius * scl;
+                        const x = cx + ox;
+                        const y = cy + oy;
+
+                        ctx.globalAlpha = s.alpha;
+                        ctx.lineWidth = s.lineWidth;
+                        ctx.strokeStyle = _p[i % _p.length];
+                        ctx.fillStyle = _p[i % _p.length];
+
+                        if (s.type === 'polygon') {
+                            drawPolygon(ctx, x, y, r, s.sides, rot);
+                            if (s.filled) {
+                                ctx.globalAlpha = s.alpha * 0.15;
+                                ctx.fill();
+                                ctx.globalAlpha = s.alpha;
+                            }
+                            ctx.stroke();
+                            // Nested inner polygon
+                            ctx.globalAlpha = s.alpha * 0.5;
+                            ctx.lineWidth = s.lineWidth * 0.5;
+                            drawPolygon(ctx, x, y, r * 0.5, s.sides, -rot * 1.5);
+                            ctx.stroke();
+
+                        } else if (s.type === 'ring') {
+                            drawRing(ctx, x, y, r, r * 0.7);
+                            ctx.globalAlpha = s.alpha * 0.4;
+                            ctx.beginPath();
+                            ctx.arc(x, y, r * 0.4, 0, TWO_PI);
+                            ctx.stroke();
+
+                        } else if (s.type === 'burst') {
+                            drawBurst(ctx, x, y, r, s.rays, rot);
+                        }
+                    }
+
+                    // Dot matrix
+                    ctx.fillStyle = _p[2];
+                    const dmRadius = Math.min(w, h) * 0.28;
+                    const dmRot = t * 0.004 * cfg.speed;
+                    drawDotMatrix(ctx, cx, cy, dmRadius, dmRot, t * cfg.speed, cfg.opacity);
+
+                    // Cross-hairs
+                    ctx.globalAlpha = 0.06 * cfg.opacity;
+                    ctx.lineWidth = 0.5;
+                    ctx.strokeStyle = _p[1];
+                    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, h); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(w, cy); ctx.stroke();
+
+                    // Corner marks
+                    const ml = 20;
+                    ctx.globalAlpha = 0.08 * cfg.opacity;
+                    ctx.beginPath(); ctx.moveTo(16, 16); ctx.lineTo(16+ml, 16); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(16, 16); ctx.lineTo(16, 16+ml); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(w-16, 16); ctx.lineTo(w-16-ml, 16); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(w-16, 16); ctx.lineTo(w-16, 16+ml); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(16, h-16); ctx.lineTo(16+ml, h-16); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(16, h-16); ctx.lineTo(16, h-16-ml); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(w-16, h-16); ctx.lineTo(w-16-ml, h-16); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(w-16, h-16); ctx.lineTo(w-16, h-16-ml); ctx.stroke();
+
+                    ctx.globalAlpha = 1;
+                }
+
+                requestAnimationFrame(drawAll);
+            }
+
+            drawAll();
+
+            // Handle resize
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    instances.forEach(inst => {
+                        inst.resize();
+                        inst.initShapes();
+                    });
+                }, 100);
+            });
+        })();
+
+        // ============================================================
+        // BOLLMAN'S WILD IDEAS — Live preview on card 05
+        // ============================================================
+        (function() {
+            fetch('bollmans-wild-ideas/data.json?t=' + Date.now())
+                .then(r => r.ok ? r.json() : null)
+                .catch(() => null)
+                .then(data => {
+                    if (!data || !data.entries || !data.entries.length) return;
+                    const latest = data.entries[0];
+                    const titleEl = document.getElementById('ideas-preview-title');
+                    const dateEl  = document.getElementById('ideas-preview-date');
+                    if (titleEl && latest.pitches && latest.pitches[0]) {
+                        titleEl.textContent = latest.pitches[0].title;
+                    }
+                    if (dateEl && latest.date) {
+                        const d = new Date(latest.date + 'T12:00:00');
+                        dateEl.textContent = d.toLocaleString('en-US',
+                            { month: 'long', day: 'numeric', year: 'numeric' }
+                        ) + '  ·  Run #' + latest.run;
+                    }
+                });
+        })();
+
+        // ============================================================
+        // PAGE TRANSITIONS
+        // ============================================================
+
+        const studioCard = document.getElementById('card-studio');
+        if (studioCard) {
+            studioCard.addEventListener('click', (e) => {
+                e.preventDefault();
+                const wrap = document.getElementById('page-wrap');
+                wrap.classList.add('is-leaving');
+                setTimeout(() => {
+                    window.location.href = 'studio/';
+                }, 400);
+            });
+        }
+    </script>
+</body>
+
+</html>

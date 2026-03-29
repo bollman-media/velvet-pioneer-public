@@ -1,0 +1,2479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gemini Studio</title>
+    <meta name="description" content="Create and edit images, music, and videos with Gemini Studio.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.cdnfonts.com/css/google-sans" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:wght@400;500;700&family=Outfit:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css?v=203">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <script>
+        // ── bfcache guard ──────────────────────────────────────────────────────
+        // When Luminous embeds this page in an iframe it mutates the DOM.
+        // If the browser restores THIS top-level page from its back-forward cache
+        // it would show those mutations. Force a fresh reload whenever the page
+        // is bfcache-restored at the top level (not inside an iframe).
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted && window.self === window.top) {
+                // bfcache restore at top-level: reload to clear any iframe mutations
+                window.location.reload(true);
+            } else if (e.persisted && window.self !== window.top) {
+                // bfcache restore inside an iframe (e.g. Luminous):
+                // Re-apply hash-based tab switching since DOMContentLoaded won't re-run
+                var hashTab = window.location.hash.replace('#', '');
+                if (['image', 'music', 'video', 'design'].includes(hashTab)) {
+                    var tabEl = document.getElementById('nav-tab-' + hashTab);
+                    if (tabEl) tabEl.click();
+                }
+            }
+        });
+    </script>
+
+</head>
+
+<body>
+    <!-- Prototype Navigation (outside the app shells, on the grey canvas) -->
+    <div class="prototype-container" id="prototype-container">
+        <div class="prototype-nav" id="prototype-nav">
+            <a href="../" class="prototype-nav__back" id="btn-back-projects" title="Back to projects">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Projects
+            </a>
+            <span class="prototype-nav__title">Gemini Editing Studio</span>
+            <div class="prototype-nav__tab-wrapper" id="nav-tab-image-wrapper">
+                <button class="prototype-nav__tab prototype-nav__tab--active" id="nav-tab-image" data-tab="image">
+                    <span class="material-symbols-outlined">image</span>
+                    <span id="image-tab-label">Image Editing</span>
+                    <span class="material-symbols-outlined nav-tab-dropdown-arrow" id="image-dropdown-arrow">arrow_drop_down</span>
+                </button>
+                <div class="nav-tab-dropdown" id="image-platform-dropdown" hidden>
+                    <button class="nav-tab-dropdown__item nav-tab-dropdown__item--active" id="platform-mobile" data-platform="mobile">
+                        <span class="material-symbols-outlined">smartphone</span>
+                        Mobile
+                        <span class="material-symbols-outlined nav-tab-dropdown__check">check</span>
+                    </button>
+                    <button class="nav-tab-dropdown__item" id="platform-web" data-platform="web">
+                        <span class="material-symbols-outlined">desktop_windows</span>
+                        Web
+                        <span class="material-symbols-outlined nav-tab-dropdown__check">check</span>
+                    </button>
+                </div>
+                </div>
+            <button class="prototype-nav__tab" id="nav-tab-music" data-tab="music">
+                <span class="material-symbols-outlined">music_note</span>
+                Music Editing
+            </button>
+            <button class="prototype-nav__tab" id="nav-tab-video" data-tab="video">
+                <span class="material-symbols-outlined">videocam</span>
+                Video Editing
+            </button>
+            <button class="prototype-nav__tab" id="nav-tab-design" data-tab="design">
+                <span class="material-symbols-outlined">design_services</span>
+                Design System
+            </button>
+        </div>
+
+        <!-- IMAGE EDITING PROTOTYPE -->
+        <div class="app-shell" id="app-shell">
+            <!-- Status Bar -->
+            <header class="status-bar" id="status-bar">
+                <div class="status-bar__time">9:30</div>
+                <div class="status-bar__icons">
+                    <svg class="status-bar__cellular" width="17" height="13" viewBox="0 0 17 13" fill="none">
+                        <rect x="0" y="6" width="3" height="7" rx="1.5" fill="#1F1F1F" />
+                        <rect x="5" y="4" width="3" height="9" rx="1.5" fill="#1F1F1F" />
+                        <rect x="10" y="2" width="3" height="11" rx="1.5" fill="#1F1F1F" />
+                        <rect x="15" y="0" width="3" height="13" rx="1.5" fill="#1F1F1F" />
+                    </svg>
+                    <svg class="status-bar__wifi" width="19" height="13" viewBox="0 0 19 13" fill="none">
+                        <path d="M9.5 13a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="#1F1F1F" />
+                        <path d="M5.5 8.5c1.1-1.1 2.5-1.7 4-1.7s2.9.6 4 1.7" stroke="#1F1F1F" stroke-width="1.5"
+                            stroke-linecap="round" fill="none" />
+                        <path d="M2.5 5.5c1.9-1.9 4.3-2.9 7-2.9s5.1 1 7 2.9" stroke="#1F1F1F" stroke-width="1.5"
+                            stroke-linecap="round" fill="none" />
+                    </svg>
+                    <svg class="status-bar__battery" width="27" height="13" viewBox="0 0 27 13" fill="none">
+                        <rect x="0" y="0" width="24" height="13" rx="3" fill="#1F1F1F" />
+                        <rect x="25" y="3.5" width="2" height="6" rx="1" fill="#1F1F1F" opacity="0.4" />
+                    </svg>
+                </div>
+            </header>
+
+            <!-- App Bar -->
+            <nav class="app-bar" id="app-bar">
+                <button class="app-bar__icon-btn" id="menu-btn" aria-label="Chat history">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="app-bar__title">
+                    <span class="app-bar__logo-text">Gemini</span>
+                </div>
+                <button class="app-bar__avatar" id="avatar-btn" aria-label="User profile">
+                    <div class="avatar-circle">
+                        <img src="../images/eric_profile_photo.jpeg" alt="Profile" class="avatar-circle__img">
+                    </div>
+                </button>
+            </nav>
+
+            <!-- Main Content (Image Editing) -->
+            <main class="content" id="content">
+                <!-- Heading -->
+                <section class="content__heading">
+                    <h1 class="content__title" id="page-title">Pick a style for your image</h1>
+                </section>
+
+                <!-- Style Cards Grid -->
+                <section class="cards-grid" id="cards-grid">
+                    <!-- Row 1 -->
+                    <div class="cards-grid__row">
+                        <button class="style-card" id="card-salon" data-style="salon">
+                            <img src="../images/salon.png" alt="Salon style" class="style-card__img" loading="lazy">
+                            <div class="style-card__overlay"></div>
+                            <div class="style-card__icon">
+                                <span class="material-symbols-outlined">note_stack_add</span>
+                            </div>
+                            <div class="style-card__label-bar">
+                                <span class="style-card__label">Salon</span>
+                            </div>
+                        </button>
+                        <button class="style-card" id="card-monochrome" data-style="monochrome">
+                            <img src="../images/monochrome.png" alt="Monochrome style" class="style-card__img"
+                                loading="lazy">
+                            <div class="style-card__overlay"></div>
+                            <div class="style-card__icon">
+                                <span class="material-symbols-outlined">note_stack_add</span>
+                            </div>
+                            <div class="style-card__label-bar">
+                                <span class="style-card__label">Monochrome</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="cards-grid__row">
+                        <button class="style-card" id="card-color-blocking" data-style="color-blocking">
+                            <img src="../images/color-blocking.png" alt="Color blocking style" class="style-card__img"
+                                loading="lazy">
+                            <div class="style-card__overlay"></div>
+                            <div class="style-card__icon">
+                                <span class="material-symbols-outlined">photo_prints</span>
+                            </div>
+                            <div class="style-card__label-bar">
+                                <span class="style-card__label">Color blocking</span>
+                            </div>
+                        </button>
+                        <button class="style-card" id="card-cyborg" data-style="cyborg">
+                            <img src="../images/cyborg.png" alt="Cyborg style" class="style-card__img" loading="lazy">
+                            <div class="style-card__overlay"></div>
+                            <div class="style-card__icon">
+                                <span class="material-symbols-outlined">note_stack_add</span>
+                            </div>
+                            <div class="style-card__label-bar">
+                                <span class="style-card__label">Cyborg</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Row 3 -->
+                    <div class="cards-grid__row">
+                        <button class="style-card" id="card-surreal" data-style="surreal">
+                            <img src="../images/surreal.png" alt="Surreal style" class="style-card__img" loading="lazy">
+                            <div class="style-card__overlay"></div>
+                            <div class="style-card__icon">
+                                <span class="material-symbols-outlined">note_stack_add</span>
+                            </div>
+                            <div class="style-card__label-bar">
+                                <span class="style-card__label">Surreal</span>
+                            </div>
+                        </button>
+                        <button class="style-card" id="card-gothic-clay" data-style="gothic-clay">
+                            <img src="../images/gothic-clay.png" alt="Gothic clay style" class="style-card__img"
+                                loading="lazy">
+                            <div class="style-card__overlay"></div>
+                            <div class="style-card__icon">
+                                <span class="material-symbols-outlined">photo_prints</span>
+                            </div>
+                            <div class="style-card__label-bar">
+                                <span class="style-card__label">Gothic clay</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Row 4 -->
+                    <div class="cards-grid__row">
+                        <button class="style-card" id="card-risograph" data-style="risograph">
+                            <img src="../images/risograph.png" alt="Risograph style" class="style-card__img"
+                                loading="lazy">
+                            <div class="style-card__overlay"></div>
+                            <div class="style-card__icon">
+                                <span class="material-symbols-outlined">note_stack_add</span>
+                            </div>
+                            <div class="style-card__label-bar">
+                                <span class="style-card__label">Risograph</span>
+                            </div>
+                        </button>
+                        <button class="style-card" id="card-steampunk" data-style="steampunk">
+                            <img src="../images/steampunk.png" alt="Steampunk style" class="style-card__img"
+                                loading="lazy">
+                            <div class="style-card__overlay"></div>
+                            <div class="style-card__icon">
+                                <span class="material-symbols-outlined">photo_prints</span>
+                            </div>
+                            <div class="style-card__label-bar">
+                                <span class="style-card__label">Steampunk</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Row 5 -->
+                    <div class="cards-grid__row">
+                        <button class="style-card" id="card-explosive" data-style="explosive">
+                            <img src="../images/explosive.png" alt="Explosive style" class="style-card__img"
+                                loading="lazy">
+                            <div class="style-card__overlay"></div>
+                            <div class="style-card__icon">
+                                <span class="material-symbols-outlined">photo_prints</span>
+                            </div>
+                            <div class="style-card__label-bar">
+                                <span class="style-card__label">Explosive</span>
+                            </div>
+                        </button>
+                        <button class="style-card" id="card-oil-painting" data-style="oil-painting">
+                            <img src="../images/oil-painting.png" alt="Oil Painting style" class="style-card__img"
+                                loading="lazy">
+                            <div class="style-card__overlay"></div>
+                            <div class="style-card__icon">
+                                <span class="material-symbols-outlined">note_stack_add</span>
+                            </div>
+                            <div class="style-card__label-bar">
+                                <span class="style-card__label">Oil painting</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Row 6 -->
+                    <div class="cards-grid__row">
+                        <button class="style-card" id="card-runway" data-style="runway">
+                            <img src="../images/runway.png" alt="Runway style" class="style-card__img" loading="lazy">
+                            <div class="style-card__overlay"></div>
+                            <div class="style-card__icon">
+                                <span class="material-symbols-outlined">note_stack_add</span>
+                            </div>
+                            <div class="style-card__label-bar">
+                                <span class="style-card__label">Runway</span>
+                            </div>
+                        </button>
+                        <button class="style-card" id="card-old-cartoon" data-style="old-cartoon">
+                            <img src="../images/old-cartoon.png" alt="Old cartoon style" class="style-card__img"
+                                loading="lazy">
+                            <div class="style-card__overlay"></div>
+                            <div class="style-card__icon">
+                                <span class="material-symbols-outlined">note_stack_add</span>
+                            </div>
+                            <div class="style-card__label-bar">
+                                <span class="style-card__label">Old cartoon</span>
+                            </div>
+                        </button>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Response Screen (hidden by default) -->
+            <div class="response-screen" id="response-screen" hidden>
+                <!-- Response App Bar -->
+                <nav class="response-bar" id="response-bar">
+                    <button class="app-bar__icon-btn" id="back-btn" aria-label="Go back">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <div class="response-bar__title">
+                        <span class="response-bar__title-text" id="response-title">Gothic clay image</span>
+                    </div>
+                    <button class="app-bar__avatar" id="response-avatar-btn" aria-label="User profile">
+                        <div class="avatar-circle">
+                            <img src="../images/eric_profile_photo.jpeg" alt="Profile" class="avatar-circle__img">
+                        </div>
+                    </button>
+                </nav>
+
+                <!-- Response Content -->
+                <div class="response-content" id="response-content">
+                    <!-- User Prompt Area -->
+                    <div class="response-prompt" id="response-prompt">
+                        <!-- Attachment Thumbnails -->
+                        <div class="response-prompt__attachments" id="response-attachments">
+                            <div class="response-thumb" id="response-thumb-style">
+                                <img class="response-thumb__img" id="response-thumb-style-img" src="" alt="">
+                                <span class="response-thumb__label" id="response-thumb-style-label">Gothic clay</span>
+                            </div>
+                            <div class="response-thumb" id="response-thumb-selfie" hidden>
+                                <img class="response-thumb__img" id="response-thumb-selfie-img" src="" alt="Your photo">
+                            </div>
+                        </div>
+                        <!-- Prompt Bubble -->
+                        <div class="response-prompt__bubble" id="response-prompt-bubble">
+                            <span class="response-prompt__text" id="response-prompt-text">give me a funny
+                                expression</span>
+                        </div>
+                    </div>
+
+                    <!-- Gemini Response -->
+                    <div class="response-answer">
+                        <!-- Sparkle Header -->
+                        <div class="response-answer__header">
+                            <svg class="response-answer__sparkle" width="27" height="22" viewBox="0 0 27 22"
+                                fill="none">
+                                <path
+                                    d="M19.6162 9.835C17.9212 9.105 16.4388 8.105 15.1663 6.8338C13.895 5.5625 12.8938 4.0788 12.165 2.3838C11.885 1.7338 11.66 1.0663 11.4875 0.3813C11.4313 0.1575 11.2313 0 11 0C10.7688 0 10.5687 0.1575 10.5125 0.3813C10.34 1.0663 10.115 1.7325 9.835 2.3838C9.105 4.0788 8.105 5.5625 6.8337 6.8338C5.5625 8.1038 4.07875 9.105 2.38375 9.835C1.73375 10.115 1.06625 10.34 0.38125 10.5125C0.1575 10.5688 0 10.7688 0 11C0 11.2313 0.1575 11.4313 0.38125 11.4875C1.06625 11.66 1.7325 11.885 2.38375 12.165C4.07875 12.895 5.5612 13.895 6.8337 15.1663C8.105 16.4375 9.1063 17.9213 9.835 19.6163C10.115 20.2663 10.34 20.9338 10.5125 21.6188C10.5687 21.8425 10.77 22 11 22C11.2313 22 11.4313 21.8425 11.4875 21.6188C11.66 20.9338 11.885 20.2675 12.165 19.6163C12.895 17.9213 13.895 16.4388 15.1663 15.1663C16.4375 13.895 17.9212 12.8938 19.6162 12.165C20.2662 11.885 20.9337 11.66 21.6187 11.4875C21.8425 11.4313 22 11.23 22 11C22 10.7688 21.8425 10.5688 21.6187 10.5125C20.9337 10.34 20.2675 10.115 19.6162 9.835Z"
+                                    fill="url(#sparkle_grad)" />
+                                <defs>
+                                    <linearGradient id="sparkle_grad" x1="7.05" y1="14.34" x2="16.62" y2="6.25"
+                                        gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#346BF1" />
+                                        <stop offset="0.4" stop-color="#3186FF" />
+                                        <stop offset="0.8" stop-color="#4FA0FF" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="response-answer__spacer"></div>
+                            <button class="response-answer__menu" id="response-menu-btn" aria-label="More options">
+                                <span class="material-symbols-outlined">more_vert</span>
+                            </button>
+                        </div>
+
+                        <!-- Response Text -->
+                        <p class="response-answer__text">Sure, here is your image</p>
+
+                        <!-- Generated Image -->
+                        <div class="response-image" id="response-image">
+                            <img class="response-image__img" id="response-image-img" src="" alt="Generated image">
+                            <!-- Overlay Controls -->
+                            <div class="response-image__controls">
+                                <button class="response-image__ctrl-btn" id="btn-share-img" aria-label="Share image">
+                                    <span class="material-symbols-outlined">share</span>
+                                </button>
+                                <button class="response-image__ctrl-btn" id="btn-edit-img" aria-label="Edit image">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                                <button class="response-image__ctrl-btn" id="btn-download-img"
+                                    aria-label="Download image">
+                                    <span class="material-symbols-outlined">download</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Action Bar -->
+                        <div class="response-actions" id="response-actions">
+                            <button class="response-actions__btn" id="btn-thumbup" aria-label="Good response">
+                                <span class="material-symbols-outlined">thumb_up</span>
+                            </button>
+                            <button class="response-actions__btn" id="btn-thumbdown" aria-label="Bad response">
+                                <span class="material-symbols-outlined">thumb_down</span>
+                            </button>
+                            <button class="response-actions__btn" id="btn-share-response" aria-label="Share response">
+                                <span class="material-symbols-outlined">share</span>
+                            </button>
+                            <button class="response-actions__btn" id="btn-copy-response" aria-label="Copy response">
+                                <span class="material-symbols-outlined">content_copy</span>
+                            </button>
+                            <button class="response-actions__btn" id="btn-download-response"
+                                aria-label="Download image">
+                                <span class="material-symbols-outlined">download</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full-width Input Bar -->
+            <footer class="input-bar" id="input-bar">
+                <div class="input-bar__inner">
+                    <div class="input-bar__field-row">
+                        <!-- Attachments Row (always visible) -->
+                        <div class="attachment-row" id="attachment-row">
+                            <!-- Template Attachment (hidden by default) -->
+                            <div class="attachment-chip" id="attachment-chip" hidden>
+                                <img class="attachment-chip__thumb" id="attachment-thumb" src="" alt="">
+                                <span class="attachment-chip__label" id="attachment-label"></span>
+                                <button class="attachment-chip__close" id="attachment-close"
+                                    aria-label="Remove template">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                            <!-- Selfie preview (hidden until photo added) -->
+                            <div class="attachment-chip selfie-chip" id="selfie-chip" hidden>
+                                <img class="attachment-chip__thumb" id="selfie-thumb" src="" alt="Your photo">
+                                <button class="attachment-chip__close" id="selfie-close" aria-label="Remove selfie">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                            <!-- Add selfie button (always visible until selfie added) -->
+                            <button class="add-selfie-btn hidden" id="add-selfie-btn" aria-label="Add image">
+                                <span class="material-symbols-outlined">add_a_photo</span>
+                                <span class="add-selfie-btn__label">Add image</span>
+                            </button>
+                            <input type="file" id="selfie-input" accept="image/*" hidden>
+                        </div>
+                        <!-- Custom Placeholder Overlay -->
+                        <div class="input-bar__textarea-wrap">
+                            <div class="placeholder-overlay" id="placeholder-overlay">
+                                <span class="placeholder-overlay__prefix" id="placeholder-prefix">Describe your image</span>
+                                <span class="placeholder-drum" id="placeholder-drum" style="display:none">
+                                    <span class="placeholder-drum__track" id="placeholder-track"></span>
+                                </span>
+                            </div>
+                            <textarea class="input-bar__textarea" id="prompt-input" rows="1"></textarea>
+                        </div>
+                    </div>
+                    <div class="input-bar__action-row">
+                        <div class="input-bar__left-actions">
+                            <button class="input-bar__action-btn" id="btn-add" aria-label="Add attachment">
+                                <span class="material-symbols-outlined">add</span>
+                            </button>
+                            <button class="input-bar__chip" id="btn-image-fx" aria-label="ImageFX mode">
+                                <span class="chip__emoji">🍌</span>
+                                <span class="chip__close material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div class="input-bar__right-actions">
+                            <button class="input-bar__thinking-pill" id="btn-thinking" aria-label="Thinking mode">
+                                Thinking
+                            </button>
+                            <button class="input-bar__action-btn input-bar__action-btn--mic" id="btn-mic"
+                                aria-label="Voice input">
+                                <span class="material-symbols-outlined">mic</span>
+                            </button>
+                            <button class="input-bar__send-btn" id="btn-send" aria-label="Send prompt" disabled
+                                style="display:none">
+                                <span class="material-symbols-outlined">send</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+
+            <!-- Gesture Bar -->
+            <div class="gesture-bar">
+                <div class="gesture-bar__handle"></div>
+            </div>
+
+            <!-- Edit Modal (hidden by default) -->
+            <div class="edit-modal" id="edit-modal" hidden>
+                <!-- Status Bar (dark) -->
+                <div class="edit-modal__status-bar">
+                    <div class="status-bar__time">9:30</div>
+                    <div class="status-bar__icons">
+                        <svg class="status-bar__cellular" width="17" height="13" viewBox="0 0 17 13" fill="none">
+                            <rect x="0" y="6" width="3" height="7" rx="1.5" fill="white" />
+                            <rect x="5" y="4" width="3" height="9" rx="1.5" fill="white" />
+                            <rect x="10" y="2" width="3" height="11" rx="1.5" fill="white" />
+                            <rect x="15" y="0" width="3" height="13" rx="1.5" fill="white" />
+                        </svg>
+                        <svg class="status-bar__wifi" width="19" height="13" viewBox="0 0 19 13" fill="none">
+                            <path d="M9.5 13a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="white" />
+                            <path d="M5.5 8.5c1.1-1.1 2.5-1.7 4-1.7s2.9.6 4 1.7" stroke="white" stroke-width="1.5"
+                                stroke-linecap="round" fill="none" />
+                            <path d="M2.5 5.5c1.9-1.9 4.3-2.9 7-2.9s5.1 1 7 2.9" stroke="white" stroke-width="1.5"
+                                stroke-linecap="round" fill="none" />
+                        </svg>
+                        <svg class="status-bar__battery" width="27" height="13" viewBox="0 0 27 13" fill="none">
+                            <rect x="0" y="0" width="24" height="13" rx="3" fill="white" />
+                            <rect x="25" y="3.5" width="2" height="6" rx="1" fill="white" opacity="0.4" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Top App Bar -->
+                <div class="edit-modal__appbar">
+                    <button class="edit-modal__icon-btn" id="edit-close-btn" aria-label="Close editor">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                    <span class="edit-modal__appbar-center">Edit</span>
+                    <span class="edit-modal__cancel-text" id="edit-cancel-btn" hidden>Cancel</span>
+                    <div class="edit-modal__appbar-actions">
+                        <button class="edit-modal__icon-btn" id="edit-undo-btn" aria-label="Undo" disabled>
+                            <span class="material-symbols-outlined">undo</span>
+                        </button>
+                        <button class="edit-modal__icon-btn" id="edit-redo-btn" aria-label="Redo" disabled>
+                            <span class="material-symbols-outlined">redo</span>
+                        </button>
+                    </div>
+                    <span class="edit-modal__done-text" id="edit-done-top-btn">Save</span>
+                    <span class="edit-modal__subtool-done" id="edit-subtool-done-btn" hidden>Done</span>
+                </div>
+
+                <!-- Image Canvas with overlay -->
+                <div class="edit-modal__canvas">
+                    <img class="edit-modal__image" id="edit-modal-image" src="" alt="Image being edited">
+                    <!-- Drawing canvas for doodling -->
+                    <canvas class="edit-modal__draw-canvas" id="edit-draw-canvas"></canvas>
+                    <!-- Erase brush canvas overlay -->
+                    <canvas class="edit-modal__erase-canvas" id="edit-erase-canvas" hidden></canvas>
+                    <!-- Gradient overlay -->
+                    <div class="edit-modal__image-overlay" id="edit-image-overlay">
+                        <div class="edit-modal__overlay-content">
+                            <div class="edit-modal__overlay-info">
+                                <span class="material-symbols-outlined edit-modal__overlay-icon">stylus_note</span>
+                                <p class="edit-modal__overlay-text">Mark up to add, edit, or remove anything</p>
+                            </div>
+                            <button class="edit-modal__overlay-gotit" id="edit-overlay-gotit">Got it</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Particle overlay — outside blur container so particles stay crisp -->
+                <canvas class="edit-modal__particle-canvas" id="edit-particle-canvas"></canvas>
+
+                <!-- Bottom Tools Panel -->
+                <div class="edit-modal__tools">
+                    <!-- Primary Tools Row -->
+                    <div class="edit-modal__tools-row">
+                        <button class="edit-modal__tool" id="edit-tool-select" data-tool="select">
+                            <div class="edit-modal__tool-icon">
+                                <span class="material-symbols-outlined">gesture</span>
+                            </div>
+                            <span class="edit-modal__tool-label">Select</span>
+                        </button>
+                        <button class="edit-modal__tool" id="edit-tool-text" data-tool="text">
+                            <div class="edit-modal__tool-icon">
+                                <span class="material-symbols-outlined">select</span>
+                            </div>
+                            <span class="edit-modal__tool-label">Text</span>
+                        </button>
+                        <button class="edit-modal__tool" id="edit-tool-resize" data-tool="resize">
+                            <div class="edit-modal__tool-icon">
+                                <span class="material-symbols-outlined">resize</span>
+                            </div>
+                            <span class="edit-modal__tool-label">Resize</span>
+                        </button>
+                        <button class="edit-modal__tool" id="edit-tool-effects" data-tool="effects">
+                            <div class="edit-modal__tool-icon">
+                                <span class="material-symbols-outlined">tune</span>
+                            </div>
+                            <span class="edit-modal__tool-label">Effects</span>
+                        </button>
+                    </div>
+
+                    <!-- Sub-tools: Resize (Aspect Ratios) -->
+                    <div class="edit-modal__subtools" data-parent="resize" hidden>
+                        <button class="edit-modal__subtool" data-subtool="original">
+                            <div class="edit-modal__subtool-icon">
+                                <span class="material-symbols-outlined">crop_square</span>
+                            </div>
+                            <span class="edit-modal__subtool-label">Square</span>
+                        </button>
+                        <button class="edit-modal__subtool" data-subtool="portrait">
+                            <div class="edit-modal__subtool-icon">
+                                <span class="material-symbols-outlined">smartphone</span>
+                            </div>
+                            <span class="edit-modal__subtool-label">Portrait</span>
+                        </button>
+                        <button class="edit-modal__subtool" data-subtool="landscape">
+                            <div class="edit-modal__subtool-icon">
+                                <span class="material-symbols-outlined">crop_landscape</span>
+                            </div>
+                            <span class="edit-modal__subtool-label">Landscape</span>
+                        </button>
+                    </div>
+
+                    <!-- Sub-tools: Effects -->
+                    <div class="edit-modal__subtools" data-parent="effects" hidden>
+                        <button class="edit-modal__subtool" data-subtool="removebg">
+                            <div class="edit-modal__subtool-icon">
+                                <span class="material-symbols-outlined">background_replace</span>
+                            </div>
+                            <span class="edit-modal__subtool-label">Remove<br>background</span>
+                        </button>
+                        <button class="edit-modal__subtool" data-subtool="lighting">
+                            <div class="edit-modal__subtool-icon">
+                                <span class="material-symbols-outlined">wb_sunny</span>
+                            </div>
+                            <span class="edit-modal__subtool-label">Lighting</span>
+                        </button>
+                        <button class="edit-modal__subtool" data-subtool="portrait">
+                            <div class="edit-modal__subtool-icon">
+                                <span class="material-symbols-outlined">portrait</span>
+                            </div>
+                            <span class="edit-modal__subtool-label">Portrait</span>
+                        </button>
+                        <button class="edit-modal__subtool" data-subtool="erase" id="img-erase-subtool-btn">
+                            <div class="edit-modal__subtool-icon">
+                                <span class="material-symbols-outlined">ink_eraser</span>
+                            </div>
+                            <span class="edit-modal__subtool-label">Erase</span>
+                        </button>
+                    </div>
+
+                    <!-- Lighting Controls Panel -->
+                    <div class="lighting-panel" id="lighting-panel" hidden>
+                        <div class="lighting-panel__header">
+                            <span class="lighting-panel__title">
+                                Lighting
+                            </span>
+                            <button class="lighting-panel__close" id="lighting-close-btn" type="button">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        <!-- Direction presets -->
+                        <div class="lighting-panel__directions">
+                            <button class="lighting-dir-btn" data-dir="top-left" title="Top Left">↖</button>
+                            <button class="lighting-dir-btn" data-dir="top" title="Top">↑</button>
+                            <button class="lighting-dir-btn" data-dir="top-right" title="Top Right">↗</button>
+                            <button class="lighting-dir-btn" data-dir="left" title="Left">←</button>
+                            <button class="lighting-dir-btn active" data-dir="center" title="Center">●</button>
+                            <button class="lighting-dir-btn" data-dir="right" title="Right">→</button>
+                            <button class="lighting-dir-btn" data-dir="bottom-left" title="Bottom Left">↙</button>
+                            <button class="lighting-dir-btn" data-dir="bottom" title="Bottom">↓</button>
+                            <button class="lighting-dir-btn" data-dir="bottom-right" title="Bottom Right">↘</button>
+                        </div>
+
+                        <!-- Sliders -->
+                        <div class="lighting-panel__sliders">
+                            <div class="lighting-slider-row">
+                                <label class="lighting-slider-label">
+                                    <span class="material-symbols-outlined">light_mode</span>
+                                    Intensity
+                                </label>
+                                <input type="range" class="lighting-slider" id="lighting-intensity" min="0" max="100"
+                                    value="60">
+                                <span class="lighting-slider-value" id="lighting-intensity-val">60</span>
+                            </div>
+                            <div class="lighting-slider-row">
+                                <label class="lighting-slider-label">
+                                    <span class="material-symbols-outlined">thermostat</span>
+                                    Warmth
+                                </label>
+                                <input type="range" class="lighting-slider lighting-slider--warmth" id="lighting-warmth"
+                                    min="0" max="100" value="50">
+                                <span class="lighting-slider-value" id="lighting-warmth-val">50</span>
+                            </div>
+                            <div class="lighting-slider-row">
+                                <label class="lighting-slider-label">
+                                    <span class="material-symbols-outlined">blur_on</span>
+                                    Ambient
+                                </label>
+                                <input type="range" class="lighting-slider" id="lighting-ambient" min="0" max="100"
+                                    value="40">
+                                <span class="lighting-slider-value" id="lighting-ambient-val">40</span>
+                            </div>
+                            <div class="lighting-slider-row">
+                                <label class="lighting-slider-label">
+                                    <span class="material-symbols-outlined">exposure</span>
+                                    Exposure
+                                </label>
+                                <input type="range" class="lighting-slider" id="lighting-exposure" min="0" max="100"
+                                    value="50">
+                                <span class="lighting-slider-value" id="lighting-exposure-val">50</span>
+                            </div>
+                            <div class="lighting-slider-row">
+                                <label class="lighting-slider-label">
+                                    <span class="material-symbols-outlined">shadow</span>
+                                    Shadows
+                                </label>
+                                <input type="range" class="lighting-slider" id="lighting-shadows" min="0" max="100"
+                                    value="50">
+                                <span class="lighting-slider-value" id="lighting-shadows-val">50</span>
+                            </div>
+                            <div class="lighting-slider-row">
+                                <label class="lighting-slider-label">
+                                    <span class="material-symbols-outlined">highlight</span>
+                                    Highlights
+                                </label>
+                                <input type="range" class="lighting-slider" id="lighting-highlights" min="0" max="100"
+                                    value="50">
+                                <span class="lighting-slider-value" id="lighting-highlights-val">50</span>
+                            </div>
+                            <div class="lighting-slider-row">
+                                <label class="lighting-slider-label">
+                                    <span class="material-symbols-outlined">contrast</span>
+                                    Contrast
+                                </label>
+                                <input type="range" class="lighting-slider" id="lighting-contrast" min="0" max="100"
+                                    value="50">
+                                <span class="lighting-slider-value" id="lighting-contrast-val">50</span>
+                            </div>
+                        </div>
+
+                        <!-- Apply button -->
+                        <button class="lighting-panel__apply" id="lighting-apply-btn" type="button">
+                            Apply
+                        </button>
+                    </div>
+
+                    <!-- Portrait Mode Controls Panel -->
+                    <div class="portrait-panel" id="portrait-panel" hidden>
+                        <div class="portrait-panel__header">
+                            <span class="portrait-panel__title">
+                                <span class="material-symbols-outlined">portrait</span>
+                                Portrait Mode
+                            </span>
+                            <button class="portrait-panel__close" id="portrait-close-btn" type="button">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        <div class="portrait-panel__sliders">
+                            <div class="lighting-slider-row">
+                                <label class="lighting-slider-label">
+                                    <span class="material-symbols-outlined">blur_on</span>
+                                    Depth
+                                </label>
+                                <input type="range" class="lighting-slider" id="portrait-depth" min="0" max="100"
+                                    value="60">
+                                <span class="lighting-slider-value" id="portrait-depth-val">60</span>
+                            </div>
+                            <div class="lighting-slider-row">
+                                <label class="lighting-slider-label">
+                                    <span class="material-symbols-outlined">blur_circular</span>
+                                    Bokeh
+                                </label>
+                                <input type="range" class="lighting-slider" id="portrait-bokeh" min="0" max="100"
+                                    value="50">
+                                <span class="lighting-slider-value" id="portrait-bokeh-val">50</span>
+                            </div>
+                            <div class="lighting-slider-row">
+                                <label class="lighting-slider-label">
+                                    <span class="material-symbols-outlined">flare</span>
+                                    Halation
+                                </label>
+                                <input type="range" class="lighting-slider" id="portrait-halation" min="0" max="100"
+                                    value="35">
+                                <span class="lighting-slider-value" id="portrait-halation-val">35</span>
+                            </div>
+                            <div class="lighting-slider-row">
+                                <label class="lighting-slider-label">
+                                    <span class="material-symbols-outlined">vignette</span>
+                                    Vignette
+                                </label>
+                                <input type="range" class="lighting-slider" id="portrait-vignette" min="0" max="100"
+                                    value="40">
+                                <span class="lighting-slider-value" id="portrait-vignette-val">40</span>
+                            </div>
+                        </div>
+
+                        <button class="portrait-panel__apply" id="portrait-apply-btn" type="button">
+                            Apply
+                        </button>
+                    </div>
+
+                    <!-- Done pill button (visible when edits exist) -->
+                    <div class="edit-modal__edit-done-row" id="edit-pill-done-row" hidden>
+                        <button class="edit-modal__edit-done-btn" id="edit-pill-done-btn">Save</button>
+                    </div>
+
+                    <!-- Input Bar (hidden by default) -->
+                    <div class="edit-modal__input" hidden>
+                        <div class="edit-modal__input-field">
+                            <input type="text" class="edit-modal__input-text" id="edit-input-text"
+                                placeholder="Edit your image" autocomplete="off">
+                        </div>
+                        <div class="edit-modal__input-actions">
+                            <button class="edit-modal__send-btn" id="edit-send-btn" aria-label="Send edit">
+                                <span class="material-symbols-outlined">send</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Gesture Bar -->
+                    <div class="edit-modal__gesture-bar">
+                        <div class="edit-modal__gesture-handle"></div>
+                    </div>
+                </div>
+
+                <!-- Discard Edits Confirmation Dialog -->
+                <div class="edit-modal__discard-dialog" id="edit-discard-dialog" hidden>
+                    <div class="edit-modal__discard-backdrop" id="edit-discard-backdrop"></div>
+                    <div class="edit-modal__discard-card">
+                        <div class="edit-modal__discard-header">
+                            <h3 class="edit-modal__discard-title">Discard edits?</h3>
+                            <button class="edit-modal__discard-close" id="edit-discard-close" aria-label="Close">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div class="edit-modal__discard-content">
+                            <p class="edit-modal__discard-body">If you go back, you'll lose all the edits you made to
+                                this
+                                image.</p>
+                        </div>
+                        <div class="edit-modal__discard-footer">
+                            <button class="edit-modal__discard-btn" id="edit-discard-keep">Keep editing</button>
+                            <button class="edit-modal__discard-btn edit-modal__discard-btn--primary"
+                                id="edit-discard-confirm">Discard</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END IMAGE EDITING PROTOTYPE -->
+
+        <!-- WEB IMAGE EDITING PROTOTYPE (hidden by default) -->
+        <div class="web-image-shell" id="web-image-shell" style="display:none">
+            <!-- Left sidebar nav rail -->
+            <aside class="web-img__sidebar">
+                <div class="web-img__sidebar-header">
+                    <div class="web-img__sidebar-header-top">
+                        <button class="web-img__sidebar-btn" aria-label="Menu">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+                    </div>
+                    <button class="web-img__sidebar-btn" aria-label="New chat">
+                        <span class="material-symbols-outlined">edit_square</span>
+                    </button>
+                </div>
+                <div class="web-img__sidebar-footer">
+                    <button class="web-img__sidebar-btn" aria-label="Settings">
+                        <span class="material-symbols-outlined">settings</span>
+                    </button>
+                </div>
+            </aside>
+            <!-- Main content area -->
+            <div class="web-img__main">
+                <!-- === TEMPLATE SURFACE === -->
+                <div class="web-img__template-surface" id="web-img-template-surface">
+                    <!-- Top Bar -->
+                    <nav class="web-img__topbar">
+                        <div class="web-img__topbar-left">
+                            <span class="web-img__logo">Gemini</span>
+                        </div>
+                        <div class="web-img__topbar-right">
+                            <span class="web-img__ultra-tag">ULTRA</span>
+                            <button class="web-img__apps-btn" aria-label="Apps">
+                                <span class="material-symbols-outlined">apps</span>
+                            </button>
+                            <button class="web-img__avatar-btn" aria-label="Profile">
+                                <img src="../images/eric_profile_photo.jpeg" alt="Profile" class="web-img__avatar-img">
+                            </button>
+                        </div>
+                    </nav>
+        
+                    <!-- Heading -->
+                    <section class="web-img__heading">
+                        <h1 class="web-img__title">Pick a style for your image</h1>
+                    </section>
+        
+                    <!-- Template Grid -->
+                    <section class="web-img__grid" id="web-img-grid">
+                        <button class="web-img__card" data-style="salon">
+                            <img src="../images/salon.png" alt="Salon" class="web-img__card-img" loading="lazy">
+                            <div class="web-img__card-overlay"></div>
+                            <span class="web-img__card-label">Salon</span>
+                        </button>
+                        <button class="web-img__card" data-style="monochrome">
+                            <img src="../images/monochrome.png" alt="Monochrome" class="web-img__card-img" loading="lazy">
+                            <div class="web-img__card-overlay"></div>
+                            <span class="web-img__card-label">Monochrome</span>
+                        </button>
+                        <button class="web-img__card" data-style="color-blocking">
+                            <img src="../images/color-blocking.png" alt="Color blocking" class="web-img__card-img" loading="lazy">
+                            <div class="web-img__card-overlay"></div>
+                            <span class="web-img__card-label">Color blocking</span>
+                        </button>
+                        <button class="web-img__card" data-style="cyborg">
+                            <img src="../images/cyborg.png" alt="Cyborg" class="web-img__card-img" loading="lazy">
+                            <div class="web-img__card-overlay"></div>
+                            <span class="web-img__card-label">Cyborg</span>
+                        </button>
+                        <button class="web-img__card" data-style="surreal">
+                            <img src="../images/surreal.png" alt="Surreal" class="web-img__card-img" loading="lazy">
+                            <div class="web-img__card-overlay"></div>
+                            <span class="web-img__card-label">Surreal</span>
+                        </button>
+                        <button class="web-img__card" data-style="gothic-clay">
+                            <img src="../images/gothic-clay.png" alt="Gothic clay" class="web-img__card-img" loading="lazy">
+                            <div class="web-img__card-overlay"></div>
+                            <span class="web-img__card-label">Gothic clay</span>
+                        </button>
+                        <button class="web-img__card" data-style="risograph">
+                            <img src="../images/risograph.png" alt="Risograph" class="web-img__card-img" loading="lazy">
+                            <div class="web-img__card-overlay"></div>
+                            <span class="web-img__card-label">Risograph</span>
+                        </button>
+                        <button class="web-img__card" data-style="steampunk">
+                            <img src="../images/steampunk.png" alt="Steampunk" class="web-img__card-img" loading="lazy">
+                            <div class="web-img__card-overlay"></div>
+                            <span class="web-img__card-label">Steampunk</span>
+                        </button>
+                        <button class="web-img__card" data-style="explosive">
+                            <img src="../images/explosive.png" alt="Explosive" class="web-img__card-img" loading="lazy">
+                            <div class="web-img__card-overlay"></div>
+                            <span class="web-img__card-label">Explosive</span>
+                        </button>
+                        <button class="web-img__card" data-style="oil-painting">
+                            <img src="../images/oil-painting.png" alt="Oil painting" class="web-img__card-img" loading="lazy">
+                            <div class="web-img__card-overlay"></div>
+                            <span class="web-img__card-label">Oil painting</span>
+                        </button>
+                        <button class="web-img__card" data-style="runway">
+                            <img src="../images/runway.png" alt="Runway" class="web-img__card-img" loading="lazy">
+                            <div class="web-img__card-overlay"></div>
+                            <span class="web-img__card-label">Runway</span>
+                        </button>
+                        <button class="web-img__card" data-style="old-cartoon">
+                            <img src="../images/old-cartoon.png" alt="Old cartoon" class="web-img__card-img" loading="lazy">
+                            <div class="web-img__card-overlay"></div>
+                            <span class="web-img__card-label">Old cartoon</span>
+                        </button>
+                    </section>
+        
+                    <!-- Input Bar -->
+                    <footer class="web-img__input-bar" id="web-img-input-bar">
+                        <div class="web-img__input-inner">
+                            <!-- Attachments row -->
+                            <div class="web-img__attach-row" id="web-img-attach-row">
+                                <div class="web-img__attach-chip" id="web-img-attach-chip" hidden>
+                                    <img class="web-img__attach-thumb" id="web-img-attach-thumb" src="" alt="Style template">
+                                    <span class="web-img__attach-label" id="web-img-attach-label"></span>
+                                    <button class="web-img__attach-close" id="web-img-attach-close" aria-label="Remove">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                                <div class="web-img__attach-chip" id="web-img-selfie-chip" hidden>
+                                    <img class="web-img__attach-thumb" id="web-img-selfie-thumb" src="" alt="Your photo">
+                                    <button class="web-img__attach-close" id="web-img-selfie-close" aria-label="Remove photo">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                                <button class="web-img__add-photo-btn hidden" id="web-img-add-photo" aria-label="Add image">
+                                    <span class="material-symbols-outlined">add_a_photo</span>
+                                    Add image
+                                </button>
+                                <input type="file" id="web-img-selfie-input" accept="image/*" hidden>
+                            </div>
+                            <div class="web-img__textarea-wrap">
+                                <div class="web-img__placeholder" id="web-img-placeholder">
+                                    <span class="web-img__placeholder-prefix" id="web-img-placeholder-prefix">Describe your image</span>
+                                    <span class="web-img__placeholder-drum" id="web-img-placeholder-drum" style="display:none">
+                                        <span class="web-img__placeholder-track" id="web-img-placeholder-track"></span>
+                                    </span>
+                                </div>
+                                <textarea class="web-img__textarea" id="web-img-prompt" rows="1" aria-label="Describe your image"></textarea>
+                            </div>
+                            <div class="web-img__action-row">
+                                <div class="web-img__actions-left">
+                                    <button class="web-img__action-btn" id="web-img-btn-add" aria-label="Add attachment">
+                                        <span class="material-symbols-outlined">add</span>
+                                    </button>
+                                    <button class="web-img__tool-chip" id="web-img-imagefx">
+                                        <span class="web-img__tool-chip-icon">🍌</span>
+                                        <span class="material-symbols-outlined">close_small</span>
+                                    </button>
+                                </div>
+                                <div class="web-img__actions-right">
+                                    <button class="web-img__thinking-pill" id="web-img-thinking">
+                                        Pro
+                                        <span class="material-symbols-outlined">keyboard_arrow_down</span>
+                                    </button>
+                                    <button class="web-img__action-btn" id="web-img-mic" aria-label="Voice">
+                                        <span class="material-symbols-outlined">mic</span>
+                                    </button>
+                                    <button class="web-img__send-btn" id="web-img-send" disabled style="display:none"
+                                        aria-label="Send">
+                                        <span class="material-symbols-outlined">send</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+
+                <!-- === RESPONSE SURFACE (hidden by default) === -->
+                <div class="web-img__response-surface" id="web-img-response-surface" hidden>
+                    <!-- Top Bar (matches Figma — same as template) -->
+                    <nav class="web-img__topbar">
+                        <div class="web-img__topbar-left">
+                            <span class="web-img__logo">Gemini</span>
+                        </div>
+                        <div class="web-img__topbar-right">
+                            <span class="web-img__ultra-tag">ULTRA</span>
+                            <button class="web-img__apps-btn" aria-label="Apps">
+                                <span class="material-symbols-outlined">apps</span>
+                            </button>
+                            <button class="web-img__avatar-btn" aria-label="Profile">
+                                <img src="../images/eric_profile_photo.jpeg" alt="Profile" class="web-img__avatar-img">
+                            </button>
+                        </div>
+                    </nav>
+
+                    <!-- Conversation Content -->
+                    <div class="web-img__response-content" id="web-img-response-content">
+                        <div class="web-img__response-conversation">
+                            <!-- User Prompt Area (right-aligned) -->
+                            <div class="web-img__response-prompt" id="web-img-response-prompt">
+                                <!-- Attachment Thumbnails -->
+                                <div class="web-img__response-attachments" id="web-img-response-attachments">
+                                    <!-- Style Template Thumb — 138×80 with overlay+label -->
+                                    <div class="web-img__response-style-thumb" id="web-img-response-thumb-style">
+                                        <img class="web-img__response-style-thumb-img" id="web-img-response-thumb-style-img" src="" alt="Selected style">
+                                        <span class="web-img__response-style-label" id="web-img-response-thumb-style-label">Style</span>
+                                    </div>
+                                    <!-- Photo/Selfie Thumb — 80×80 -->
+                                    <div class="web-img__response-selfie-thumb" id="web-img-response-thumb-selfie" hidden>
+                                        <img class="web-img__response-selfie-thumb-img" id="web-img-response-thumb-selfie-img" src="" alt="Your photo">
+                                    </div>
+                                </div>
+                                <!-- Prompt Bubble -->
+                                <div class="web-img__response-bubble" id="web-img-response-bubble">
+                                    <span class="web-img__response-text" id="web-img-response-text">describe your image</span>
+                                </div>
+                            </div>
+
+                            <!-- Gemini Response -->
+                            <div class="web-img__response-answer" id="web-img-response-answer">
+                                <!-- Sparkle Header — sparkle icon + text -->
+                                <div class="web-img__response-header">
+                                    <svg class="web-img__response-sparkle" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M24.6162 14.835C22.9212 14.105 21.4388 13.105 20.1663 11.8337C18.895 10.5625 17.8938 9.07875 17.165 7.38375C16.885 6.73375 16.66 6.06625 16.4875 5.38125C16.4313 5.1575 16.2313 5 16 5C15.7688 5 15.5687 5.1575 15.5125 5.38125C15.34 6.06625 15.115 6.7325 14.835 7.38375C14.105 9.07875 13.105 10.5625 11.8337 11.8337C10.5625 13.1037 9.07875 14.105 7.38375 14.835C6.73375 15.115 6.06625 15.34 5.38125 15.5125C5.1575 15.5687 5 15.7688 5 16C5 16.2313 5.1575 16.4313 5.38125 16.4875C6.06625 16.66 6.7325 16.885 7.38375 17.165C9.07875 17.895 10.5612 18.895 11.8337 20.1663C13.105 21.4375 14.1063 22.9212 14.835 24.6162C15.115 25.2662 15.34 25.9337 15.5125 26.6187C15.5687 26.8425 15.77 27 16 27C16.2313 27 16.4313 26.8425 16.4875 26.6187C16.66 25.9337 16.885 25.2675 17.165 24.6162C17.895 22.9212 18.895 21.4388 20.1663 20.1663C21.4375 18.895 22.9212 17.8938 24.6162 17.165C25.2662 16.885 25.9337 16.66 26.6187 16.4875C26.8425 16.4313 27 16.23 27 16C27 15.7688 26.8425 15.5687 26.6187 15.5125C25.9337 15.34 25.2675 15.115 24.6162 14.835Z" fill="url(#web_sparkle_grad)" />
+                                        <defs>
+                                            <linearGradient id="web_sparkle_grad" x1="12.05" y1="19.34" x2="21.62" y2="11.25" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#346BF1" />
+                                                <stop offset="0.4" stop-color="#3186FF" />
+                                                <stop offset="0.8" stop-color="#4FA0FF" />
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <div class="web-img__response-header-content">
+                                        <!-- Response Text -->
+                                        <p class="web-img__response-answer-text" id="web-img-response-answer-text">Sure, here is your image.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Response Image Area (52px left indent) -->
+                                <div class="web-img__response-image-area">
+                                    <div class="web-img__response-image" id="web-img-response-image">
+                                        <img class="web-img__response-image-img" id="web-img-response-image-img" src="" alt="Generated image">
+                                        <!-- Loading shimmer -->
+                                        <div class="web-img__response-loading" id="web-img-response-loading">
+                                            <div class="web-img__loading-shimmer"></div>
+                                        </div>
+                                        <!-- Image overlay controls — bottom right (matching mobile) -->
+                                        <div class="web-img__response-image-edit-bar">
+                                            <button class="web-img__response-ctrl-btn" id="web-img-btn-share-img" aria-label="Share image">
+                                                <span class="material-symbols-outlined">share</span>
+                                            </button>
+                                            <button class="web-img__response-ctrl-btn" id="web-img-btn-edit-img" aria-label="Edit image">
+                                                <span class="material-symbols-outlined">edit</span>
+                                            </button>
+                                            <button class="web-img__response-ctrl-btn" id="web-img-btn-download-img" aria-label="Download image">
+                                                <span class="material-symbols-outlined">download</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Bar Footer — 52px indent, 32×32 buttons -->
+                                <div class="web-img__response-footer">
+                                    <div class="web-img__response-actions" id="web-img-response-actions">
+                                        <button class="web-img__response-action-btn" id="web-img-btn-thumbup" aria-label="Good response">
+                                            <span class="material-symbols-outlined">thumb_up</span>
+                                        </button>
+                                        <button class="web-img__response-action-btn" id="web-img-btn-thumbdown" aria-label="Bad response">
+                                            <span class="material-symbols-outlined">thumb_down</span>
+                                        </button>
+                                        <button class="web-img__response-action-btn" id="web-img-btn-refresh" aria-label="Regenerate">
+                                            <span class="material-symbols-outlined">refresh</span>
+                                        </button>
+                                        <button class="web-img__response-action-btn" id="web-img-btn-share-response" aria-label="Share response">
+                                            <span class="material-symbols-outlined">share</span>
+                                        </button>
+                                        <button class="web-img__response-action-btn" id="web-img-btn-copy-response" aria-label="Copy response">
+                                            <span class="material-symbols-outlined">content_copy</span>
+                                        </button>
+                                        <button class="web-img__response-action-btn" id="web-img-btn-more" aria-label="More options">
+                                            <span class="material-symbols-outlined">more_vert</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Follow-up Input Bar -->
+                    <footer class="web-img__input-bar" id="web-img-response-input-bar">
+                        <div class="web-img__input-inner">
+                            <div class="web-img__textarea-wrap">
+                                <div class="web-img__placeholder" id="web-img-response-placeholder">Describe your image</div>
+                                <textarea class="web-img__textarea" id="web-img-response-prompt-input" rows="1"></textarea>
+                            </div>
+                            <div class="web-img__action-row">
+                                <div class="web-img__actions-left">
+                                    <button class="web-img__action-btn" id="web-img-response-btn-add" aria-label="Add attachment">
+                                        <span class="material-symbols-outlined">add</span>
+                                    </button>
+                                    <button class="web-img__tool-chip">
+                                        <span class="web-img__tool-chip-icon">🍌</span>
+                                        <span class="material-symbols-outlined">close_small</span>
+                                    </button>
+                                </div>
+                                <div class="web-img__actions-right">
+                                    <button class="web-img__thinking-pill">
+                                        Pro
+                                        <span class="material-symbols-outlined">keyboard_arrow_down</span>
+                                    </button>
+                                    <button class="web-img__action-btn" id="web-img-response-mic" aria-label="Voice">
+                                        <span class="material-symbols-outlined">mic</span>
+                                    </button>
+                                    <button class="web-img__send-btn" id="web-img-response-send" disabled style="display:none" aria-label="Send">
+                                        <span class="material-symbols-outlined">send</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+        
+                <!-- Luminous particle transition overlay -->
+                <canvas class="web-img__transition-canvas" id="web-img-transition-canvas"></canvas>
+
+                <!-- === EDIT SURFACE (hidden by default) === -->
+                <div class="web-img__edit-surface" id="web-img-edit-surface" hidden>
+                    <!-- Top Toolbar -->
+                    <nav class="web-img__toolbar" id="web-img-toolbar">
+                        <div class="web-img__toolbar-left">
+                            <button class="web-img__toolbar-close" id="web-img-edit-close" aria-label="Close" title="Close editor">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div class="web-img__toolbar-center" id="web-img-toolbar-center">
+                            <button class="web-img__tool-btn" id="web-img-tool-select" data-tool="select" title="Draw on the image to select areas for editing">
+                                <span class="material-symbols-outlined">gesture</span>
+                                Select
+                            </button>
+                            <button class="web-img__tool-btn" id="web-img-tool-text" data-tool="text" title="Add or edit text on the image">
+                                <span class="material-symbols-outlined">select</span>
+                                Text
+                            </button>
+                            <button class="web-img__tool-btn" id="web-img-tool-resize" data-tool="resize" title="Change the aspect ratio of your image">
+                                <span class="material-symbols-outlined">resize</span>
+                                Resize
+                            </button>
+                            <button class="web-img__tool-btn" id="web-img-tool-effects" data-tool="effects" title="Apply effects like remove background, lighting, and more">
+                                <span class="material-symbols-outlined">tune</span>
+                                Effects
+                            </button>
+                        </div>
+                        <div class="web-img__toolbar-right">
+                            <button class="web-img__toolbar-icon" id="web-img-undo" aria-label="Undo" title="Undo last edit" disabled>
+                                <span class="material-symbols-outlined">undo</span>
+                            </button>
+                            <button class="web-img__toolbar-icon" id="web-img-redo" aria-label="Redo" title="Redo last undone edit" disabled>
+                                <span class="material-symbols-outlined">redo</span>
+                            </button>
+                            <button class="web-img__toolbar-done" id="web-img-done" title="Save edits and return to response" disabled>Save</button>
+                        </div>
+                    </nav>
+        
+                    <!-- Canvas Area -->
+                    <div class="web-img__canvas-area" id="web-img-canvas-area">
+                        <div class="web-img__canvas-wrapper" id="web-img-canvas-wrapper">
+                            <img class="web-img__canvas-img" id="web-img-canvas-img" src="" alt="Editing image">
+                            <canvas class="web-img__draw-canvas" id="web-img-draw-canvas"></canvas>
+                            <canvas class="web-img__erase-canvas" id="web-img-erase-canvas" hidden></canvas>
+                            <!-- Particle loader canvas -->
+                            <canvas class="web-img__particle-canvas" id="web-img-particle-canvas"></canvas>
+                            <!-- Text overlay removed - floating text created dynamically -->
+                            <!-- Select lasso overlay -->
+                            <svg class="web-img__lasso-svg" id="web-img-lasso-svg" hidden></svg>
+                            <!-- Resize crop overlay -->
+                            <div class="web-img__resize-overlay" id="web-img-resize-overlay" hidden>
+                                <div class="web-img__resize-border"></div>
+                                <div class="web-img__resize-handle web-img__resize-handle--tl"></div>
+                                <div class="web-img__resize-handle web-img__resize-handle--tr"></div>
+                                <div class="web-img__resize-handle web-img__resize-handle--bl"></div>
+                                <div class="web-img__resize-handle web-img__resize-handle--br"></div>
+                            </div>
+                        </div>
+                        <!-- Loading shimmer -->
+                        <div class="web-img__loading" id="web-img-loading" hidden>
+                            <div class="web-img__loading-spinner"></div>
+                            <button class="web-img__loading-cancel" id="web-img-loading-cancel">
+                                <span class="material-symbols-outlined">close</span>
+                                Cancel
+                            </button>
+                        </div>
+
+                        <!-- Sub-tool panels (floating inside canvas) -->
+                        <div class="web-img__subtool-bar" id="web-img-subtool-bar" hidden>
+                        <!-- Effects sub-tools -->
+                        <div class="web-img__subtools" id="web-img-effects-subtools" data-parent="effects" hidden>
+                            <button class="web-img__subtool-btn" data-subtool="removebg" title="Remove the background from your image">
+                                <span class="material-symbols-outlined">background_replace</span>
+                                <span>Remove BG</span>
+                            </button>
+                            <button class="web-img__subtool-btn" data-subtool="erase" title="Erase objects by painting over them">
+                                <span class="material-symbols-outlined">ink_eraser</span>
+                                <span>Erase</span>
+                            </button>
+                        </div>
+                        <!-- Resize sub-tools -->
+                        <div class="web-img__subtools" id="web-img-resize-subtools" data-parent="resize" hidden>
+                            <button class="web-img__subtool-btn" data-subtool="square" title="Resize to 1:1 square aspect ratio">
+                                <span class="material-symbols-outlined">crop_square</span>
+                                <span>Square</span>
+                            </button>
+                            <button class="web-img__subtool-btn" data-subtool="portrait" title="Resize to 9:16 portrait aspect ratio">
+                                <span class="material-symbols-outlined">smartphone</span>
+                                <span>Portrait</span>
+                            </button>
+                            <button class="web-img__subtool-btn" data-subtool="landscape" title="Resize to 16:9 landscape aspect ratio">
+                                <span class="material-symbols-outlined">crop_landscape</span>
+                                <span>Landscape</span>
+                            </button>
+                        </div>
+                        </div>
+                    </div><!-- /.web-img__canvas-area -->
+        
+                    <!-- Bottom Input Bar (for Select/Text tools) -->
+                    <footer class="web-img__edit-input" id="web-img-edit-input" hidden>
+                        <div class="web-img__edit-input-inner">
+                            <!-- Attachment preview row (shown when image attached) -->
+                            <div class="web-img__edit-attach-row" id="web-img-edit-attach-row" hidden>
+                                <div class="web-img__edit-attach-chip" id="web-img-edit-attach-chip">
+                                    <img class="web-img__edit-attach-thumb" id="web-img-edit-attach-thumb" src="" alt="Attached image">
+                                    <button class="web-img__edit-attach-close" id="web-img-edit-attach-close" aria-label="Remove attachment">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="web-img__edit-input-row">
+                                <button class="web-img__edit-add-btn" id="web-img-edit-add-btn" aria-label="Attach image" title="Attach an image to place in your doodle area">
+                                    <span class="material-symbols-outlined">add</span>
+                                </button>
+                                <input type="file" id="web-img-edit-attach-input" accept="image/*" hidden>
+                                <div class="web-img__edit-input-field">
+                                    <input type="text" class="web-img__edit-input-text" id="web-img-edit-prompt"
+                                        placeholder="Edit your image" autocomplete="off" aria-label="Edit your image">
+                                </div>
+                                <div class="web-img__edit-input-actions">
+                                    <button class="web-img__edit-send-btn" id="web-img-edit-send" aria-label="Send edit">
+                                        <span class="material-symbols-outlined">send</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+
+                <!-- Education overlay (first visit) -->
+                <div class="web-img__education" id="web-img-education" hidden>
+                    <div class="web-img__education-content">
+                        <span class="material-symbols-outlined web-img__education-icon">gesture</span>
+                        <p class="web-img__education-text">Mark up to add, edit, or remove</p>
+                        <button class="web-img__education-gotit" id="web-img-education-gotit">Got it</button>
+                    </div>
+                </div>
+
+                <!-- Discard confirmation dialog -->
+                <div class="web-img__discard-dialog" id="web-img-discard-dialog" hidden>
+                    <div class="web-img__discard-backdrop" id="web-img-discard-backdrop"></div>
+                    <div class="web-img__discard-card">
+                        <div class="web-img__discard-header">
+                            <h3 class="web-img__discard-title">Discard edits?</h3>
+                            <button class="web-img__discard-close" id="web-img-discard-keep-x" aria-label="Close">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div class="web-img__discard-content">
+                            <p class="web-img__discard-body">If you go back, you'll lose all the edits you made to this image.</p>
+                        </div>
+                        <div class="web-img__discard-footer">
+                            <button class="web-img__discard-btn" id="web-img-discard-keep">Keep editing</button>
+                            <button class="web-img__discard-btn" id="web-img-discard-confirm">Discard</button>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.web-img__main -->
+        </div><!-- /.web-image-shell -->
+        <!-- END WEB IMAGE EDITING PROTOTYPE -->
+
+        <div class="app-shell app-shell--music" id="music-shell" style="display:none">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-bar__time">9:30</div>
+                <div class="status-bar__icons">
+                    <svg class="status-bar__cellular" width="17" height="13" viewBox="0 0 17 13" fill="none">
+                        <rect x="0" y="6" width="3" height="7" rx="1.5" fill="#1F1F1F" />
+                        <rect x="5" y="4" width="3" height="9" rx="1.5" fill="#1F1F1F" />
+                        <rect x="10" y="2" width="3" height="11" rx="1.5" fill="#1F1F1F" />
+                        <rect x="15" y="0" width="3" height="13" rx="1.5" fill="#1F1F1F" />
+                    </svg>
+                    <svg class="status-bar__wifi" width="19" height="13" viewBox="0 0 19 13" fill="none">
+                        <path d="M9.5 13a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="#1F1F1F" />
+                        <path d="M5.5 8.5c1.1-1.1 2.5-1.7 4-1.7s2.9.6 4 1.7" stroke="#1F1F1F" stroke-width="1.5"
+                            stroke-linecap="round" fill="none" />
+                        <path d="M2.5 5.5c1.9-1.9 4.3-2.9 7-2.9s5.1 1 7 2.9" stroke="#1F1F1F" stroke-width="1.5"
+                            stroke-linecap="round" fill="none" />
+                    </svg>
+                    <svg class="status-bar__battery" width="27" height="13" viewBox="0 0 27 13" fill="none">
+                        <rect x="0" y="0" width="24" height="13" rx="3" fill="#1F1F1F" />
+                        <rect x="25" y="3.5" width="2" height="6" rx="1" fill="#1F1F1F" opacity="0.4" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- App Bar -->
+            <div class="app-bar">
+                <button class="app-bar__icon-btn" aria-label="Chat history">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="app-bar__title">
+                    <span class="app-bar__logo-text">Gemini</span>
+                </div>
+                <button class="app-bar__avatar" aria-label="User profile">
+                    <div class="avatar-circle">
+                        <img src="../images/eric_profile_photo.jpeg" alt="Profile" class="avatar-circle__img">
+                    </div>
+                </button>
+            </div>
+
+            <!-- Music Content -->
+            <div class="content" id="music-content">
+                <!-- Heading -->
+                <div class="content__heading">
+                    <h1 class="content__title">Pick a track to remix</h1>
+                </div>
+
+                <!-- Music Cards Grid -->
+                <div class="music-grid" id="music-grid">
+                    <!-- Row 1 -->
+                    <div class="music-grid__row">
+                        <div class="music-card" id="card-90s-rap" data-genre="90s-rap" role="button" tabindex="0">
+                            <img src="../images/90s-rap.png" alt="90s rap" class="music-card__img" loading="lazy">
+                            <div class="music-card__overlay"></div>
+
+                            <div class="music-card__label-bar">
+                                <span class="music-card__label">90s rap</span>
+                                <span class="music-card__play-btn" role="button" tabindex="0"
+                                    aria-label="Preview 90s rap">
+                                    <span>play_arrow</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="music-card" id="card-latin-pop" data-genre="latin-pop" role="button" tabindex="0">
+                            <img src="../images/latin-pop.png" alt="Latin pop" class="music-card__img" loading="lazy">
+                            <div class="music-card__overlay"></div>
+
+                            <div class="music-card__label-bar">
+                                <span class="music-card__label">Latin pop</span>
+                                <span class="music-card__play-btn" role="button" tabindex="0"
+                                    aria-label="Preview Latin pop">
+                                    <span>play_arrow</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="music-grid__row">
+                        <div class="music-card" id="card-folk-ballad" data-genre="folk-ballad" role="button"
+                            tabindex="0">
+                            <img src="../images/folk-ballad.png" alt="Folk ballad" class="music-card__img" loading="lazy">
+                            <div class="music-card__overlay"></div>
+
+                            <div class="music-card__label-bar">
+                                <span class="music-card__label">Folk ballad</span>
+                                <span class="music-card__play-btn" role="button" tabindex="0"
+                                    aria-label="Preview Folk ballad">
+                                    <span>play_arrow</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="music-card" id="card-8-bit" data-genre="8-bit" role="button" tabindex="0">
+                            <img src="../images/8-bit.png" alt="8-bit" class="music-card__img" loading="lazy">
+                            <div class="music-card__overlay"></div>
+
+                            <div class="music-card__label-bar">
+                                <span class="music-card__label">8-bit</span>
+                                <span class="music-card__play-btn" role="button" tabindex="0"
+                                    aria-label="Preview 8-bit">
+                                    <span>play_arrow</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3 -->
+                    <div class="music-grid__row">
+                        <div class="music-card" id="card-workout" data-genre="workout" role="button" tabindex="0">
+                            <img src="../images/workout.png" alt="Workout" class="music-card__img" loading="lazy">
+                            <div class="music-card__overlay"></div>
+
+                            <div class="music-card__label-bar">
+                                <span class="music-card__label">Workout</span>
+                                <span class="music-card__play-btn" role="button" tabindex="0"
+                                    aria-label="Preview Workout">
+                                    <span>play_arrow</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="music-card" id="card-reggaeton" data-genre="reggaeton" role="button" tabindex="0">
+                            <img src="../images/reggaeton.png" alt="Reggaeton" class="music-card__img" loading="lazy">
+                            <div class="music-card__overlay"></div>
+
+                            <div class="music-card__label-bar">
+                                <span class="music-card__label">Reggaeton</span>
+                                <span class="music-card__play-btn" role="button" tabindex="0"
+                                    aria-label="Preview Reggaeton">
+                                    <span>play_arrow</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Music Response Screen (hidden by default) -->
+            <div class="music-response-screen" id="music-response-screen" hidden>
+                <!-- Response App Bar -->
+                <div class="response-bar" id="music-response-bar">
+                    <button class="app-bar__icon-btn" id="music-back-btn" aria-label="Go back">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <div class="response-bar__title">
+                        <span class="response-bar__title-text" id="music-response-title">Song Template</span>
+                    </div>
+                    <button class="app-bar__avatar" aria-label="User profile">
+                        <div class="avatar-circle">
+                            <img src="../images/eric_profile_photo.jpeg" alt="Profile" class="avatar-circle__img">
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Response Content -->
+                <div class="response-content" id="music-response-content">
+                    <!-- User Prompt Area -->
+                    <div class="response-prompt" id="music-response-prompt">
+                        <!-- Attachment Thumbnails -->
+                        <div class="response-prompt__attachments" id="music-response-attachments">
+                            <div class="response-thumb" id="music-response-thumb-genre">
+                                <img class="response-thumb__img" id="music-response-thumb-genre-img" src="" alt="">
+                                <span class="response-thumb__label" id="music-response-thumb-genre-label">Remix</span>
+                            </div>
+                            <div class="response-thumb" id="music-response-thumb-photo" hidden>
+                                <img class="response-thumb__img" id="music-response-thumb-photo-img" src=""
+                                    alt="Your photo">
+                            </div>
+                        </div>
+                        <!-- Prompt Bubble -->
+                        <div class="response-prompt__bubble" id="music-response-prompt-bubble">
+                            <span class="response-prompt__text" id="music-response-prompt-text">Make this into a country
+                                song</span>
+                        </div>
+                    </div>
+
+                    <!-- Gemini Response -->
+                    <div class="response-answer">
+                        <!-- Sparkle Header -->
+                        <div class="response-answer__header">
+                            <svg class="response-answer__sparkle" width="27" height="22" viewBox="0 0 27 22"
+                                fill="none">
+                                <path
+                                    d="M19.6162 9.835C17.9212 9.105 16.4388 8.105 15.1663 6.8338C13.895 5.5625 12.8938 4.0788 12.165 2.3838C11.885 1.7338 11.66 1.0663 11.4875 0.3813C11.4313 0.1575 11.2313 0 11 0C10.7688 0 10.5687 0.1575 10.5125 0.3813C10.34 1.0663 10.115 1.7325 9.835 2.3838C9.105 4.0788 8.105 5.5625 6.8337 6.8338C5.5625 8.1038 4.07875 9.105 2.38375 9.835C1.73375 10.115 1.06625 10.34 0.38125 10.5125C0.1575 10.5688 0 10.7688 0 11C0 11.2313 0.1575 11.4313 0.38125 11.4875C1.06625 11.66 1.7325 11.885 2.38375 12.165C4.07875 12.895 5.5612 13.895 6.8337 15.1663C8.105 16.4375 9.1063 17.9213 9.835 19.6163C10.115 20.2663 10.34 20.9338 10.5125 21.6188C10.5687 21.8425 10.77 22 11 22C11.2313 22 11.4313 21.8425 11.4875 21.6188C11.66 20.9338 11.885 20.2675 12.165 19.6163C12.895 17.9213 13.895 16.4388 15.1663 15.1663C16.4375 13.895 17.9212 12.8938 19.6162 12.165C20.2662 11.885 20.9337 11.66 21.6187 11.4875C21.8425 11.4313 22 11.23 22 11C22 10.7688 21.8425 10.5688 21.6187 10.5125C20.9337 10.34 20.2675 10.115 19.6162 9.835Z"
+                                    fill="url(#music_sparkle_grad)" />
+                                <defs>
+                                    <linearGradient id="music_sparkle_grad" x1="7.05" y1="14.34" x2="16.62" y2="6.25"
+                                        gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#346BF1" />
+                                        <stop offset="0.4" stop-color="#3186FF" />
+                                        <stop offset="0.8" stop-color="#4FA0FF" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="response-answer__spacer"></div>
+                            <button class="response-answer__menu" id="music-response-menu-btn"
+                                aria-label="More options">
+                                <span class="material-symbols-outlined">more_vert</span>
+                            </button>
+                        </div>
+
+                        <!-- Response Text -->
+                        <p class="response-answer__text" id="music-response-answer-text">Your song is ready!</p>
+
+                        <!-- Music Player -->
+                        <div class="music-player" id="music-player">
+                            <div class="music-player__artwork" id="music-player-artwork">
+                                <img class="music-player__artwork-img" id="music-player-artwork-img" src=""
+                                    alt="Album cover">
+                                <!-- Overlay Controls -->
+                                <div class="music-player__overlay-controls">
+                                    <button class="music-player__ctrl-btn" id="music-player-edit-btn" aria-label="Edit">
+                                        <span class="material-symbols-outlined">edit</span>
+                                    </button>
+                                    <button class="music-player__ctrl-btn" id="music-player-share-btn"
+                                        aria-label="Share">
+                                        <span class="material-symbols-outlined">share</span>
+                                    </button>
+                                    <button class="music-player__ctrl-btn" id="music-player-download-btn"
+                                        aria-label="Download">
+                                        <span class="material-symbols-outlined">download</span>
+                                    </button>
+                                </div>
+                                <!-- Center Play/Pause -->
+                                <button class="music-player__play-pause" id="music-player-play-pause"
+                                    aria-label="Play or Pause">
+                                    <span id="music-player-play-icon">pause</span>
+                                </button>
+                                <!-- Sound Toggle -->
+                                <button class="music-player__sound-toggle" id="music-player-sound-toggle"
+                                    aria-label="Toggle sound">
+                                    <span class="material-symbols-outlined"
+                                        id="music-player-sound-icon">volume_off</span>
+                                </button>
+                                <!-- Progress section -->
+                                <div class="music-player__progress-section">
+                                    <span class="music-player__time" id="music-player-current-time">0:00</span>
+                                    <span class="music-player__time-separator">/</span>
+                                    <span class="music-player__time" id="music-player-total-time">0:08</span>
+                                </div>
+                                <div class="music-player__progress-bar">
+                                    <div class="music-player__progress-track" id="music-player-progress-track">
+                                        <div class="music-player__progress-fill" id="music-player-progress-fill"></div>
+                                        <div class="music-player__progress-thumb" id="music-player-progress-thumb">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Bar -->
+                        <div class="response-actions" id="music-response-actions">
+                            <button class="response-actions__btn" id="music-btn-thumbup" aria-label="Good response">
+                                <span class="material-symbols-outlined">thumb_up</span>
+                            </button>
+                            <button class="response-actions__btn" id="music-btn-thumbdown" aria-label="Bad response">
+                                <span class="material-symbols-outlined">thumb_down</span>
+                            </button>
+                            <button class="response-actions__btn" id="music-btn-share-response"
+                                aria-label="Share response">
+                                <span class="material-symbols-outlined">share</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Music Edit Screen (hidden by default) -->
+            <div class="music-edit-screen" id="music-edit-screen" hidden>
+                <!-- Dark Status Bar -->
+                <div class="music-edit__status-bar">
+                    <span class="music-edit__status-time">9:30</span>
+                    <div class="music-edit__status-icons">
+                        <svg width="17" height="13" viewBox="0 0 17 13" fill="none">
+                            <rect x="0" y="6" width="3" height="7" rx="1.5" fill="white" />
+                            <rect x="5" y="4" width="3" height="9" rx="1.5" fill="white" />
+                            <rect x="10" y="2" width="3" height="11" rx="1.5" fill="white" />
+                            <rect x="15" y="0" width="3" height="13" rx="1.5" fill="white" />
+                        </svg>
+                        <svg width="19" height="13" viewBox="0 0 19 13" fill="none">
+                            <path d="M9.5 13a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="white" />
+                            <path d="M5.5 8.5c1.1-1.1 2.5-1.7 4-1.7s2.9.6 4 1.7" stroke="white" stroke-width="1.5"
+                                stroke-linecap="round" fill="none" />
+                            <path d="M2.5 5.5c1.9-1.9 4.3-2.9 7-2.9s5.1 1 7 2.9" stroke="white" stroke-width="1.5"
+                                stroke-linecap="round" fill="none" />
+                        </svg>
+                        <svg width="27" height="13" viewBox="0 0 27 13" fill="none">
+                            <rect x="0" y="0" width="24" height="13" rx="3" fill="white" />
+                            <rect x="25" y="3.5" width="2" height="6" rx="1" fill="white" opacity="0.4" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Edit App Bar -->
+                <div class="music-edit__app-bar">
+                    <button class="music-edit__close-btn" id="music-edit-close" aria-label="Close editor">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                    <button class="music-edit__cancel-btn" id="music-edit-cancel" hidden>Cancel</button>
+                    <span class="music-edit__title" id="music-edit-title">Edit</span>
+                    <div class="music-edit__appbar-actions" id="music-edit-appbar-actions" hidden>
+                        <button class="music-edit__undo-btn" id="music-edit-undo" aria-label="Undo" disabled>
+                            <span class="material-symbols-outlined">undo</span>
+                        </button>
+                        <button class="music-edit__redo-btn" id="music-edit-redo" aria-label="Redo" disabled>
+                            <span class="material-symbols-outlined">redo</span>
+                        </button>
+                    </div>
+                    <button class="music-edit__done-btn" id="music-edit-done">Save</button>
+                </div>
+
+                <!-- Album Artwork Display (Flip Card) -->
+                <div class="music-edit__artwork-area">
+                    <div class="music-edit__artwork-container" id="music-edit-artwork-container">
+                        <div class="music-edit__flip-card">
+                            <!-- Front: Album Art -->
+                            <div class="music-edit__flip-front">
+                                <img class="music-edit__artwork-img" id="music-edit-artwork-img" src=""
+                                    alt="Album cover">
+                                <!-- Drawing canvas for Select/Text -->
+                                <canvas class="music-art__draw-canvas" id="music-art-draw-canvas"></canvas>
+                                <!-- Erase brush canvas overlay -->
+                                <canvas class="music-art__erase-canvas" id="music-art-erase-canvas" hidden></canvas>
+                                <!-- Particle overlay (loading state) -->
+                                <canvas class="music-art__particle-canvas" id="music-art-particle-canvas"></canvas>
+                                <!-- Education overlay -->
+                                <div class="music-art__overlay hidden" id="music-art-overlay">
+                                    <div class="music-art__overlay-content">
+                                        <span class="material-symbols-outlined">stylus_note</span>
+                                        <p>Draw on art to select area</p>
+                                        <button class="music-art__overlay-gotit" id="music-art-overlay-gotit">Got
+                                            it</button>
+                                    </div>
+                                </div>
+                                <button class="music-edit__play-btn" id="music-edit-play-btn"
+                                    aria-label="Play or Pause">
+                                    <span id="music-edit-play-icon">play_arrow</span>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tools Section -->
+                <div class="music-edit__tools-section">
+                    <!-- Tool Buttons -->
+                    <div class="music-edit__tool-buttons">
+                        <div class="music-edit__tool" data-tool="art">
+                            <button class="music-edit__tool-btn" aria-label="Art">
+                                <span class="material-symbols-outlined">image</span>
+                            </button>
+                            <span class="music-edit__tool-label">Art</span>
+                        </div>
+                        <div class="music-edit__tool" data-tool="lyrics">
+                            <button class="music-edit__tool-btn" aria-label="Lyrics">
+                                <span class="material-symbols-outlined">lyrics</span>
+                            </button>
+                            <span class="music-edit__tool-label">Lyrics</span>
+                        </div>
+                        <div class="music-edit__tool" data-tool="mood">
+                            <button class="music-edit__tool-btn" aria-label="Mood">
+                                <span class="material-symbols-outlined">emoji_objects</span>
+                            </button>
+                            <span class="music-edit__tool-label">Mood</span>
+                        </div>
+                        <!-- Mood FX now opens from this button but lives in the lighting bottom sheet -->
+                    </div>
+
+                    <!-- Tool Content Panels -->
+                    <!-- Art -->
+                    <div class="music-edit__tool-panel" id="panel-art" hidden>
+                        <div class="edit-modal__tools-row">
+                            <button class="edit-modal__tool" data-tool="select">
+                                <div class="edit-modal__tool-icon">
+                                    <span class="material-symbols-outlined">gesture</span>
+                                </div>
+                                <span class="edit-modal__tool-label">Select</span>
+                            </button>
+                            <button class="edit-modal__tool" data-tool="text">
+                                <div class="edit-modal__tool-icon">
+                                    <span class="material-symbols-outlined">select</span>
+                                </div>
+                                <span class="edit-modal__tool-label">Text</span>
+                            </button>
+                            <button class="edit-modal__tool" data-tool="effects">
+                                <div class="edit-modal__tool-icon">
+                                    <span class="material-symbols-outlined">tune</span>
+                                </div>
+                                <span class="edit-modal__tool-label">Effects</span>
+                            </button>
+                        </div>
+                        <!-- Effects sub-tools (shown when Effects is active) -->
+                        <div class="edit-modal__subtools" id="music-art-effects-subtools" data-parent="effects" hidden>
+                            <button class="edit-modal__subtool" data-subtool="removebg">
+                                <div class="edit-modal__subtool-icon">
+                                    <span class="material-symbols-outlined">background_replace</span>
+                                </div>
+                                <span class="edit-modal__subtool-label">Remove<br>background</span>
+                            </button>
+                            <button class="edit-modal__subtool" data-subtool="lighting">
+                                <div class="edit-modal__subtool-icon">
+                                    <span class="material-symbols-outlined">wb_sunny</span>
+                                </div>
+                                <span class="edit-modal__subtool-label">Lighting</span>
+                            </button>
+                            <button class="edit-modal__subtool" data-subtool="portrait">
+                                <div class="edit-modal__subtool-icon">
+                                    <span class="material-symbols-outlined">portrait</span>
+                                </div>
+                                <span class="edit-modal__subtool-label">Portrait</span>
+                            </button>
+                            <button class="edit-modal__subtool" data-subtool="erase" id="music-erase-subtool-btn">
+                                <div class="edit-modal__subtool-icon">
+                                    <span class="material-symbols-outlined">ink_eraser</span>
+                                </div>
+                                <span class="edit-modal__subtool-label">Erase</span>
+                            </button>
+                        </div>
+                        <!-- Music Lighting Panel -->
+                        <div class="lighting-panel" id="music-lighting-panel" hidden>
+                            <div class="lighting-panel__header">
+                                <span class="lighting-panel__title">
+                                    <span class="material-symbols-outlined">wb_sunny</span>
+                                    Lighting
+                                </span>
+                                <button class="lighting-panel__close" id="music-lighting-close-btn" type="button">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                            <div class="lighting-panel__directions">
+                                <button class="lighting-dir-btn" data-dir="top-left" title="Top Left">↖</button>
+                                <button class="lighting-dir-btn" data-dir="top" title="Top">↑</button>
+                                <button class="lighting-dir-btn" data-dir="top-right" title="Top Right">↗</button>
+                                <button class="lighting-dir-btn" data-dir="left" title="Left">←</button>
+                                <button class="lighting-dir-btn active" data-dir="center" title="Center">●</button>
+                                <button class="lighting-dir-btn" data-dir="right" title="Right">→</button>
+                                <button class="lighting-dir-btn" data-dir="bottom-left" title="Bottom Left">↙</button>
+                                <button class="lighting-dir-btn" data-dir="bottom" title="Bottom">↓</button>
+                                <button class="lighting-dir-btn" data-dir="bottom-right" title="Bottom Right">↘</button>
+                            </div>
+                            <div class="lighting-panel__sliders">
+                                <div class="lighting-slider-row">
+                                    <label class="lighting-slider-label"><span
+                                            class="material-symbols-outlined">light_mode</span>Intensity</label>
+                                    <input type="range" class="lighting-slider" id="music-lighting-intensity" min="0" max="100" value="60">
+                                    <span class="lighting-slider-value" id="music-lighting-intensity-val">60</span>
+                                </div>
+                                <div class="lighting-slider-row">
+                                        <label class="lighting-slider-label"><span class="material-symbols-outlined">thermometer</span>Warmth</label>
+                                        <input type="range" class="lighting-slider" id="music-lighting-warmth" min="0" max="100" value="50">
+                                        <span class="lighting-slider-value" id="music-lighting-warmth-val">50</span>
+                                        </div>
+                                        <div class="lighting-slider-row">
+                                            <label class="lighting-slider-label"><span class="material-symbols-outlined">flare</span>Ambient</label>
+                                            <input type="range" class="lighting-slider" id="music-lighting-ambient" min="0" max="100" value="40">
+                                            <span class="lighting-slider-value" id="music-lighting-ambient-val">40</span>
+                                        </div>
+                                        <div class="lighting-slider-row">
+                                            <label class="lighting-slider-label"><span class="material-symbols-outlined">exposure</span>Exposure</label>
+                                            <input type="range" class="lighting-slider" id="music-lighting-exposure" min="0" max="100" value="50">
+                                            <span class="lighting-slider-value" id="music-lighting-exposure-val">50</span>
+                                        </div>
+                                        <div class="lighting-slider-row">
+                                            <label class="lighting-slider-label"><span class="material-symbols-outlined">shadow</span>Shadows</label>
+                                            <input type="range" class="lighting-slider" id="music-lighting-shadows" min="0" max="100" value="50">
+                                            <span class="lighting-slider-value" id="music-lighting-shadows-val">50</span>
+                                        </div>
+                                        <div class="lighting-slider-row">
+                                        <label class="lighting-slider-label"><span class="material-symbols-outlined">highlight</span>Highlights</label>
+                                        <input type="range" class="lighting-slider" id="music-lighting-highlights" min="0" max="100" value="50">
+                                        <span class="lighting-slider-value" id="music-lighting-highlights-val">50</span>
+                                        </div>
+                                        <div class="lighting-slider-row">
+                                            <label class="lighting-slider-label"><span class="material-symbols-outlined">contrast</span>Contrast</label>
+                                            <input type="range" class="lighting-slider" id="music-lighting-contrast" min="0" max="100" value="50">
+                                            <span class="lighting-slider-value" id="music-lighting-contrast-val">50</span>
+                                        </div>
+                                        </div>
+                            <button class="lighting-panel__apply" id="music-lighting-apply-btn" type="button">Apply
+                                Lighting</button>
+                            </div>
+
+                        <!-- Music Portrait Panel -->
+                        <div class="portrait-panel" id="music-portrait-panel" hidden>
+                            <div class="portrait-panel__header">
+                                <span class="portrait-panel__title">
+                                    <span class="material-symbols-outlined">portrait</span>
+                                    Portrait Mode
+                                </span>
+                                <button class="portrait-panel__close" id="music-portrait-close-btn" type="button">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                            <div class="portrait-panel__sliders">
+                                <div class="lighting-slider-row">
+                                    <label class="lighting-slider-label"><span class="material-symbols-outlined">blur_on</span>Depth</label>
+                                    <input type="range" class="lighting-slider" id="music-portrait-depth" min="0" max="100" value="60">
+                                    <span class="lighting-slider-value" id="music-portrait-depth-val">60</span>
+                                </div>
+                                <div class="lighting-slider-row">
+                                        <label class="lighting-slider-label"><span class="material-symbols-outlined">blur_circular</span>Bokeh</label>
+                                        <input type="range" class="lighting-slider" id="music-portrait-bokeh" min="0" max="100" value="50">
+                                        <span class="lighting-slider-value" id="music-portrait-bokeh-val">50</span>
+                                        </div>
+                                        <div class="lighting-slider-row">
+                                            <label class="lighting-slider-label"><span class="material-symbols-outlined">flare</span>Halation</label>
+                                            <input type="range" class="lighting-slider" id="music-portrait-halation" min="0" max="100" value="35">
+                                            <span class="lighting-slider-value" id="music-portrait-halation-val">35</span>
+                                        </div>
+                                        <div class="lighting-slider-row">
+                                            <label class="lighting-slider-label"><span class="material-symbols-outlined">vignette</span>Vignette</label>
+                                            <input type="range" class="lighting-slider" id="music-portrait-vignette" min="0" max="100" value="40">
+                                            <span class="lighting-slider-value" id="music-portrait-vignette-val">40</span>
+                                        </div>
+                                        </div>
+                                        <button class="portrait-panel__apply" id="music-portrait-apply-btn" type="button">Apply</button>
+                                        </div>
+
+                    </div>
+
+                    <!-- Lyrics full-screen editor -->
+                    <div class="music-edit__tool-panel music-edit__lyrics-panel" id="panel-lyrics" hidden>
+                        <div class="music-edit__lyrics-card">
+                            <div class="music-edit__lyrics-scroll" id="music-edit-lyrics-scroll">
+                                <div class="music-edit__lyrics-text" id="music-edit-lyrics-text"
+                                    contenteditable="false"></div>
+                            </div>
+                            <div class="music-edit__lyrics-scrubber">
+                                <div class="music-edit__lyrics-scrubber-track">
+                                    <div class="music-edit__lyrics-scrubber-fill" id="lyrics-scrubber-fill"></div>
+                                    <div class="music-edit__lyrics-scrubber-thumb" id="lyrics-scrubber-thumb">
+                                        <span class="material-symbols-outlined" id="lyrics-scrubber-icon">pause</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="music-edit__gesture-bar">
+                                <div class="music-edit__gesture-handle"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mood tool panel (inline, not a bottom sheet overlay) -->
+                    <div class="music-edit__tool-panel" id="panel-mood" hidden>
+                        <div class="mood-pad mood-pad--inlined">
+                            <div class="mood-pad__header">
+                                <span class="mood-pad__title">Mood</span>
+                                <span class="mood-pad__subtitle">Touch to shape the feel</span>
+                            </div>
+                            <div class="mood-pad__surface" id="mood-pad-surface">
+                                <!-- Axis labels — typographic anchors -->
+                                <span class="mood-pad__axis-label mood-pad__axis-label--left">Warm</span>
+                                <span class="mood-pad__axis-label mood-pad__axis-label--right">Bright</span>
+                                <span class="mood-pad__axis-label mood-pad__axis-label--top">Spacious</span>
+                                <span class="mood-pad__axis-label mood-pad__axis-label--bottom">Intimate</span>
+                                <!-- Grid lines -->
+                                <div class="mood-pad__grid"></div>
+                                <!-- Crosshairs -->
+                                <div class="mood-pad__crosshair"></div>
+                                <div class="mood-pad__crosshair mood-pad__crosshair--v"></div>
+                                <!-- Background glow (color shift) -->
+                                <div class="mood-pad__glow" id="mood-pad-glow"></div>
+                                <!-- Touch indicator circle -->
+                                <div class="mood-pad__finger" id="mood-pad-finger" hidden>
+                                    <div class="mood-pad__ripple" id="mood-pad-ripple"></div>
+                                </div>
+                                <!-- Cue / instruction text -->
+                                <div class="mood-pad__cue" id="mood-pad-cue"></div>
+
+                                <!-- Hold indicator -->
+                                <div class="mood-pad__hold" id="mood-pad-hold" hidden></div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input bar for Art Select/Text sub-tools -->
+                <div class="edit-modal__input" id="music-edit-lyrics-input" hidden>
+                    <div class="edit-modal__input-field">
+                        <input type="text" class="edit-modal__input-text" id="music-lyrics-input-text"
+                            placeholder="Draw on image to select area" autocomplete="off">
+                    </div>
+                    <div class="edit-modal__input-actions">
+                        <button class="edit-modal__send-btn" id="music-lyrics-send-btn" aria-label="Send edit">
+                            <span class="material-symbols-outlined">send</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Gesture Bar — always at bottom -->
+                <div class="music-edit__gesture-bar" id="music-edit-bottom-gesture-bar">
+                    <div class="music-edit__gesture-handle"></div>
+                </div>
+            </div>
+
+            <!-- Music Input Bar -->
+            <div class="input-bar" id="music-input-bar">
+                <div class="input-bar__inner">
+                    <div class="input-bar__field-row">
+                        <!-- Attachments Row -->
+                        <div class="attachment-row" id="music-attachment-row">
+                            <!-- Template Attachment (hidden by default) -->
+                            <div class="attachment-chip" id="music-attachment-chip" hidden>
+                                <img class="attachment-chip__thumb" id="music-attachment-thumb" src="" alt="">
+                                <span class="attachment-chip__label" id="music-attachment-label"></span>
+                                <button class="attachment-chip__close" id="music-attachment-close"
+                                    aria-label="Remove template">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                            <!-- Photo Attachment (hidden by default) -->
+                            <div class="attachment-chip" id="music-photo-chip" hidden>
+                                <img class="attachment-chip__thumb" id="music-photo-thumb" src="" alt="Your photo">
+                                <span class="attachment-chip__label" id="music-photo-label"></span>
+                                <button class="attachment-chip__close" id="music-photo-close" aria-label="Remove photo">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                            <!-- Add image button (hidden until genre selected) -->
+                            <button class="add-selfie-btn hidden" id="music-add-photo-btn" aria-label="Add image">
+                                <span class="material-symbols-outlined">add_a_photo</span>
+                                <span class="add-selfie-btn__label">Add image</span>
+                            </button>
+                            <input type="file" id="music-photo-input" accept="image/*" hidden>
+                        </div>
+                        <!-- Custom Placeholder Overlay -->
+                        <div class="input-bar__textarea-wrap">
+                            <div class="placeholder-overlay" id="music-placeholder-overlay">
+                                <span class="placeholder-overlay__prefix" id="music-placeholder-prefix">Describe your track</span>
+                                <span class="placeholder-drum" id="music-placeholder-drum" style="display:none">
+                                    <span class="placeholder-drum__track" id="music-placeholder-track"></span>
+                                </span>
+                            </div>
+                            <textarea class="input-bar__textarea" id="music-prompt-input" rows="1"></textarea>
+                        </div>
+                    </div>
+                    <div class="input-bar__action-row">
+                        <div class="input-bar__left-actions">
+                            <button class="input-bar__action-btn" id="music-btn-add" aria-label="Add attachment">
+                                <span class="material-symbols-outlined">add</span>
+                            </button>
+                            <button class="input-bar__chip" id="btn-music-chip" aria-label="Music mode">
+                                <svg class="chip__music-icon" width="14" height="14" viewBox="0 0 9 14" fill="none">
+                                    <path
+                                        d="M3 14C2.16667 14 1.45833 13.7083 0.875 13.125C0.291667 12.5417 0 11.8333 0 11C0 10.1667 0.291667 9.45833 0.875 8.875C1.45833 8.29167 2.16667 8 3 8C3.27778 8 3.54167 8.04167 3.79167 8.125C4.04167 8.19444 4.27778 8.29167 4.5 8.41667V0.75C4.5 0.541665 4.56944 0.368055 4.70833 0.229166C4.86111 0.076388 5.04167 0 5.25 0H8.25C8.45833 0 8.63195 0.076388 8.77083 0.229166C8.92361 0.368055 9 0.541665 9 0.75V2.25C9 2.45833 8.92361 2.63889 8.77083 2.79167C8.63195 2.93055 8.45833 3 8.25 3H6V11C6 11.8333 5.70833 12.5417 5.125 13.125C4.54167 13.7083 3.83333 14 3 14Z"
+                                        fill="#0B57D0" />
+                                </svg>
+                                <span class="chip__close material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div class="input-bar__right-actions">
+                            <button class="input-bar__thinking-pill" aria-label="Thinking mode">
+                                Thinking
+                            </button>
+                            <button class="input-bar__action-btn input-bar__action-btn--mic" id="music-btn-mic"
+                                aria-label="Voice input">
+                                <span class="material-symbols-outlined">mic</span>
+                            </button>
+                            <button class="input-bar__send-btn" id="music-btn-send" aria-label="Generate music" disabled
+                                style="display:none">
+                                <span class="material-symbols-outlined">send</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gesture Bar -->
+            <div class="gesture-bar">
+                <div class="gesture-bar__handle"></div>
+            </div>
+        </div>
+        <!-- END MUSIC EDITING PROTOTYPE -->
+
+        <!-- VIDEO EDITING PROTOTYPE -->
+        <div class="app-shell app-shell--video" id="video-shell" style="display:none">
+            <!-- Status Bar -->
+            <header class="status-bar">
+                <div class="status-bar__time">9:30</div>
+                <div class="status-bar__icons">
+                    <svg class="status-bar__cellular" width="17" height="13" viewBox="0 0 17 13" fill="none">
+                        <rect x="0" y="6" width="3" height="7" rx="1.5" fill="#1F1F1F" />
+                        <rect x="5" y="4" width="3" height="9" rx="1.5" fill="#1F1F1F" />
+                        <rect x="10" y="2" width="3" height="11" rx="1.5" fill="#1F1F1F" />
+                        <rect x="15" y="0" width="3" height="13" rx="1.5" fill="#1F1F1F" />
+                    </svg>
+                    <svg class="status-bar__wifi" width="19" height="13" viewBox="0 0 19 13" fill="none">
+                        <path d="M9.5 13a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="#1F1F1F" />
+                        <path d="M5.5 8.5c1.1-1.1 2.5-1.7 4-1.7s2.9.6 4 1.7" stroke="#1F1F1F" stroke-width="1.5"
+                            stroke-linecap="round" fill="none" />
+                        <path d="M2.5 5.5c1.9-1.9 4.3-2.9 7-2.9s5.1 1 7 2.9" stroke="#1F1F1F" stroke-width="1.5"
+                            stroke-linecap="round" fill="none" />
+                    </svg>
+                    <svg class="status-bar__battery" width="27" height="13" viewBox="0 0 27 13" fill="none">
+                        <rect x="0" y="0" width="24" height="13" rx="3" fill="#1F1F1F" />
+                        <rect x="25" y="3.5" width="2" height="6" rx="1" fill="#1F1F1F" opacity="0.4" />
+                    </svg>
+                </div>
+            </header>
+
+            <!-- Glassmorphic Toolbar (Figma dc-Toolbar) -->
+            <div class="video-glass-toolbar" id="video-glass-toolbar">
+                <div class="video-glass-toolbar__scrim"></div>
+                <button class="video-glass-btn video-glass-btn--menu" aria-label="Menu">
+                    <span class="material-symbols-outlined video-glass-btn__icon">menu</span>
+                </button>
+                <button class="video-glass-btn video-glass-btn--compose" id="video-compose-btn" aria-label="Compose">
+                    <span class="video-glass-btn__compose-icon">
+                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M24.5 15.167C24.5 21 19.833 23.333 14 23.333C8.167 23.333 3.5 21 3.5 15.167C3.5 9.333 7 7 12.833 7" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            <path d="M12.387 16.78L12.387 16.36C12.387 14.505 13.122 12.72 14.44 11.413L21.242 4.623C22.152 3.713 23.634 3.713 24.544 4.623C25.454 5.533 25.454 7.015 24.544 7.925L17.742 14.726C16.424 16.045 14.65 16.78 12.795 16.78L12.387 16.78Z" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                    </span>
+                    <span class="video-glass-btn__more-dots">⋯</span>
+                </button>
+            </div>
+
+            <!-- Video Content -->
+            <div class="content" id="video-content">
+                <!-- Heading -->
+                <div class="content__heading">
+                    <h1 class="content__title">Pick a template to make your own video</h1>
+                </div>
+
+                <!-- Video Cards Grid — same layout as Figma spec -->
+                <div class="video-grid" id="video-grid">
+                    <!-- Row 1: Full-width card -->
+                    <div class="video-grid__row">
+                        <div class="video-card video-card--wide" id="vcard-cyberpunk" data-vtemplate="cyberpunk"
+                            role="button" tabindex="0">
+                            <img src="../images/cyborg.png" alt="Cyberpunk" class="video-card__img" loading="lazy">
+                            <div class="video-card__overlay"></div>
+
+                            <div class="video-card__label-bar">
+                                <span class="video-card__label">Cyberpunk</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Two half-width cards -->
+                    <div class="video-grid__row video-grid__row--half">
+                        <div class="video-card" id="vcard-civilization" data-vtemplate="civilization" role="button"
+                            tabindex="0">
+                            <img src="../images/surreal.png" alt="Civilization" class="video-card__img" loading="lazy">
+                            <div class="video-card__overlay"></div>
+
+                            <div class="video-card__label-bar">
+                                <span class="video-card__label">Civilization</span>
+                            </div>
+                        </div>
+                        <div class="video-card" id="vcard-metalic" data-vtemplate="metalic" role="button" tabindex="0">
+                            <img src="../images/gothic-clay.png" alt="Metalic" class="video-card__img" loading="lazy">
+                            <div class="video-card__overlay"></div>
+
+                            <div class="video-card__label-bar">
+                                <span class="video-card__label">Metalic</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Full-width card -->
+                    <div class="video-grid__row">
+                        <div class="video-card video-card--wide" id="vcard-cutout" data-vtemplate="cutout" role="button"
+                            tabindex="0">
+                            <img src="../images/watercolor.png" alt="Cosmos" class="video-card__img" loading="lazy">
+                            <div class="video-card__overlay"></div>
+
+                            <div class="video-card__label-bar">
+                                <span class="video-card__label">Cosmos</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Two half-width cards -->
+                    <div class="video-grid__row video-grid__row--half">
+                        <div class="video-card" id="vcard-surreal" data-vtemplate="surreal" role="button" tabindex="0">
+                            <img src="../images/steampunk.png" alt="Surreal" class="video-card__img" loading="lazy">
+                            <div class="video-card__overlay"></div>
+
+                            <div class="video-card__label-bar">
+                                <span class="video-card__label">Surreal</span>
+                            </div>
+                        </div>
+                        <div class="video-card" id="vcard-explosive" data-vtemplate="explosive" role="button"
+                            tabindex="0">
+                            <img src="../images/explosive.png" alt="Explosive" class="video-card__img" loading="lazy">
+                            <div class="video-card__overlay"></div>
+
+                            <div class="video-card__label-bar">
+                                <span class="video-card__label">Explosive</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Response Screen (hidden by default) -->
+            <div class="video-response-screen" id="video-response-screen" hidden>
+                <!-- Response App Bar -->
+                <div class="response-bar" id="video-response-bar">
+                    <button class="app-bar__icon-btn" id="video-back-btn" aria-label="Go back">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <div class="response-bar__title">
+                        <span class="response-bar__title-text" id="video-response-title">Video Template</span>
+                    </div>
+                    <button class="app-bar__avatar" aria-label="User profile">
+                        <div class="avatar-circle">
+                            <img src="../images/eric_profile_photo.jpeg" alt="Profile" class="avatar-circle__img">
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Response Content -->
+                <div class="response-content" id="video-response-content">
+                    <!-- User Prompt Area -->
+                    <div class="response-prompt" id="video-response-prompt">
+                        <!-- Attachment Thumbnails -->
+                        <div class="response-prompt__attachments" id="video-response-attachments">
+                            <div class="response-thumb" id="video-response-thumb-template">
+                                <img class="response-thumb__img" id="video-response-thumb-template-img" src="" alt="">
+                                <span class="response-thumb__label"
+                                    id="video-response-thumb-template-label">Template</span>
+                            </div>
+                            <div class="response-thumb" id="video-response-thumb-photo" hidden>
+                                <img class="response-thumb__img" id="video-response-thumb-photo-img" src=""
+                                    alt="Your photo">
+                            </div>
+                        </div>
+                        <!-- Prompt Bubble -->
+                        <div class="response-prompt__bubble" id="video-response-prompt-bubble">
+                            <span class="response-prompt__text" id="video-response-prompt-text">Create a cinematic
+                                video</span>
+                        </div>
+                    </div>
+
+                    <!-- Gemini Response -->
+                    <div class="response-answer">
+                        <!-- Sparkle Header -->
+                        <div class="response-answer__header">
+                            <svg class="response-answer__sparkle" width="27" height="22" viewBox="0 0 27 22"
+                                fill="none">
+                                <path
+                                    d="M19.6162 9.835C17.9212 9.105 16.4388 8.105 15.1663 6.8338C13.895 5.5625 12.8938 4.0788 12.165 2.3838C11.885 1.7338 11.66 1.0663 11.4875 0.3813C11.4313 0.1575 11.2313 0 11 0C10.7688 0 10.5687 0.1575 10.5125 0.3813C10.34 1.0663 10.115 1.7325 9.835 2.3838C9.105 4.0788 8.105 5.5625 6.8337 6.8338C5.5625 8.1038 4.07875 9.105 2.38375 9.835C1.73375 10.115 1.06625 10.34 0.38125 10.5125C0.1575 10.5688 0 10.7688 0 11C0 11.2313 0.1575 11.4313 0.38125 11.4875C1.06625 11.66 1.7325 11.885 2.38375 12.165C4.07875 12.895 5.5612 13.895 6.8337 15.1663C8.105 16.4375 9.1063 17.9213 9.835 19.6163C10.115 20.2663 10.34 20.9338 10.5125 21.6188C10.5687 21.8425 10.77 22 11 22C11.2313 22 11.4313 21.8425 11.4875 21.6188C11.66 20.9338 11.885 20.2675 12.165 19.6163C12.895 17.9213 13.895 16.4388 15.1663 15.1663C16.4375 13.895 17.9212 12.8938 19.6162 12.165C20.2662 11.885 20.9337 11.66 21.6187 11.4875C21.8425 11.4313 22 11.23 22 11C22 10.7688 21.8425 10.5688 21.6187 10.5125C20.9337 10.34 20.2675 10.115 19.6162 9.835Z"
+                                    fill="url(#video_sparkle_grad)" />
+                                <defs>
+                                    <linearGradient id="video_sparkle_grad" x1="7.05" y1="14.34" x2="16.62" y2="6.25"
+                                        gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#346BF1" />
+                                        <stop offset="0.4" stop-color="#3186FF" />
+                                        <stop offset="0.8" stop-color="#4FA0FF" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="response-answer__spacer"></div>
+                            <button class="response-answer__menu" id="video-response-menu-btn"
+                                aria-label="More options">
+                                <span class="material-symbols-outlined">more_vert</span>
+                            </button>
+                        </div>
+
+                        <!-- Response Text -->
+                        <p class="response-answer__text" id="video-response-answer-text">Your video is ready!</p>
+
+                        <!-- Video Player (16:9) -->
+                        <div class="video-player" id="video-player">
+                            <div class="video-player__viewport" id="video-player-viewport">
+                                <img class="video-player__poster" id="video-player-poster" src="" alt="Video preview">
+                                <video id="video-player-video" class="video-player__video" playsinline loop preload="auto">
+                                </video>
+                                <!-- Overlay Controls -->
+                                <div class="video-player__overlay-controls">
+                                    <button class="video-player__ctrl-btn" id="video-player-edit-btn" aria-label="Edit">
+                                        <span class="material-symbols-outlined">edit</span>
+                                    </button>
+                                    <button class="video-player__ctrl-btn" id="video-player-share-btn"
+                                        aria-label="Share">
+                                        <span class="material-symbols-outlined">share</span>
+                                    </button>
+                                    <button class="video-player__ctrl-btn" id="video-player-download-btn"
+                                        aria-label="Download">
+                                        <span class="material-symbols-outlined">download</span>
+                                    </button>
+                                </div>
+                                <!-- Center Play/Pause -->
+                                <button class="video-player__play-pause" id="video-player-play-pause"
+                                    aria-label="Play or Pause">
+                                    <span id="video-player-play-icon">play_arrow</span>
+                                </button>
+                                <!-- Progress section -->
+                                <div class="video-player__progress-section">
+                                    <span class="video-player__time" id="video-player-current-time">0:00</span>
+                                    <span class="video-player__time-separator">/</span>
+                                    <span class="video-player__time" id="video-player-total-time">0:08</span>
+                                    <span class="flex-spacer"></span>
+                                    <!-- Sound Toggle -->
+                                    <button class="video-player__sound-toggle" id="video-player-sound-toggle" aria-label="Toggle sound">
+                                        <span class="material-symbols-outlined" id="video-player-sound-icon">volume_up</span>
+                                    </button>
+                                </div>
+                                <div class="video-player__progress-bar">
+                                    <div class="video-player__progress-track" id="video-player-progress-track">
+                                        <div class="video-player__progress-fill" id="video-player-progress-fill"></div>
+                                        <div class="video-player__progress-thumb" id="video-player-progress-thumb">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Bar -->
+                        <div class="response-actions" id="video-response-actions">
+                            <button class="response-actions__btn" id="video-btn-thumbup" aria-label="Good response">
+                                <span class="material-symbols-outlined">thumb_up</span>
+                            </button>
+                            <button class="response-actions__btn" id="video-btn-thumbdown" aria-label="Bad response">
+                                <span class="material-symbols-outlined">thumb_down</span>
+                            </button>
+                            <button class="response-actions__btn" id="video-btn-share-response"
+                                aria-label="Share response">
+                                <span class="material-symbols-outlined">share</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ======================= VIDEO EDIT SCREEN ======================= -->
+            <div class="video-edit-screen" id="video-edit-screen" hidden>
+                <!-- Dark Status Bar -->
+                <div class="video-edit__status-bar">
+                    <span class="video-edit__status-time">9:30</span>
+                    <div class="video-edit__status-icons">
+                        <svg width="17" height="13" viewBox="0 0 17 13" fill="none">
+                            <rect x="0" y="6" width="3" height="7" rx="1.5" fill="white" />
+                            <rect x="5" y="4" width="3" height="9" rx="1.5" fill="white" />
+                            <rect x="10" y="2" width="3" height="11" rx="1.5" fill="white" />
+                            <rect x="15" y="0" width="3" height="13" rx="1.5" fill="white" />
+                        </svg>
+                        <svg width="19" height="13" viewBox="0 0 19 13" fill="none">
+                            <path d="M9.5 13a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="white" />
+                            <path d="M5.5 8.5c1.1-1.1 2.5-1.7 4-1.7s2.9.6 4 1.7" stroke="white" stroke-width="1.5"
+                                stroke-linecap="round" fill="none" />
+                            <path d="M2.5 5.5c1.9-1.9 4.3-2.9 7-2.9s5.1 1 7 2.9" stroke="white" stroke-width="1.5"
+                                stroke-linecap="round" fill="none" />
+                        </svg>
+                        <svg width="27" height="13" viewBox="0 0 27 13" fill="none">
+                            <rect x="0" y="0" width="24" height="13" rx="3" fill="white" />
+                            <rect x="25" y="3.5" width="2" height="6" rx="1" fill="white" opacity="0.4" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Edit App Bar -->
+                <div class="video-edit__app-bar">
+                    <button class="video-edit__close-btn" id="video-edit-close" aria-label="Close editor">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                    <button class="video-edit__cancel-btn" id="video-edit-cancel" hidden>Cancel</button>
+                    <span class="video-edit__title" id="video-edit-title">Edit</span>
+                    <div class="video-edit__appbar-actions" id="video-edit-appbar-actions" hidden>
+                        <button class="video-edit__undo-btn" id="video-edit-undo" aria-label="Undo" disabled>
+                            <span class="material-symbols-outlined">undo</span>
+                        </button>
+                        <button class="video-edit__redo-btn" id="video-edit-redo" aria-label="Redo" disabled>
+                            <span class="material-symbols-outlined">redo</span>
+                        </button>
+                    </div>
+                    <button class="video-edit__done-btn" id="video-edit-done" disabled>Save</button>
+                </div>
+
+                <!-- Video Player Area -->
+                <div class="video-edit__player-area">
+                    <div class="video-edit__player-viewport" id="video-edit-viewport">
+                        <video id="video-edit-video" class="video-edit__video" playsinline loop preload="auto"></video>
+                        <!-- Center Play/Pause -->
+                        <button class="video-edit__play-pause" id="video-edit-play-pause" aria-label="Play or Pause">
+                            <span id="video-edit-play-icon">pause</span>
+                        </button>
+                        <!-- Bottom gradient footer with time + scrubber + mute -->
+                        <div class="video-edit__footer">
+                            <div class="video-edit__footer-top">
+                                <span class="video-edit__time" id="video-edit-current-time">0:00</span>
+                                <span class="video-edit__time-sep">/</span>
+                                <span class="video-edit__time" id="video-edit-total-time">0:08</span>
+                                <span class="flex-spacer"></span>
+                                <button class="video-edit__mute-btn" id="video-edit-mute" aria-label="Toggle sound">
+                                    <span class="material-symbols-outlined" id="video-edit-mute-icon">volume_off</span>
+                                </button>
+                            </div>
+                            <div class="video-edit__scrubber">
+                                <div class="video-edit__scrubber-track" id="video-edit-scrubber-track">
+                                    <div class="video-edit__scrubber-fill" id="video-edit-scrubber-fill"></div>
+                                    <div class="video-edit__scrubber-thumb" id="video-edit-scrubber-thumb"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tool Buttons -->
+                <div class="video-edit__tools-section" id="video-edit-tools-section">
+                    <div class="video-edit__tool-buttons">
+                        <div class="video-edit__tool" data-vtool="shots">
+                            <button class="video-edit__tool-btn" aria-label="Shots">
+                                <span class="material-symbols-outlined">video_camera_back</span>
+                            </button>
+                            <span class="video-edit__tool-label">Shots</span>
+                        </div>
+                        <div class="video-edit__tool" data-vtool="extend">
+                            <button class="video-edit__tool-btn" aria-label="Extend">
+                                <span class="material-symbols-outlined">swap_horiz</span>
+                            </button>
+                            <span class="video-edit__tool-label">Extend</span>
+                        </div>
+                        <div class="video-edit__tool" data-vtool="resize">
+                            <button class="video-edit__tool-btn" aria-label="Resize">
+                                <span class="material-symbols-outlined">crop</span>
+                            </button>
+                            <span class="video-edit__tool-label">Resize</span>
+                        </div>
+                        <div class="video-edit__tool" data-vtool="effects">
+                            <button class="video-edit__tool-btn" aria-label="Effects">
+                                <span class="material-symbols-outlined">tune</span>
+                            </button>
+                            <span class="video-edit__tool-label">Effects</span>
+                        </div>
+                    </div>
+                    <!-- Resize subtools (shown when Resize tool is active) -->
+                    <div class="edit-modal__subtools video-edit__resize-subtools" id="video-edit-resize-subtools" hidden>
+                        <button class="edit-modal__subtool" data-vsubtool="square">
+                            <div class="edit-modal__subtool-icon">
+                                <span class="material-symbols-outlined">crop_square</span>
+                            </div>
+                            <span class="edit-modal__subtool-label">Square</span>
+                        </button>
+                        <button class="edit-modal__subtool" data-vsubtool="portrait">
+                            <div class="edit-modal__subtool-icon">
+                                <span class="material-symbols-outlined">smartphone</span>
+                            </div>
+                            <span class="edit-modal__subtool-label">Portrait</span>
+                        </button>
+                        <button class="edit-modal__subtool" data-vsubtool="landscape">
+                            <div class="edit-modal__subtool-icon">
+                                <span class="material-symbols-outlined">crop_landscape</span>
+                            </div>
+                            <span class="edit-modal__subtool-label">Landscape</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Shots Panel (shown when Shots tool active) -->
+                <div class="video-edit__shots-panel" id="video-edit-shots-panel" hidden>
+                    <!-- Keyframes Strip -->
+                    <div class="video-edit__keyframes-strip" id="video-edit-keyframes-strip"></div>
+
+                    <!-- Variations -->
+                    <div class="video-edit__variations-area">
+                        <h3 class="video-edit__variations-title">Camera</h3>
+                        <div class="video-edit__variations-grid" id="video-edit-variations-grid"></div>
+                    </div>
+
+                    <!-- Shots Input Bar -->
+                    <div class="video-edit__shots-input-bar">
+                        <div class="video-edit__shots-input-wrap">
+                            <div class="attachment-chip attachment-chip--dark" id="video-edit-shots-thumb" hidden>
+                                <img class="attachment-chip__thumb" id="video-edit-shots-thumb-img" src="" alt="Selected shot">
+                                <span class="attachment-chip__label" id="video-edit-shots-thumb-label"></span>
+                                <button class="attachment-chip__close" id="video-edit-shots-thumb-remove" aria-label="Remove">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                            <input type="text" class="video-edit__shots-input-field" id="video-edit-shots-input"
+                                placeholder="Describe your shot">
+                        </div>
+                        <div class="video-edit__shots-actions">
+                            <div class="video-edit__shots-actions-left"></div>
+                            <button class="video-edit__shots-send-btn" id="video-edit-shots-send" aria-label="Send">
+                                <span class="material-symbols-outlined">send</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="video-edit__shots-gesture">
+                        <div class="video-edit__gesture-handle"></div>
+                    </div>
+                </div>
+
+                <!-- Gesture Bar (default) -->
+                <div class="video-edit__gesture-bar" id="video-edit-gesture-bar">
+                    <div class="video-edit__gesture-handle"></div>
+                </div>
+                <!-- Discard Dialog -->
+                <div class="edit-modal__discard-dialog" id="video-discard-dialog" hidden>
+                    <div class="edit-modal__discard-backdrop" id="video-discard-backdrop"></div>
+                    <div class="edit-modal__discard-card">
+                        <div class="edit-modal__discard-header">
+                            <h3 class="edit-modal__discard-title">Discard edits?</h3>
+                            <button class="edit-modal__discard-close" id="video-discard-close" aria-label="Close">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div class="edit-modal__discard-content">
+                            <p class="edit-modal__discard-body">If you go back, you'll lose all the edits you made to
+                                this video.</p>
+                            </div>
+                            <div class="edit-modal__discard-footer">
+                                <button class="edit-modal__discard-btn" id="video-discard-keep">Keep editing</button>
+                                <button class="edit-modal__discard-btn edit-modal__discard-btn--primary" id="video-discard-confirm">Discard</button>
+                                </div>
+                                </div>
+                                </div>
+            </div>
+
+            <!-- Floating Input Bar (Figma Spec) -->
+            <div class="video-floating-input" id="video-floating-input">
+                <div class="video-floating-input__scrim"></div>
+                <div class="video-floating-input__container">
+                    <div class="video-floating-input__bg"></div>
+                    <div class="video-floating-input__content">
+                        <!-- Attachment Row (template pill + selfie) -->
+                        <div class="video-floating-input__attachments" id="video-attachment-row">
+                            <!-- Template Attachment Chip -->
+                            <div class="attachment-chip" id="video-attachment-chip" hidden>
+                                <img class="attachment-chip__thumb" id="video-attachment-thumb" src="" alt="">
+                                <span class="attachment-chip__label" id="video-attachment-label"></span>
+                                <button class="attachment-chip__close" id="video-attachment-close" aria-label="Remove template">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                            <!-- Selfie Chip -->
+                            <div class="attachment-chip selfie-chip" id="video-selfie-chip" hidden>
+                                <img class="attachment-chip__thumb" id="video-selfie-thumb" src="" alt="Your photo">
+                                <button class="attachment-chip__close" id="video-selfie-close" aria-label="Remove selfie">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="video-floating-input__input-row">
+                            <button class="video-floating-input__action-btn" id="video-float-add" aria-label="Add">
+                                <span class="material-symbols-outlined">add</span>
+                            </button>
+                            <div class="video-floating-input__field">
+                                <textarea class="video-floating-input__textarea input-bar__textarea" id="video-prompt-input" placeholder="Ask Gemini" rows="1"></textarea>
+                                <span class="video-floating-input__placeholder">Ask Gemini</span>
+                            </div>
+                            <button class="video-floating-input__action-btn" id="video-float-mic" aria-label="Voice input">
+                                <span class="material-symbols-outlined">mic</span>
+                            </button>
+                            <div class="video-floating-input__morph-container">
+                                <button class="video-floating-input__action-btn" id="video-float-record" aria-label="Record">
+                                    <span class="material-symbols-outlined">circle</span>
+                                </button>
+                                <button class="video-floating-input__send-btn" id="video-float-send" aria-label="Send">
+                                    <span class="video-floating-input__send-circle"></span>
+                                    <span class="material-symbols-outlined video-floating-input__send-icon">arrow_upward</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gesture Bar -->
+            <div class="gesture-bar video-gesture-bar">
+                <div class="gesture-bar__handle"></div>
+            </div>
+        </div>
+        <!-- END VIDEO EDITING PROTOTYPE -->
+
+        <!-- DESIGN SYSTEM -->
+        <div id="design-shell" class="design-shell">
+            <iframe id="design-system-frame" src="../design-system.html" class="design-shell__iframe"
+                title="GenMedia Design System"></iframe>
+        </div>
+        <!-- END DESIGN SYSTEM -->
+</div><!-- end prototype-container -->
+
+    <script src="../script.js?v=20260327web3"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,2498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bollman's Wild Ideas — Daily Product Design Pitches</title>
+    <meta name="description" content="Five bold product design pitches targeting GenZ & GenMedia, generated every morning by an AI agent reading live trends.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        /* ============================================================
+           BOLLMAN'S WILD IDEAS — EDITORIAL VIEWER
+           Typography system: Major Third scale (×1.250), base 16px
+           ============================================================ */
+
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        :root {
+            /* ── Palette ── */
+            --bg:            #030302;
+            --surface:       #0a0a0a;
+            --line:          rgba(255,255,255,0.07);
+            --line-strong:   rgba(255,255,255,0.13);
+            --text-primary:  #ebebeb;
+            --text-secondary:#9a9a9a;   /* was #666 — now passes WCAG AA on dark bg */
+            --text-tertiary: #555;
+            --text-muted:    #2a2a2a;
+            --amber:         #E8A000;
+            --amber-dim:     rgba(232,160,0,0.10);
+            --amber-line:    rgba(232,160,0,0.35);
+
+            /* ── Fonts ── */
+            --font:         'Inter', -apple-system, sans-serif;
+            --font-serif:   'DM Serif Display', Georgia, serif;
+
+            /* ── Type scale (Major Third · 1.250) ── */
+            --t-10:  0.625rem;   /* 10px  — truly micro metadata    */
+            --t-11:  0.6875rem;  /* 11px  — ALL CAPS labels, rail   */
+            --t-12:  0.75rem;    /* 12px  — secondary labels        */
+            --t-13:  0.8125rem;  /* 13px  — captions, kickers       */
+            --t-15:  0.9375rem;  /* 15px  — primary body copy       */
+            --t-17:  1.0625rem;  /* 17px  — subhead body            */
+            --t-22:  1.375rem;   /* 22px  — section date, heading   */
+
+            /* ── Easing ── */
+            --ease-standard: cubic-bezier(0.4,0,0.2,1);
+            --ease-emph:     cubic-bezier(0.2,0,0,1);
+            --ease-spring:   cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        ::selection { background: var(--amber-dim); color: var(--amber); }
+
+        /* ── PAGE WRAP ── */
+        .page-wrap {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            animation: pageIn 0.55s var(--ease-emph) 0.05s forwards;
+        }
+        @keyframes pageIn {
+            from { opacity:0; transform:translateY(10px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .page-wrap.is-leaving {
+            animation: pageOut 0.38s var(--ease-emph) forwards;
+        }
+        @keyframes pageOut {
+            to { opacity:0; transform:scale(0.98); filter:blur(3px); }
+        }
+
+        /* ── TOP BAR ── */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(20px,4vw,48px);
+            height: 52px;
+            border-bottom: 1px solid var(--line);
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        /* ── prototype-nav__back (shared pill button) ── */
+        .prototype-nav__back {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px 10px 14px;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            font-family: var(--font);
+            font-size: var(--t-13);
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.85);
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+            white-space: nowrap;
+        }
+        .prototype-nav__back .material-symbols-outlined { font-size: 17px; }
+        .prototype-nav__back:hover {
+            background: rgba(30, 30, 30, 0.95);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        .top-bar__wordmark {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: var(--t-11);
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--amber);
+            white-space: nowrap;
+        }
+        .top-bar__meta {
+            font-size: var(--t-11);
+            font-weight: 400;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            white-space: nowrap;
+        }
+
+        /* ── MASTHEAD ── */
+        .masthead {
+            padding: clamp(22px,3.5vh,44px) clamp(20px,4vw,48px) clamp(16px,2.5vh,28px);
+            border-bottom: 1px solid var(--line);
+            flex-shrink: 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+        }
+        .masthead__eyebrow {
+            display: block;
+            font-size: var(--t-11);
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 10px;
+            opacity: 0.85;
+        }
+        .masthead__title {
+            font-size: clamp(2.6rem, 5.5vw, 6rem);
+            font-weight: 800;
+            letter-spacing: -0.055em;
+            line-height: 0.88;
+            color: var(--text-primary);
+        }
+        .masthead__title em {
+            font-style: normal;
+            color: var(--amber);
+        }
+        .masthead__sub {
+            font-size: clamp(0.8125rem, 1vw, 0.875rem);  /* 13–14px */
+            font-weight: 400;
+            letter-spacing: 0.01em;
+            color: var(--text-secondary);
+            margin-top: 14px;
+            line-height: 1.65;
+        }
+        .masthead__stats {
+            text-align: right;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 14px;
+        }
+        .masthead__stat-label {
+            display: block;
+            font-size: var(--t-11);
+            font-weight: 500;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-bottom: 3px;
+        }
+        .masthead__stat-val {
+            display: block;
+            font-size: clamp(1rem, 2vw, 1.6rem);
+            font-weight: 200;
+            letter-spacing: -0.03em;
+            color: var(--text-secondary);
+        }
+
+        /* ── MAIN LAYOUT ── */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* ── DATE RAIL ── */
+        .rail {
+            width: 160px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--line);
+            overflow-y: auto;
+            scrollbar-width: none;
+            padding: 24px 0;
+            position: relative;
+        }
+        .rail::-webkit-scrollbar { display:none; }
+
+        .rail::before {
+            content: '';
+            position: absolute;
+            left: 24px;
+            top: 48px;
+            bottom: 24px;
+            width: 1px;
+            background: linear-gradient(to bottom, var(--line-strong), transparent);
+        }
+
+        .rail__heading {
+            font-size: var(--t-10);
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 0 16px 14px 46px;
+        }
+
+        .rail__item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px 10px 6px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.18s;
+        }
+        .rail__item:hover { background: rgba(255,255,255,0.018); }
+        .rail__item.is-active { background: var(--amber-dim); }
+
+        .rail__dot {
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            border: 1.5px solid var(--text-tertiary);
+            background: var(--bg);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        .rail__item.is-active .rail__dot {
+            border-color: var(--amber);
+            background: var(--amber);
+            box-shadow: 0 0 8px rgba(232,160,0,0.35);
+        }
+        .rail__item:hover:not(.is-active) .rail__dot { border-color: #555; }
+
+        .rail__text__date {
+            font-size: var(--t-12);
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            transition: color 0.18s;
+        }
+        .rail__item.is-active .rail__text__date { color: var(--amber); }
+
+        .rail__text__run {
+            font-size: var(--t-10);
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+
+        .rail__item.is-active::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: var(--amber);
+            border-radius: 1px;
+        }
+
+        /* ── CONTENT ── */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.08) transparent;
+            min-width: 0;
+        }
+        .content::-webkit-scrollbar { width:3px; }
+        .content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius:2px; }
+
+        /* Issue header */
+        .issue-header {
+            padding: clamp(28px,4vh,52px) clamp(28px,5vw,72px) 0;
+            padding-left: calc(clamp(28px,5vw,72px) + 92px);
+            opacity: 0;
+            animation: slideIn 0.5s var(--ease-emph) forwards;
+        }
+        @keyframes slideIn {
+            from { opacity:0; transform:translateX(14px); }
+            to   { opacity:1; transform:translateX(0); }
+        }
+
+        .issue-header__kicker {
+            font-size: var(--t-11);
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--amber);
+            opacity: 0.85;
+            margin-bottom: 8px;
+        }
+        .issue-header__date {
+            font-size: clamp(1.4rem, 2.8vw, 2.4rem);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+        .issue-header__count {
+            font-size: var(--t-13);
+            font-weight: 400;
+            letter-spacing: 0.03em;
+            color: var(--text-tertiary);
+            margin-top: 9px;
+        }
+
+        /* Insights strip */
+        .insights-strip {
+            margin: 28px 0 0;
+            padding: 18px clamp(28px,5vw,72px);
+            padding-left: calc(clamp(28px,5vw,72px) + 92px);
+            border-top: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+        .insights-strip__toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+        .insights-strip__label {
+            font-size: var(--t-11);
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+        }
+        .insights-strip__caret {
+            font-size: var(--t-13);
+            color: var(--text-tertiary);
+            transition: transform 0.22s var(--ease-standard);
+        }
+        .insights-strip.is-open .insights-strip__caret { transform: rotate(180deg); }
+        .insights-strip__body {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .insights-strip.is-open .insights-strip__body { display: flex; }
+
+        .insight-item {
+            display: flex;
+            gap: 16px;
+            align-items: baseline;
+        }
+        .insight-item__n {
+            font-size: var(--t-11);
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            color: var(--amber);
+            width: 18px;
+            flex-shrink: 0;
+        }
+        .insight-item__text {
+            font-size: var(--t-15);
+            font-weight: 400;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+        .insight-item__text strong { color: var(--text-primary); font-weight: 500; }
+
+        /* ══════════════════════════════════════════
+           PITCHES — THE CORE READING EXPERIENCE
+           ══════════════════════════════════════════ */
+        .pitches-list {
+            padding: 0 clamp(28px,5vw,72px) 96px;
+        }
+
+        .pitch {
+            padding: 56px 0;
+            border-bottom: 1px solid var(--line);
+            display: grid;
+            grid-template-columns: 60px 1fr 220px;
+            gap: 0 32px;
+            opacity: 0;
+            animation: pitchIn 0.55s var(--ease-emph) forwards;
+        }
+        .pitch:nth-child(1) { animation-delay:0.05s; }
+        .pitch:nth-child(2) { animation-delay:0.13s; }
+        .pitch:nth-child(3) { animation-delay:0.21s; }
+        .pitch:nth-child(4) { animation-delay:0.29s; }
+        .pitch:nth-child(5) { animation-delay:0.37s; }
+        @keyframes pitchIn {
+            from { opacity:0; transform:translateY(20px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        /* Large ordinal number — design element, intentionally oversized */
+        .pitch__num {
+            font-size: clamp(3rem, 4.2vw, 4.5rem);
+            font-weight: 200;
+            letter-spacing: -0.05em;
+            color: var(--amber);
+            line-height: 1;
+            opacity: 0.35;
+            padding-top: 4px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            transition: opacity 0.25s var(--ease-standard);
+            user-select: none;
+        }
+        .pitch:hover .pitch__num { opacity: 0.65; }
+
+        .pitch__body {
+            /* Constrain line length: ~68ch = comfortable reading measure */
+            max-width: 68ch;
+        }
+
+        /* ── TREND COLLAGE (editorial mood board) ── */
+        .pitch__collage {
+            position: sticky;
+            top: 20px;
+            align-self: start;
+            padding-top: 32px;
+        }
+        .pitch__collage-label {
+            font-size: 0.42rem;
+            font-weight: 600;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-bottom: 10px;
+        }
+        .pitch__collage-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+        .pitch__collage-img {
+            width: 100%;
+            border-radius: 5px;
+            object-fit: cover;
+            filter: saturate(0.35) brightness(0.8) contrast(1.1);
+            transition: filter 0.4s var(--ease-standard), transform 0.4s var(--ease-standard);
+        }
+        .pitch__collage-img:hover {
+            filter: saturate(0.9) brightness(1) contrast(1);
+            transform: scale(1.03);
+        }
+        .pitch__collage-img--hero {
+            grid-column: 1 / -1;
+            aspect-ratio: 16 / 10;
+        }
+        .pitch__collage-img--square {
+            aspect-ratio: 1;
+        }
+        .pitch__collage-credit {
+            font-size: 0.4rem;
+            color: var(--text-tertiary);
+            opacity: 0.5;
+            margin-top: 8px;
+            text-align: right;
+            letter-spacing: 0.02em;
+        }
+
+        .pitch__rule {
+            height: 1px;
+            background: var(--line-strong);
+            margin-bottom: 20px;
+        }
+
+        /* Pitch title — DM Serif Display italic, editorial weight */
+        .pitch__title {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: clamp(1.45rem, 2.8vw, 2.25rem);
+            font-weight: 400;
+            letter-spacing: -0.015em;
+            line-height: 1.15;
+            color: var(--text-primary);
+            margin-bottom: 28px;
+            transition: color 0.2s var(--ease-standard);
+        }
+        .pitch:hover .pitch__title { color: #fff; }
+
+        /* Field rows */
+        .pitch__fields {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        /* ── Field labels: ALL CAPS, precise tracking ── */
+        .field__label {
+            display: block;
+            font-size: var(--t-11);
+            font-weight: 600;
+            letter-spacing: 0.17em;
+            text-transform: uppercase;
+            color: var(--amber);
+            opacity: 0.8;
+            margin-bottom: 7px;
+        }
+
+        /* ── Body copy: 15px, 1.72 leading, proper contrast ── */
+        .field__text {
+            font-size: var(--t-15);
+            font-weight: 400;
+            color: var(--text-secondary);
+            line-height: 1.72;
+            /* Optional: constrain to soft measure within the pitch body */
+            max-width: 62ch;
+        }
+
+        /* ── HYPOTHESIS: the editorial pull-quote treatment ── */
+        .field--hypothesis .field__label {
+            letter-spacing: 0.2em;
+        }
+        .field--hypothesis .field__text {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: clamp(1rem, 1.6vw, 1.2rem);  /* 16–19px — intentionally larger */
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.6;
+            border-left: 2.5px solid var(--amber-line);
+            padding-left: 20px;
+            max-width: 56ch;  /* slightly tighter measure for pull-quote */
+            opacity: 0.92;
+        }
+
+
+
+        /* ── The Edge ── */
+        .field--edge .field__label { color: var(--text-tertiary); opacity: 0.6; }
+        .field--edge .field__text  { color: var(--text-tertiary); }
+
+        /* Empty / Loading */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 50vh;
+            gap: 14px;
+            text-align: center;
+            padding: 40px;
+        }
+        .empty-state__icon { font-size: 2rem; opacity: 0.18; }
+        .empty-state__title {
+            font-size: var(--t-17);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .empty-state__body {
+            font-size: var(--t-15);
+            font-weight: 400;
+            color: var(--text-tertiary);
+            line-height: 1.65;
+            max-width: 320px;
+        }
+        .empty-state__cmd {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: var(--t-12);
+            color: var(--amber);
+            background: rgba(232,160,0,0.05);
+            border: 1px solid var(--amber-line);
+            padding: 8px 16px;
+            border-radius: 2px;
+            margin-top: 8px;
+        }
+
+        /* Film grain */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.022;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 860px) {
+            .rail { width: 140px; }
+            .pitch { grid-template-columns: 44px 1fr 160px; gap: 0 20px; }
+            .pitch__collage-img--hero { aspect-ratio: 3/2; }
+            .pitch__num { font-size: 2.8rem; }
+            .masthead { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .masthead__stats { align-items: flex-start; flex-direction: row; gap: 24px; }
+            .issue-header { padding-left: calc(clamp(28px,5vw,72px) + 64px); }
+            .insights-strip { padding-left: calc(clamp(28px,5vw,72px) + 64px); }
+        }
+        @media (max-width: 600px) {
+            .main-layout { flex-direction: column; }
+            .rail {
+                width: 100%; height: 52px; border-right: none;
+                border-bottom: 1px solid var(--line);
+                overflow-x: auto; overflow-y: hidden;
+                display: flex; align-items: center; padding: 0 12px;
+            }
+            .rail::before { display: none; }
+            .rail__heading { display: none; }
+            .rail__item { flex-direction: column; align-items: center; padding: 6px 12px; gap: 3px; flex-shrink: 0; }
+            .rail__item.is-active::after { display: none; }
+            .rail__dot { width: 6px; height: 6px; }
+            .pitch { grid-template-columns: 1fr; }
+            .pitch__collage { display: none; }
+            .pitch__mockup { display: none; }
+            .pitch__collage { display: none; }
+            .pitch__num { display: none; }
+            .field__text { max-width: 100%; }
+            .field--hypothesis .field__text { max-width: 100%; }
+            .issue-header { padding-left: clamp(16px,4vw,28px); }
+            .insights-strip { padding-left: clamp(16px,4vw,28px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ── UPVOTE BUTTON ── */
+        .pitch__header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:28px; }
+        .pitch__header .pitch__title { margin-bottom:0; flex:1; }
+        .upvote-btn {
+            flex-shrink:0; width:34px; height:34px;
+            border:1px solid var(--line-strong); border-radius:50%;
+            background:transparent; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            font-size:16px; color:var(--text-tertiary); margin-top:4px;
+            transition:color .2s, border-color .2s, background .2s, transform .15s var(--ease-spring);
+        }
+        .upvote-btn:hover, .upvote-btn.is-liked {
+            color:var(--amber); border-color:var(--amber-line); background:var(--amber-dim);
+        }
+        .upvote-btn.pop { animation:heartPop .3s var(--ease-spring); }
+        @keyframes heartPop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.45)} }
+
+        /* ── LIKED RAIL ITEM ── */
+        .rail__liked-item {
+            position:relative; display:flex; align-items:center; gap:10px;
+            padding:10px 14px 10px 8px; cursor:pointer;
+            border-bottom:1px solid var(--line); margin-bottom:6px;
+            transition:background .18s;
+        }
+        .rail__liked-item:hover { background:rgba(255,255,255,0.018); }
+        .rail__liked-item.is-active { background:var(--amber-dim); }
+        .rail__liked-item.is-active::after {
+            content:''; position:absolute; right:0; top:8px; bottom:8px;
+            width:2px; background:var(--amber); border-radius:1px;
+        }
+        .rail__liked-icon { font-size:13px; color:var(--text-tertiary); transition:color .18s; }
+        .rail__liked-item.is-active .rail__liked-icon,
+        .rail__liked-item:hover      .rail__liked-icon { color:var(--amber); }
+        .rail__liked-text {
+            font-size:var(--t-12); font-weight:600; letter-spacing:.08em;
+            text-transform:uppercase; color:var(--text-secondary); transition:color .18s;
+        }
+        .rail__liked-item.is-active .rail__liked-text { color:var(--amber); }
+        .rail__liked-count { font-size:var(--t-10); color:var(--text-tertiary); margin-top:2px; }
+
+        /* ── LIKED VIEW ── */
+        .liked-date-group { padding:28px clamp(28px,5vw,72px) 0; border-top:1px solid var(--line); margin-top:24px; }
+        .liked-date-group:first-child { border-top:none; margin-top:0; }
+        .liked-date-label {
+            display:block; font-size:var(--t-11); font-weight:600;
+            letter-spacing:.18em; text-transform:uppercase; color:var(--text-tertiary);
+            padding-bottom:16px; border-bottom:1px solid var(--line);
+        }
+
+        /* ── Liked Filters ── */
+        .liked-filters {
+            display: flex;
+            gap: 8px;
+            padding: 30px 64px 24px 160px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .liked-filters::-webkit-scrollbar { display: none; }
+        .liked-filter-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 100px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-family: inherit;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .liked-filter-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.1);
+        }
+        .liked-filter-btn.is-active {
+            background: rgba(255,255,255,0.9);
+            color: #000;
+            border-color: transparent;
+        }
+        @media (max-width: 900px) {
+            .liked-filters { padding: 0 24px 24px; }
+        }
+
+        /* ── PITCH IMAGE (Circular Layout) ── */
+        .pitch__header {
+            display: flex;
+            align-items: center;
+            gap: clamp(14px, 3vw, 24px);
+            margin-bottom: clamp(20px, 4vh, 32px);
+            position: relative;
+        }
+        .pitch__image-wrap {
+            width: clamp(72px, 8vw, 110px);
+            height: clamp(72px, 8vw, 110px);
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--surface-strong);
+            border: 1px solid var(--line);
+            flex-shrink: 0;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin-bottom: 0 !important;
+        }
+        .pitch__image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s var(--ease-standard);
+        }
+        .pitch:hover .pitch__image { transform: scale(1.1); }
+        .pitch__image-wrap::after {
+            content: ''; position: absolute; inset: 0;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.15); pointer-events: none;
+        }
+
+        /* ── PODCAST PLAYER ── */
+        .podcast-player {
+            margin: 20px 0 0;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            max-width: 68ch;
+            transition: background 0.25s var(--ease-standard), border-color 0.4s, box-shadow 0.4s;
+        }
+        .podcast-player:hover {
+            background: rgba(255,255,255,0.035);
+            border-color: var(--line-strong);
+        }
+        .podcast-player.is-playing {
+            border-color: rgba(232,160,0,0.2);
+            box-shadow: 0 0 20px rgba(232,160,0,0.04);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(232,160,0,0.3); }
+            50% { box-shadow: 0 0 0 6px rgba(232,160,0,0); }
+        }
+
+        .podcast-player__play {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: 1.5px solid var(--amber-line);
+            background: var(--amber-dim);
+            color: var(--amber);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            transition: background 0.2s, transform 0.15s var(--ease-spring), border-color 0.2s, box-shadow 0.3s;
+        }
+        .podcast-player__play:hover {
+            background: rgba(232,160,0,0.2);
+            border-color: var(--amber);
+            transform: scale(1.08);
+        }
+        .podcast-player__play:active { transform: scale(0.95); }
+        .podcast-player__play.is-playing {
+            border-color: var(--amber);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        .podcast-player__play .material-symbols-outlined {
+            font-size: 20px;
+            font-variation-settings: 'FILL' 1;
+        }
+        .podcast-player__info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .podcast-player__top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .podcast-player__label {
+            font-size: var(--t-11);
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            white-space: nowrap;
+        }
+        .podcast-player__label .material-symbols-outlined {
+            font-size: 13px;
+            vertical-align: -2px;
+            margin-right: 4px;
+            color: var(--amber);
+            opacity: 0.7;
+        }
+        .podcast-player__time {
+            font-size: var(--t-11);
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+        .podcast-player.is-playing .podcast-player__time {
+            color: var(--text-secondary);
+        }
+        .podcast-player__scrubber {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, rgba(232,160,0,0.15) 0%, rgba(255,255,255,0.08) 0%);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+            transition: height 0.15s var(--ease-standard);
+        }
+        .podcast-player:hover .podcast-player__scrubber { height: 6px; }
+        .podcast-player__scrubber::-webkit-slider-runnable-track {
+            height: 100%;
+            border-radius: 2px;
+        }
+        .podcast-player__scrubber::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: var(--amber);
+            border: 2px solid rgba(6,6,6,0.6);
+            margin-top: -5px;
+            box-shadow: 0 0 8px rgba(232,160,0,0.4);
+            cursor: pointer;
+            transition: transform 0.15s var(--ease-spring), box-shadow 0.2s;
+        }
+        .podcast-player__scrubber::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+            box-shadow: 0 0 12px rgba(232,160,0,0.6);
+        }
+        .podcast-player__scrubber::-moz-range-track {
+            height: 100%;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.08);
+        }
+        .podcast-player__scrubber::-moz-range-thumb {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: var(--amber);
+            border: 2px solid rgba(6,6,6,0.6);
+            box-shadow: 0 0 8px rgba(232,160,0,0.4);
+            cursor: pointer;
+        }
+        .podcast-player__scrubber::-moz-range-progress {
+            background: var(--amber);
+            border-radius: 2px;
+            height: 100%;
+        }
+
+        /* ── STAT TABLE (opportunity + evidence) ── */
+        .stat-table {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            margin-top: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .stat-cell {
+            padding: 14px 14px;
+            text-align: center;
+            border-right: 1px solid var(--line);
+            transition: background 0.2s;
+        }
+        .stat-cell:last-child {
+            border-right: none;
+        }
+        .stat-cell:hover {
+            background: rgba(255,255,255,0.025);
+        }
+        .stat-cell__number {
+            font-size: 2.15rem;
+            font-weight: 100;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            color: white;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            margin-bottom: 5px;
+        }
+        .stat-cell__label {
+            font-size: 1em;
+            font-weight: 200;
+            letter-spacing: 0.01em;
+            line-height: 1.3;
+            color: var(--text-tertiary);
+        }
+
+        /* ── Evidence Links ── */
+        .field__text--evidence {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .field__text--evidence a {
+            color: #ffffff;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            transition: border-color 0.2s;
+        }
+        .field__text--evidence a:hover {
+            border-color: #ffffff;
+        }
+
+        /* ── Opportunity Size variant ── */
+        .field--opportunity .stat-cell {
+            border-color: rgba(52,211,153,0.08);
+        }
+        .field--opportunity .stat-cell:hover {
+            background: rgba(52,211,153,0.03);
+        }
+    </style>
+<!--
+
+
+        :root {
+            --bg:            #060606;
+            --surface:       #0a0a0a;
+            --line:          rgba(255,255,255,0.07);
+            --line-strong:   rgba(255,255,255,0.12);
+            --text-primary:  #e8e8e8;
+            --text-secondary:#666;
+            --text-tertiary: #3a3a3a;
+            --text-muted:    #1e1e1e;
+            --amber:         #E8A000;
+            --amber-dim:     rgba(232,160,0,0.10);
+            --amber-line:    rgba(232,160,0,0.3);
+            --font:          'Inter', -apple-system, sans-serif;
+            --font-serif:    'DM Serif Display', Georgia, serif;
+            --ease-standard: cubic-bezier(0.4,0,0.2,1);
+            --ease-emph:     cubic-bezier(0.2,0,0,1);
+            --ease-spring:   cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+
+        html { font-size:16px; -webkit-font-smoothing:antialiased; }
+
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        ::selection { background: var(--amber-dim); color: var(--amber); }
+
+        /* ── PAGE WRAP ── */
+        .page-wrap {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            animation: pageIn 0.55s var(--ease-emph) 0.05s forwards;
+        }
+        @keyframes pageIn {
+            from { opacity:0; transform:translateY(10px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .page-wrap.is-leaving {
+            animation: pageOut 0.38s var(--ease-emph) forwards;
+        }
+        @keyframes pageOut {
+            to { opacity:0; transform:scale(0.98); filter:blur(3px); }
+        }
+
+        /* ── TOP BAR ── */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(20px,4vw,48px);
+            height: 50px;
+            border-bottom: 1px solid var(--line);
+            flex-shrink: 0;
+            position: relative;
+        }
+        .back-link {
+            font-size: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--text-primary); }
+        .back-link__arrow {
+            display: inline-block;
+            width: 16px;
+            height: 1px;
+            background: currentColor;
+            transition: width 0.25s var(--ease-spring);
+        }
+        .back-link:hover .back-link__arrow { width: 22px; }
+
+        .top-bar__wordmark {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.26em;
+            text-transform: uppercase;
+            color: var(--amber);
+            white-space: nowrap;
+        }
+        .top-bar__meta {
+            font-size: 0.48rem;
+            font-weight: 400;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            white-space: nowrap;
+        }
+
+        /* ── MASTHEAD ── */
+        .masthead {
+            padding: clamp(24px,4vh,48px) clamp(20px,4vw,48px) clamp(18px,3vh,32px);
+            border-bottom: 1px solid var(--line);
+            flex-shrink: 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+        }
+        .masthead__eyebrow {
+            display: block;
+            font-size: 0.48rem;
+            font-weight: 500;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 8px;
+        }
+        .masthead__title {
+            font-size: clamp(2.6rem,5.5vw,6rem);
+            font-weight: 800;
+            letter-spacing: -0.055em;
+            line-height: 0.88;
+            color: var(--text-primary);
+        }
+        .masthead__title em {
+            font-style: normal;
+            color: var(--amber);
+        }
+        .masthead__sub {
+            font-size: clamp(0.58rem,1vw,0.72rem);
+            font-weight: 300;
+            letter-spacing: 0.06em;
+            color: var(--text-secondary);
+            margin-top: 14px;
+            line-height: 1.6;
+        }
+        .masthead__stats {
+            text-align: right;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+        .masthead__stat {}
+        .masthead__stat-label {
+            display: block;
+            font-size: 0.44rem;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-bottom: 3px;
+        }
+        .masthead__stat-val {
+            display: block;
+            font-size: clamp(1rem,2vw,1.6rem);
+            font-weight: 200;
+            letter-spacing: -0.03em;
+            color: var(--text-secondary);
+        }
+
+        /* ── MAIN LAYOUT ── */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* ── DATE RAIL (Timeline) ── */
+        .rail {
+            width: 196px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--line);
+            overflow-y: auto;
+            scrollbar-width: none;
+            padding: 24px 0;
+            position: relative;
+        }
+        .rail::-webkit-scrollbar { display:none; }
+
+        /* Vertical spine */
+        .rail::before {
+            content: '';
+            position: absolute;
+            left: 27px;
+            top: 48px;
+            bottom: 24px;
+            width: 1px;
+            background: linear-gradient(to bottom, var(--line-strong), transparent);
+        }
+
+        .rail__heading {
+            font-size: 0.44rem;
+            font-weight: 600;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 0 20px 14px 52px;
+        }
+
+        .rail__item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px 10px 6px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.18s;
+        }
+        .rail__item:hover { background: rgba(255,255,255,0.018); }
+        .rail__item.is-active { background: var(--amber-dim); }
+
+        .rail__dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 1.5px solid var(--text-tertiary);
+            background: var(--bg);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        .rail__item.is-active .rail__dot {
+            border-color: var(--amber);
+            background: var(--amber);
+            box-shadow: 0 0 8px rgba(232,160,0,0.35);
+        }
+        .rail__item:hover:not(.is-active) .rail__dot { border-color: #555; }
+
+        .rail__text__date {
+            font-size: 0.56rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            transition: color 0.18s;
+        }
+        .rail__item.is-active .rail__text__date { color: var(--amber); }
+
+        .rail__text__run {
+            font-size: 0.42rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+
+        /* Active accent bar */
+        .rail__item.is-active::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: var(--amber);
+            border-radius: 1px;
+        }
+
+        /* ── CONTENT ── */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.08) transparent;
+            min-width: 0;
+        }
+        .content::-webkit-scrollbar { width:3px; }
+        .content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius:2px; }
+
+        /* Issue header */
+        .issue-header {
+            padding: clamp(28px,4vh,48px) clamp(28px,5vw,80px) 0;
+            padding-left: calc(clamp(28px,5vw,80px) + 92px);
+            opacity: 0;
+            animation: slideIn 0.5s var(--ease-emph) forwards;
+        }
+        @keyframes slideIn {
+            from { opacity:0; transform:translateX(14px); }
+            to   { opacity:1; transform:translateX(0); }
+        }
+
+        .issue-header__kicker {
+            font-size: 0.46rem;
+            font-weight: 500;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 6px;
+        }
+        .issue-header__date {
+            font-size: clamp(1.3rem,2.8vw,2.2rem);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+        .issue-header__count {
+            font-size: 0.52rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-top: 7px;
+        }
+
+        /* Insights strip */
+        .insights-strip {
+            margin: 24px 0 0;
+            padding: 18px clamp(28px,5vw,80px);
+            padding-left: calc(clamp(28px,5vw,80px) + 92px);
+            border-top: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+        .insights-strip__toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+        .insights-strip__label {
+            font-size: 0.46rem;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+        }
+        .insights-strip__caret {
+            font-size: 0.55rem;
+            color: var(--text-tertiary);
+            transition: transform 0.22s var(--ease-standard);
+        }
+        .insights-strip.is-open .insights-strip__caret { transform: rotate(180deg); }
+        .insights-strip__body {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .insights-strip.is-open .insights-strip__body { display: flex; }
+
+        .insight-item {
+            display: flex;
+            gap: 14px;
+            align-items: baseline;
+        }
+        .insight-item__n {
+            font-size: 0.44rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            color: var(--amber);
+            width: 16px;
+            flex-shrink: 0;
+        }
+        .insight-item__text {
+            font-size: 0.66rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+        .insight-item__text strong { color: var(--text-primary); font-weight: 500; }
+
+        /* ── PITCHES ── */
+        .pitches-list {
+            padding: 0 clamp(28px,5vw,80px) 80px;
+        }
+
+        .pitch {
+            padding: 40px 0;
+            border-bottom: 1px solid var(--line);
+            display: grid;
+            grid-template-columns: 64px 1fr 201px 220px;
+            gap: 0 40px;
+            opacity: 0;
+            animation: pitchIn 0.55s var(--ease-emph) forwards;
+        }
+        .pitch:nth-child(1) { animation-delay:0.05s; }
+        .pitch:nth-child(2) { animation-delay:0.12s; }
+        .pitch:nth-child(3) { animation-delay:0.19s; }
+        .pitch:nth-child(4) { animation-delay:0.26s; }
+        .pitch:nth-child(5) { animation-delay:0.33s; }
+        @keyframes pitchIn {
+            from { opacity:0; transform:translateY(18px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        .pitch__num {
+            font-size: 4.2rem;
+            font-weight: 200;
+            letter-spacing: -0.05em;
+            color: var(--amber);
+            line-height: 1;
+            opacity: 0.45;
+            padding-top: 2px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            transition: opacity 0.2s;
+        }
+        .pitch:hover .pitch__num { opacity: 0.75; }
+
+        .pitch__body {}
+
+        .pitch__rule {
+            height: 1px;
+            background: var(--line-strong);
+            margin-bottom: 18px;
+        }
+
+        .pitch__title {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: clamp(1.4rem, 2.7vw, 2.22rem);
+            font-weight: 500;
+            letter-spacing: -0.015em;
+            line-height: 1.1;
+            color: var(--text-primary);
+            margin-bottom: 0;
+            flex: 1;
+            transition: color 0.18s;
+        }
+        .pitch:hover .pitch__title { color: #fff; }
+
+        .pitch__fields {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .field__label {
+            display: block;
+            font-size: 0.42rem;
+            font-weight: 600;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 5px;
+        }
+        .field__text {
+            font-size: 0.72rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+        .field--hypothesis .field__label { color: var(--text-tertiary); }
+        .field--hypothesis .field__text {
+            font-size: 0.78rem;
+            font-weight: 400;
+            font-style: italic;
+            color: var(--text-primary);
+            line-height: 1.55;
+            border-left: 2px solid var(--amber-line);
+            padding-left: 14px;
+        }
+
+        .field--genz .field__label { color: #a78bfa; }
+        .field--viral .field__label { color: #f472b6; }
+        .field--gemini .field__label { color: #60a5fa; }
+        .field--opportunity .field__label { color: #34d399; }
+        .field--network .field__label { color: #fbbf24; }
+        .field--jtbd .field__label { color: #fb923c; }
+        .field--jtbd .field__text {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 0.78rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.55;
+            border-left: 2px solid rgba(251,146,60,0.35);
+            padding-left: 14px;
+            opacity: 0.92;
+        }
+
+        /* ── EVIDENCE — Infographic Style ── */
+        .field--evidence {
+            margin-top: 16px;
+            padding: 0;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+        }
+        .field--evidence .field__label {
+            color: var(--text-tertiary);
+            margin-bottom: 14px;
+        }
+        .field__text--evidence {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .field__text--evidence a {
+            color: #ffffff;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            transition: border-color 0.2s;
+        }
+        .field__text--evidence a:hover {
+            border-color: #ffffff;
+        }
+
+        /* ── STAT TABLE (opportunity + evidence) ── */
+        .stat-table {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            margin-bottom: 16px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .stat-cell {
+            padding: 14px 14px;
+            text-align: center;
+            border-right: 1px solid var(--line);
+            transition: background 0.2s;
+        }
+        .stat-cell:last-child {
+            border-right: none;
+        }
+        .stat-cell:hover {
+            background: rgba(255,255,255,0.025);
+        }
+        .stat-cell__number {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            color: var(--amber);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            margin-bottom: 5px;
+        }
+        .stat-cell__label {
+            font-size: 1em;
+            font-weight: 200;
+            letter-spacing: 0.01em;
+            line-height: 1.3;
+            color: var(--text-tertiary);
+        }
+
+        /* ── Opportunity Size — green variant ── */
+        .field--opportunity {
+            margin-top: 8px;
+        }
+        .field--opportunity .stat-cell__number {
+            color: #34d399;
+        }
+        .field--opportunity .stat-cell {
+            border-color: rgba(52,211,153,0.08);
+        }
+        .field--opportunity .stat-cell:hover {
+            background: rgba(52,211,153,0.03);
+        }
+
+        /* Empty / Loading */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 50vh;
+            gap: 14px;
+            text-align: center;
+            padding: 40px;
+        }
+        .empty-state__icon { font-size: 2rem; opacity: 0.18; }
+        .empty-state__title {
+            font-size: 0.9rem; font-weight: 600; color: var(--text-secondary);
+        }
+        .empty-state__body {
+            font-size: 0.68rem; font-weight: 300;
+            color: var(--text-tertiary); line-height: 1.6; max-width: 300px;
+        }
+        .empty-state__cmd {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.6rem;
+            color: var(--amber);
+            background: rgba(232,160,0,0.05);
+            border: 1px solid var(--amber-line);
+            padding: 7px 14px;
+            border-radius: 2px;
+            margin-top: 6px;
+        }
+
+        /* Film grain */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.022;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 860px) {
+            .rail { width: 160px; }
+            .pitch { grid-template-columns: 48px 1fr 201px; gap: 0 18px; }
+            .pitch__collage { display: none; }
+            .pitch__collage-img--hero { aspect-ratio: 3/2; }
+            .pitch__num { font-size: 3.2rem; }
+            .masthead { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .masthead__stats { align-items: flex-start; }
+            .issue-header { padding-left: calc(clamp(28px,5vw,80px) + 66px); }
+            .insights-strip { padding-left: calc(clamp(28px,5vw,80px) + 66px); }
+        }
+        @media (max-width: 600px) {
+            .main-layout { flex-direction: column; }
+            .rail {
+                width: 100%; height: 52px; border-right: none;
+                border-bottom: 1px solid var(--line);
+                overflow-x: auto; overflow-y: hidden;
+                display: flex; align-items: center; padding: 0 12px;
+            }
+            .rail::before { display: none; }
+            .rail__heading { display: none; }
+            .rail__item { flex-direction: column; align-items: center; padding: 6px 12px; gap: 3px; flex-shrink: 0; }
+            .rail__item.is-active::after { display: none; }
+            .rail__dot { width: 6px; height: 6px; }
+            .issue-header { padding-left: clamp(16px,4vw,28px); }
+            .insights-strip { padding-left: clamp(16px,4vw,28px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+-->
+</head>
+<body>
+
+<div class="page-wrap" id="page-wrap">
+
+    <!-- Top Bar -->
+    <header class="top-bar">
+        <a href="../index.html" id="back-link" class="prototype-nav__back" title="Back to projects">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Projects
+        </a>
+
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <span class="top-bar__meta">Daily Product Design Pitches</span>
+            <button id="generate-btn" onclick="generatePitches()" style="background: rgba(232,160,0,0.15); border: 1px solid var(--amber-line); color: var(--amber); cursor: pointer; display: flex; align-items: center; padding: 6px 14px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; font-family: 'SF Mono', 'Fira Code', monospace; transition: all 0.2s;">
+                <span class="material-symbols-outlined" style="font-size: 14px; margin-right: 6px;" id="generate-icon">refresh</span>
+                <span id="generate-text">Generate Today's</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Masthead -->
+    <div class="masthead">
+        <div>
+            <span class="masthead__eyebrow">GenMedia Dispatch · Powered by Gemini + Live Trends</span>
+            <h1 class="masthead__title">Bollman's<br><em>Wild</em> Ideas</h1>
+            <p class="masthead__sub">Five bold product design pitches targeting GenZ & GenMedia,<br>generated every morning at 8 AM.</p>
+        </div>
+        <div class="masthead__stats">
+            <div class="masthead__stat">
+                <span class="masthead__stat-label">Issues</span>
+                <span class="masthead__stat-val" id="meta-runs">—</span>
+            </div>
+            <div class="masthead__stat">
+                <span class="masthead__stat-label">Total Pitches</span>
+                <span class="masthead__stat-val" id="meta-pitches">—</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main layout -->
+    <div class="main-layout">
+
+        <!-- Timeline Rail -->
+        <nav class="rail" id="date-rail" aria-label="Issue timeline">
+            <div class="rail__heading">Issues</div>
+        </nav>
+
+        <!-- Content -->
+        <main class="content" id="content">
+            <div class="empty-state">
+                <div class="empty-state__icon">💡</div>
+                <div class="empty-state__title">Loading…</div>
+            </div>
+        </main>
+
+    </div>
+</div>
+
+<script>
+    'use strict';
+    const rail        = document.getElementById('date-rail');
+    const content     = document.getElementById('content');
+    const metaRuns    = document.getElementById('meta-runs');
+    const metaPitches = document.getElementById('meta-pitches');
+    const pageWrap    = document.getElementById('page-wrap');
+    let data = null, activeDate = null;
+
+    // ── Likes (localStorage) ──────────────────────────────────────
+    const LS = 'bollman-likes';
+    const loadLikes = () => { try { return JSON.parse(localStorage.getItem(LS)||'{}'); } catch{ return {}; } };
+    const saveLikes = l  => localStorage.setItem(LS, JSON.stringify(l));
+    const likeKey   = (d,i) => `${d}::${i}`;
+    const isLiked   = (d,i) => !!loadLikes()[likeKey(d,i)];
+
+    function toggleLike(date, idx) {
+        const likes = loadLikes(), k = likeKey(date, idx);
+        const liked = !likes[k];
+        if (liked) likes[k] = true; else delete likes[k];
+        saveLikes(likes);
+
+        const btn = content.querySelector(`.upvote-btn[data-date="${date}"][data-idx="${idx}"]`);
+        if (btn) {
+            btn.classList.toggle('is-liked', liked);
+            btn.innerHTML = liked ? '\u2665' : '\u2661';
+            btn.classList.add('pop');
+            btn.addEventListener('animationend', () => btn.classList.remove('pop'), {once:true});
+        }
+        updateLikedBadge();
+
+        // Sync to server
+        fetch('/api/save-upvotes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date, pitchIndex: idx, liked })
+        }).catch(err => console.error('Failed to sync upvote:', err));
+    }
+
+    function updateLikedBadge() {
+        const el = document.getElementById('rail-liked-count');
+        if (el) { const n = Object.keys(loadLikes()).length; el.textContent = n || ''; }
+    }
+
+    // ── Load ──────────────────────────────────────────────────
+    async function boot() {
+        try {
+            const r = await fetch('./data.json?t='+Date.now());
+            if (!r.ok) throw new Error();
+            data = await r.json();
+            if (!data.entries?.length) throw new Error();
+            init();
+        } catch { showEmpty('No ideas yet','Run the idea engine first.','python3 ~/.gemini/jetski/scratch/idea-engine/run.py'); }
+    }
+
+    function showEmpty(title, body, cmd) {
+        content.innerHTML = `<div class="empty-state">
+            <div class="empty-state__icon">💡</div>
+            <div class="empty-state__title">${esc(title)}</div>
+            ${body?`<p class="empty-state__body">${esc(body)}</p>`:''}
+            ${cmd?`<div class="empty-state__cmd">${esc(cmd)}</div>`:''}
+        </div>`;
+    }
+
+    // ── Init ──────────────────────────────────────────────────
+    function init() {
+        const entries = data.entries;
+        metaRuns.textContent    = entries.length;
+        metaPitches.textContent = entries.reduce((s,e)=>s+(e.pitches||[]).length, 0);
+
+        // Liked item pinned at top of rail
+        const likedEl = document.createElement('div');
+        likedEl.id = 'rail-liked-item';
+        likedEl.className = 'rail__liked-item';
+        likedEl.setAttribute('role','button');
+        likedEl.setAttribute('tabindex','0');
+        likedEl.innerHTML = `
+            <span class="rail__liked-icon">\u2665</span>
+            <div><div class="rail__liked-text">Liked</div>
+            <div class="rail__liked-count" id="rail-liked-count"></div></div>`;
+        likedEl.addEventListener('click', selectLiked);
+        likedEl.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' ') selectLiked(); });
+        rail.querySelector('.rail__heading').after(likedEl);
+
+        // Date entries
+        entries.forEach((entry, i) => {
+            const d   = new Date(entry.date+'T12:00:00');
+            const mon = d.toLocaleString('en-US',{month:'short'}).toUpperCase();
+            const day = d.getDate();
+            const el  = document.createElement('div');
+            el.className    = 'rail__item'+(i===0?' is-active':'');
+            el.dataset.date = entry.date;
+            el.setAttribute('role','button');
+            el.setAttribute('tabindex','0');
+            el.innerHTML = `<div class="rail__dot"></div>
+                <div><div class="rail__text__date">${mon} ${day}</div>
+                <div class="rail__text__run">Run #${entry.run}</div></div>`;
+            el.addEventListener('click', ()=>select(entry.date));
+            el.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' ') select(entry.date); });
+            rail.appendChild(el);
+        });
+
+        updateLikedBadge();
+        
+        let target = entries[0].date;
+        const hashDate = window.location.hash.replace('#issue-', '');
+        if (hashDate && entries.find(e => e.date === hashDate)) {
+            target = hashDate;
+        }
+        select(target);
+    }
+
+    // ── Select ────────────────────────────────────────────────
+    function select(date) {
+        activeDate = date;
+        window.history.replaceState(null, '', '#issue-' + date);
+        document.getElementById('rail-liked-item')?.classList.remove('is-active');
+        rail.querySelectorAll('.rail__item').forEach(el =>
+            el.classList.toggle('is-active', el.dataset.date === date));
+        const entry = data.entries.find(e => e.date === date);
+        if (entry) render(entry);
+        content.scrollTop = 0;
+    }
+
+    function selectLiked() {
+        activeDate = null;
+        document.getElementById('rail-liked-item')?.classList.add('is-active');
+        rail.querySelectorAll('.rail__item').forEach(el => el.classList.remove('is-active'));
+        renderLiked();
+        content.scrollTop = 0;
+    }
+
+    function mdLinks(text) {
+        if (!text) return '';
+        return text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+    }
+
+    // ── Extract stats from text for infographic callouts ──
+    function extractStats(text) {
+        if (!text) return [];
+        const stats = [];
+        const patterns = [
+            // User counts first (most impressive): 3.3B Android users, 1.5B MAU, ~2M users
+            { re: /(~?[\d.,]+[BKMGT]\+?)\s*(users|MAU|DAU|creators|Android users|Google Photos users|TikTok users|Workspace users|people|active|downloads)/gi,
+              fmt: (m) => ({ value: m[1], label: m[2] }) },
+            // Dollar amounts: $250B+, $10M+/month, $100M+/month
+            { re: /(\$[\d.,]+[BKMGT]?\+?)(\/\w+)?/gi,
+              fmt: (m) => {
+                const val = m[1] + (m[2] || '');
+                // Find context after the match
+                const after = text.slice(m.index + m[0].length, m.index + m[0].length + 50).trim();
+                let label = after.split(/[.,;!]/)[0].trim();
+                label = label.replace(/^(?:of|in|for|with|the|a|an|by|at|to|from|could|can|is|be|and|or|plus|\+)\s+/gi, '');
+                if (label.length > 35) label = label.slice(0, 33) + '…';
+                if (!label || label.length < 3) {
+                    const before = text.slice(Math.max(0, m.index - 40), m.index).trim();
+                    label = before.split(/[.,;!]/).pop().trim();
+                    label = label.replace(/^(?:of|in|for|with|the|a|an|by|at|to|from|could|can|is|be|and|or|generating|generate)\s+/gi, '');
+                }
+                if (!label || label.length < 3) label = 'revenue potential';
+                return { value: val, label };
+              }},
+            // Percentages: 20%, 0.1%, 0.5%
+            { re: /([\d.,]+%\+?)(?:\s*(YoY|annually|growth|CAGR|monthly|conversion))?/gi,
+              fmt: (m) => {
+                const val = m[1];
+                let label = m[2] || '';
+                if (!label) {
+                    const after = text.slice(m.index + m[0].length, m.index + m[0].length + 40).trim();
+                    label = after.split(/[.,;!]/)[0].trim();
+                    label = label.replace(/^(?:of|in|for|with|the|a|an|by|at|to|from)\s+/gi, '');
+                }
+                if (label.length > 30) label = label.slice(0, 28) + '…';
+                if (!label || label.length < 3) label = 'conversion rate';
+                return { value: val, label };
+              }},
+            // Hours: 4+ hours/day
+            { re: /([\d.,]+\+?\s*hours?\/(?:day|week|month))/gi,
+              fmt: (m) => ({ value: m[1], label: 'daily engagement' }) },
+        ];
+        const seen = new Set();
+        for (const {re, fmt} of patterns) {
+            let m;
+            while ((m = re.exec(text)) !== null) {
+                const stat = fmt(m);
+                const key = stat.value.toLowerCase().replace(/\s+/g, '');
+                if (seen.has(key)) continue;
+                seen.add(key);
+                stats.push(stat);
+            }
+        }
+        return stats.slice(0, 4);
+    }
+
+    function renderStatGrid(stats) {
+        if (!stats.length) return '';
+        return `<div class="stat-table">${stats.map(s =>
+            `<div class="stat-cell">
+                <div class="stat-cell__number">${esc(s.value)}</div>
+                <div class="stat-cell__label">${esc(s.label)}</div>
+            </div>`
+        ).join('')}</div>`;
+    }
+
+    // ── Pitch card ────────────────────────────────────────────
+    function pitchCard(p, i, date) {
+        const num   = String(i+1).padStart(2,'0');
+        const liked = isLiked(date, i);
+
+        // Extract stats for infographic callouts
+        const oppStats = extractStats(p.opportunitySize || '');
+        const evidenceStats = extractStats(p.evidence || '');
+
+        // Build trend collage HTML
+        const trends = p.trendImages || [];
+        const collageHtml = trends.length ? `
+            <div class="pitch__collage">
+                <div class="pitch__collage-label">Trend Signals</div>
+                <div class="pitch__collage-grid">
+                    ${trends.map((img, ti) => `<img src="${esc(img.url)}" alt="${esc(img.alt || '')}" class="pitch__collage-img ${ti === 0 ? 'pitch__collage-img--hero' : 'pitch__collage-img--square'}" loading="lazy">`).join('')}
+                </div>
+                <div class="pitch__collage-credit">via Pexels</div>
+            </div>` : '';
+
+        let mockupHtml = '';
+        if (p.mockupUrl) {
+            mockupHtml = `<img src="${p.mockupUrl}" class="pitch__mockup-img" style="grid-column: 3 / span 2; width: 100%; max-width: 700px; align-self: start; margin-top: -20px; mix-blend-mode: screen;" alt="Apple Keynote Mockup" />`;
+        } else {
+            const deviceHeroSrc = p.imageUrl || 'https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=3000&auto=format&fit=crop';
+            mockupHtml = `
+            <div class="pitch__mockup" style="position: relative; width: 201px; height: 437px; flex-shrink: 0; border-radius: 33px; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.1); background: #000; isolation: isolate; align-self: start; margin-top: 54px; font-family: 'SF Pro Display', 'Inter', -apple-system, sans-serif;">
+                <div style="position: absolute; top: 0; left: 0; width: 402px; height: 874px; transform: scale(0.5); transform-origin: top left; pointer-events: none;">
+                    <div style="position: absolute; width: 563px; height: 332px; left: -80px; top: 600px; background: radial-gradient(circle at 50% 50%, rgba(0,0,0,1) 44%, rgba(49,40,55,1) 93%); filter: blur(156px); border-radius: 170px; z-index: 5;"></div>
+                    <div style="position: absolute; width: 384px; height: 493px; left: 9px; top: 126px; border-radius: 60px; background: url('${deviceHeroSrc}') center/cover no-repeat; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);"></div>
+                    <div style="position: absolute; width: 384px; height: 493px; left: 9px; top: 126px; border-radius: 60px; background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.8) 100%);"></div>
+                    <div style="position: absolute; width: 402px; height: 62px; left: 0; top: 0; display: flex; justify-content: space-between; padding: 21px 24px 19px 24px; box-sizing: border-box; background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%); z-index: 90;">
+                        <div style="font-size: 17px; font-weight: 600; color: #fff; letter-spacing: 0px;">9:41</div>
+                        <div style="display: flex; gap: 7px; align-items: center;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">signal_cellular_4_bar</span>
+                            <span class="material-symbols-outlined" style="font-size: 16px;">wifi</span>
+                            <div style="width: 25px; height: 13px; position: relative; border: 1px solid rgba(255,255,255,0.35); border-radius: 4.3px; box-sizing: border-box;"><div style="position: absolute; top: 1px; left: 1px; height: 9px; width: 21px; background: #fff; border-radius: 2.5px;"></div></div>
+                        </div>
+                    </div>
+                    <div style="position: absolute; width: 126px; height: 37px; left: 138px; top: 14px; border-radius: 20px; background: #000; z-index: 100;"></div>
+                    <div style="position: absolute; width: 402px; height: 54px; left: 0; top: 62px; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; box-sizing: border-box; z-index: 50;">
+                        <div style="height: 44px; width: 44px; border-radius: 296px; background: rgba(51, 51, 51, 0.45); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(40px); display: flex; align-items: center; justify-content: center;"><span class="material-symbols-outlined">menu</span></div>
+                        <div style="flex-grow: 1;"><div style="height: 44px; width: 72px; border-radius: 999px; background: rgba(51, 51, 51, 0.45); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(40px); margin-left: 20px;"></div></div>
+                        <div style="height: 44px; width: 82px; border-radius: 296px; background: rgba(51, 51, 51, 0.45); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(40px); display: flex; align-items: center; justify-content: center; gap: 8px;"><span class="material-symbols-outlined">edit_square</span><span class="material-symbols-outlined">more_horiz</span></div>
+                    </div>
+                    <div style="position: absolute; width: 380px; left: 25px; top: 460px; z-index: 50; padding-right: 25px; box-sizing: border-box;">
+                        <div style="font-size: 28px; font-weight: 600; color: #fff; line-height: 1.2; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">${esc(p.title)}</div>
+                        <div style="font-size: 16px; color: rgba(255,255,255,0.85); line-height: 1.4; margin-top: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${esc(p.pitch || p.problem)}</div>
+                    </div>
+                    <div style="position: absolute; width: 122px; height: 36px; left: 140px; top: 645px; display: flex; justify-content: center; gap: 7px; align-items: center; z-index: 10;">
+                        <div style="width: 36px; height: 36px; border-radius: 74px; background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center;"><span class="material-symbols-outlined" style="font-size: 20px;">download</span></div>
+                        <div style="width: 36px; height: 36px; border-radius: 74px; background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center;"><span class="material-symbols-outlined" style="font-size: 20px;">content_copy</span></div>
+                        <div style="width: 36px; height: 36px; border-radius: 74px; background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center;"><span class="material-symbols-outlined" style="font-size: 20px;">ios_share</span></div>
+                    </div>
+                    <div style="position: absolute; width: 402px; height: 168px; left: 0; top: 706px; z-index: 20;">
+                        <div style="position: absolute; width: 402px; height: 168px; left: 0; top: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%); z-index: 1;"></div>
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;">
+                            <div style="position: absolute; width: 56px; height: 56px; top: 56px; left: 56px; border-radius: 6999px; background: #000; box-shadow: inset 0 -1.93px 34px rgba(15,23,58,1), inset 0 -2.8px 19.6px rgba(106,100,253,1); display: flex; justify-content: center; align-items: center;"><span class="material-symbols-outlined" style="font-size: 28px;">videocam</span></div>
+                            <div style="position: absolute; width: 80px; height: 80px; left: 161px; top: 44px; border-radius: 144px; background: rgba(31,59,155,0.66); box-shadow: inset 0 0 36px rgba(150,157,255,1), inset 0 -6px 24px rgba(255,181,232,1); display: flex; justify-content: center; align-items: center; z-index: 5;"><div style="position: absolute; width: 100%; height: 100%; border-radius: 144px; background: rgba(49,134,255,0.56); filter: blur(36px);"></div></div>
+                            <div style="position: absolute; width: 56px; height: 56px; top: 56px; left: 290px; border-radius: 6999px; background: #000; box-shadow: inset 0 -1.93px 34px rgba(15,23,58,1), inset 0 -2.8px 19.6px rgba(106,100,253,1); display: flex; justify-content: center; align-items: center;"><span class="material-symbols-outlined" style="font-size: 28px;">keyboard</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        return `<article class="pitch" id="pitch-${num}-${date.replace(/[^\w]/g,'-')}">
+            <div class="pitch__num">${num}</div>
+            <div class="pitch__body">
+                <div class="pitch__rule"></div>
+                <div class="pitch__header">
+                    ${p.imageUrl?`<div class="pitch__image-wrap"><img src="${p.imageUrl}" class="pitch__image" loading="lazy" alt="Abstract concept for ${esc(p.title)}"></div>`:''}
+                    <h2 class="pitch__title">${esc(p.title)}</h2>
+                    <button class="upvote-btn${liked?' is-liked':''}"
+                        data-date="${esc(date)}" data-idx="${i}"
+                        aria-label="${liked?'Remove upvote':'Like this idea'}">${liked?'\u2665':'\u2661'}</button>
+                </div>
+                <div class="pitch__fields">
+                    ${p.pitch?`<div class="field field--pitch"><span class="field__label">The Pitch</span><p class="field__text">${esc(p.pitch)}</p></div>`:''}
+                    ${p.jtbd?`<div class="field field--jtbd"><span class="field__label">Job to Be Done</span><p class="field__text">${esc(p.jtbd)}</p></div>`:''}
+                    ${p.contrarianBet?`<div class="field field--hypothesis"><span class="field__label">Contrarian Bet</span><p class="field__text">${esc(p.contrarianBet)}</p></div>`:p.problem?`<div class="field field--problem"><span class="field__label">The Problem</span><p class="field__text">${esc(p.problem)}</p></div>`:''}
+                    ${p.genZHook?`<div class="field field--genz"><span class="field__label">Gen Z Hook</span><p class="field__text">${esc(p.genZHook)}</p></div>`:p.hypothesis?`<div class="field field--hypothesis"><span class="field__label">Hypothesis</span><p class="field__text">${esc(p.hypothesis)}</p></div>`:''}
+                    ${p.viralLoop?`<div class="field field--viral"><span class="field__label">Viral Loop</span><p class="field__text">${esc(p.viralLoop)}</p></div>`:''}
+                    ${p.whyGemini?`<div class="field field--gemini"><span class="field__label">Why Gemini</span><p class="field__text">${esc(p.whyGemini)}</p></div>`:''}
+                    ${p.opportunitySize?`<div class="field field--opportunity"><span class="field__label">Opportunity Size</span>${renderStatGrid(oppStats)}<p class="field__text">${esc(p.opportunitySize)}</p></div>`:''}
+                    ${p.networkEffect?`<div class="field field--network"><span class="field__label">Network Effect</span><p class="field__text">${esc(p.networkEffect)}</p></div>`:''}
+                    ${p.whyNow?`<div class="field field--why"><span class="field__label">Why Now</span><p class="field__text">${esc(p.whyNow)}</p></div>`:''}
+                    ${p.evidence?`<div class="field field--evidence"><span class="field__label">Trend Sources</span>${renderStatGrid(evidenceStats)}<div class="field__text field__text--evidence">${mdLinks(esc(p.evidence))}</div></div>`:''}
+                </div>
+            </div>
+            ${mockupHtml}
+            ${collageHtml}
+        </article>`;
+    }
+
+    function bindUpvotes() {
+        content.querySelectorAll('.upvote-btn').forEach(btn =>
+            btn.addEventListener('click', ()=>toggleLike(btn.dataset.date, +btn.dataset.idx)));
+    }
+
+    // ── Render entry ──────────────────────────────────────────
+    function render(entry) {
+        const d   = new Date(entry.date+'T12:00:00');
+        const lbl = d.toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+        const pitches  = entry.pitches  || [];
+        const insights = entry.insights || [];
+
+        let html = `<div class="issue-header">
+            <div class="issue-header__kicker">Issue &middot; Run #${entry.run}</div>
+            <div class="issue-header__date" style="display:flex; align-items:center; gap:16px;">
+                ${esc(lbl)}
+                <button class="share-btn" data-date="${entry.date}" title="Copy link" onclick="window.shareIssue(this, '${entry.date}')" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.15)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='var(--text-secondary)';">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
+                </button>
+            </div>
+            <div class="issue-header__count">${pitches.length} pitches &middot; ${insights.length} signal insights</div>
+            ${entry.podcastUrl ? `
+            <div class="podcast-player">
+                <button class="podcast-player__play" aria-label="Play podcast">
+                    <span class="material-symbols-outlined">play_arrow</span>
+                </button>
+                <div class="podcast-player__info">
+                    <input type="range" class="podcast-player__scrubber" min="0" max="100" value="0" step="0.1">
+                </div>
+                <audio class="podcast-audio" src="${entry.podcastUrl}" preload="metadata"></audio>
+            </div>` : ''}
+        </div>`;
+
+        if (insights.length) {
+            const rows = insights.map((ins,i) => {
+                const ci = ins.indexOf(':');
+                const display = ci>-1
+                    ? `<strong>${esc(ins.slice(0,ci))}</strong>${esc(ins.slice(ci))}`
+                    : esc(ins);
+                return `<div class="insight-item"><span class="insight-item__n">0${i+1}</span><span class="insight-item__text">${display}</span></div>`;
+            }).join('');
+            html += `<div class="insights-strip" id="insights-strip">
+                <div class="insights-strip__toggle" id="insights-toggle">
+                    <span class="insights-strip__label">Today's Signal Insights</span>
+                    <span class="insights-strip__caret">▾</span>
+                </div>
+                <div class="insights-strip__body">${rows}</div>
+            </div>`;
+        }
+
+        if (pitches.length) {
+            html += `<div class="pitches-list">${pitches.map((p,i)=>pitchCard(p,i,entry.date)).join('')}</div>`;
+        } else {
+            showEmpty('No pitches parsed','The engine ran but the structured output could not be extracted.');
+            return;
+        }
+
+        content.innerHTML = html;
+        document.getElementById('insights-toggle')?.addEventListener('click',
+            ()=>document.getElementById('insights-strip')?.classList.toggle('is-open'));
+        bindUpvotes();
+        bindPodcastPlayer();
+    }
+
+    // ── Render liked view ──────────────────────────────────────
+    function pitchMatchesFilter(p, f) {
+        if (f === 'All') return true;
+        const text = (p.title + ' ' + p.pitch + ' ' + (p.problem||'') + ' ' + (p.hypothesis||'') + ' ' + p.jtbd).toLowerCase();
+        return text.includes(f.toLowerCase());
+    }
+
+    function renderLiked(activeFilter = 'All') {
+        const likes = loadLikes();
+        let keys = Object.keys(likes);
+        
+        keys = keys.filter(k => {
+            const [d,i] = k.split('::');
+            const entry = data.entries.find(e=>e.date===d);
+            if (!entry) return false;
+            const p = (entry.pitches||[])[i];
+            if (!p) return false;
+            return pitchMatchesFilter(p, activeFilter);
+        });
+
+        let html = `<div class="issue-header">
+            <div class="issue-header__kicker">Saved Ideas</div>
+            <div class="issue-header__date">Liked Pitches</div>
+            <div class="issue-header__count">${keys.length} idea${keys.length!==1?'s':''} saved</div>
+        </div>`;
+
+        let filtersHtml = `<div class="liked-filters">`;
+        ['All', 'Music', 'AR', 'Video', 'Art', 'Fashion', 'Social', 'Gaming'].forEach(f => {
+            filtersHtml += `<button class="liked-filter-btn ${f===activeFilter?'is-active':''}" data-filter="${f}">${f}</button>`;
+        });
+        filtersHtml += `</div>`;
+        html += filtersHtml;
+
+        if (!keys.length) {
+            html += `<div class="empty-state" style="height:38vh">
+                <div class="empty-state__icon">♡</div>
+                <div class="empty-state__title">No liked ideas yet</div>
+                <p class="empty-state__body">Tap the ♡ on any pitch to save it here.</p>
+            </div>`;
+            content.innerHTML = html;
+            bindFilterButtons();
+            return;
+        }
+
+        const byDate = {};
+        keys.forEach(k => { const [d,i]=k.split('::'); (byDate[d]||(byDate[d]=[])).push(+i); });
+        const dates = Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
+
+        html += `<div class="pitches-list">`;
+        dates.forEach(date => {
+            const entry = data.entries.find(e=>e.date===date);
+            if (!entry) return;
+            const d = new Date(date+'T12:00:00');
+            const lbl = d.toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric'});
+            html += `<div class="liked-date-group">
+                <span class="liked-date-label" style="display:flex; align-items:center; gap: 12px;">
+                    ${esc(lbl)}
+                </span>`;
+            if (entry.podcastUrl) {
+                html += `
+                <div class="podcast-player" style="margin-bottom: 24px;">
+                    <button class="podcast-player__play" aria-label="Play podcast">
+                        <span class="material-symbols-outlined">play_arrow</span>
+                    </button>
+                    <div class="podcast-player__info">
+                        <input type="range" class="podcast-player__scrubber" min="0" max="100" value="0" step="0.1">
+                    </div>
+                    <audio class="podcast-audio" src="${entry.podcastUrl}" preload="metadata"></audio>
+                </div>`;
+            }
+            byDate[date].sort((a,b)=>a-b).forEach(idx => {
+                const p = (entry.pitches||[])[idx];
+                if (p) html += pitchCard(p, idx, date);
+            });
+            html += `</div>`;
+        });
+        html += `</div>`;
+
+        content.innerHTML = html;
+        bindUpvotes();
+        bindFilterButtons();
+    }
+    
+    function bindFilterButtons() {
+        document.querySelectorAll('.liked-filter-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                const f = e.target.getAttribute('data-filter');
+                renderLiked(f);
+            });
+        });
+    }
+
+    // ── Utilities ─────────────────────────────────────────────
+    function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    window.shareIssue = function(btn, date) {
+        const url = new URL(window.location.href);
+        url.hash = 'issue-' + date;
+        navigator.clipboard.writeText(url.toString());
+        const icon = btn.querySelector('.material-symbols-outlined');
+        const old = icon.textContent;
+        icon.textContent = 'check';
+        icon.style.color = '#4CAF50';
+        setTimeout(() => { icon.textContent = old; icon.style.color = ''; }, 2000);
+    };
+
+    // ── Podcast Player ────────────────────────────────────────
+    function bindPodcastPlayer() {
+        document.querySelectorAll('.podcast-player').forEach(player => {
+            if (player.dataset.bound) return;
+            player.dataset.bound = true;
+
+            const audio = player.querySelector('.podcast-audio');
+            const btn   = player.querySelector('.podcast-player__play');
+            const scrub = player.querySelector('.podcast-player__scrubber');
+            if (!audio || !btn || !scrub) return;
+
+            function fmt(s) {
+                const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+                return m + ':' + String(sec).padStart(2, '0');
+            }
+
+            function setPlaying(playing) {
+                const icon = btn.querySelector('.material-symbols-outlined');
+                icon.textContent = playing ? 'pause' : 'play_arrow';
+                btn.classList.toggle('is-playing', playing);
+                player.classList.toggle('is-playing', playing);
+            }
+
+            function togglePlayback() {
+                if (audio.paused) {
+                    document.querySelectorAll('.podcast-audio').forEach(a => {
+                        if (a !== audio) a.pause();
+                    });
+                    audio.play(); 
+                } else { 
+                    audio.pause(); 
+                }
+            }
+
+            btn.addEventListener('click', togglePlayback);
+            audio.addEventListener('play', () => setPlaying(true));
+            audio.addEventListener('pause', () => setPlaying(false));
+
+            audio.addEventListener('timeupdate', () => {
+                if (audio.duration) {
+                    scrub.value = (audio.currentTime / audio.duration) * 100;
+                    const pct = (audio.currentTime / audio.duration) * 100;
+                    scrub.style.background = `linear-gradient(to right, #E8A000 ${pct}%, rgba(255,255,255,0.08) ${pct}%)`;
+                }
+            });
+
+            audio.addEventListener('ended', () => {
+                scrub.value = 0;
+                scrub.style.background = 'linear-gradient(to right, rgba(232,160,0,0.15) 0%, rgba(255,255,255,0.08) 0%)';
+                
+                // Auto advance to next chronological run/podcast
+                if (data && data.entries && activeDate) {
+                    const activeIdx = data.entries.findIndex(e => e.date === activeDate);
+                    // The entries array is descending by date, so index - 1 is the next chronological day
+                    if (activeIdx > 0) {
+                        const nextEntry = data.entries[activeIdx - 1];
+                        if (nextEntry) {
+                            select(nextEntry.date);
+                            // After rendering, find the new podcast player and play it
+                            setTimeout(() => {
+                                const newAudio = document.querySelector('.podcast-audio');
+                                if (newAudio) {
+                                    newAudio.play().catch(e => console.error("Auto-play prevented", e));
+                                }
+                            }, 100);
+                        }
+                    }
+                }
+            });
+
+            scrub.addEventListener('input', () => {
+                if (audio.duration) {
+                    audio.currentTime = (scrub.value / 100) * audio.duration;
+                }
+            });
+        });
+
+        // Global keydown P to toggle the very first audio
+        if (!window.__globalPBound) {
+            window.__globalPBound = true;
+            document.addEventListener('keydown', e => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                if (e.key === 'p' || e.key === 'P') {
+                    e.preventDefault();
+                    const topAudio = document.querySelector('.podcast-audio');
+                    if (topAudio) {
+                        if (topAudio.paused) topAudio.play();
+                        else topAudio.pause();
+                    }
+                }
+            });
+        }
+    }
+
+    document.getElementById('back-link').addEventListener('click', e => {
+        e.preventDefault();
+        pageWrap.classList.add('is-leaving');
+        setTimeout(()=>{ window.location.href = '../index.html'; }, 360);
+    });
+
+    document.addEventListener('keydown', e => {
+        if (!data || activeDate === null) return;
+        const entries = data.entries;
+        const idx = entries.findIndex(en=>en.date===activeDate);
+        if (e.key==='ArrowRight' && idx>0)              select(entries[idx-1].date);
+        if (e.key==='ArrowLeft'  && idx<entries.length-1) select(entries[idx+1].date);
+    });
+
+    // ── Generate Pitches (Via Local Server) ──────────────────────
+    async function generatePitches() {
+        const btn = document.getElementById('generate-btn');
+        const icon = document.getElementById('generate-icon');
+        const text = document.getElementById('generate-text');
+
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        btn.style.cursor = 'not-allowed';
+        icon.style.animation = 'spin 1.5s linear infinite';
+        text.innerText = "Generating (takes ~3 mins)...";
+
+        // Add a spin animation if not exists
+        if (!document.getElementById('spin-style')) {
+            const style = document.createElement('style');
+            style.id = 'spin-style';
+            style.textContent = '@keyframes spin { 100% { transform: rotate(360deg); } }';
+            document.head.appendChild(style);
+        }
+
+        try {
+            const res = await fetch('/generate', { method: 'POST' });
+            if (!res.ok) {
+                const errJson = await res.json().catch(()=>({}));
+                throw new Error(errJson.logs || 'Server returned ' + res.status);
+            }
+            // If successful, reload JSON data and repopulate the UI!🍯
+            await boot();
+        } catch (e) {
+            alert("Error running generator:\\n" + e.message);
+        } finally {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            icon.style.animation = 'none';
+            text.innerText = "Generate Today's";
+        }
+    }
+
+    // ── Auto Refresh ─────────────────────────────────────────
+    let lastDataStr = "";
+    setInterval(async () => {
+        try {
+            const r = await fetch('./data.json?t='+Date.now());
+            if (!r.ok) return;
+            const text = await r.text();
+            if (lastDataStr && text !== lastDataStr) {
+                data = JSON.parse(text);
+                const currentActive = activeDate;
+                
+                // Clear existing rail items
+                rail.querySelectorAll('.rail__item').forEach(e => e.remove());
+                document.getElementById('rail-liked-item')?.remove();
+                
+                init();
+                if (currentActive) select(currentActive);
+            }
+            lastDataStr = text;
+        } catch(e){}
+    }, 15000);
+
+    boot().then(async () => {
+        // Initialize lastDataStr directly after first load
+        const r = await fetch('./data.json?t='+Date.now());
+        if (r.ok) lastDataStr = await r.text();
+    });
+</script>
+<!--
+
+
+    // ── Select date ───────────────────────────────────────────
+    function select(date) {
+        if (date === activeDate) return;
+        activeDate = date;
+
+        rail.querySelectorAll('.rail__item').forEach(el => {
+            el.classList.toggle('is-active', el.dataset.date === date);
+        });
+
+        const entry = data.entries.find(e => e.date === date);
+        if (entry) render(entry);
+        content.scrollTop = 0;
+    }
+
+        const pitches  = entry.pitches  || [];
+        const insights = entry.insights || [];
+
+        let html = `
+            <div class="issue-header">
+                <div class="issue-header__kicker">Issue · Run #${entry.run}</div>
+                <div class="issue-header__date">${esc(dateLabel)}</div>
+                <div class="issue-header__count">${pitches.length} pitches · ${insights.length} signal insights</div>
+            </div>`;
+
+        // Insights strip
+        if (insights.length) {
+            const rows = insights.map((ins, i) => {
+                const ci = ins.indexOf(':');
+                const display = ci > -1
+                    ? `<strong>${esc(ins.slice(0, ci))}</strong>${esc(ins.slice(ci))}`
+                    : esc(ins);
+                return `<div class="insight-item">
+                    <span class="insight-item__n">0${i+1}</span>
+                    <span class="insight-item__text">${display}</span>
+                </div>`;
+            }).join('');
+            html += `
+                <div class="insights-strip" id="insights-strip">
+                    <div class="insights-strip__toggle" id="insights-toggle">
+                        <span class="insights-strip__label">Today's Signal Insights</span>
+                        <span class="insights-strip__caret">▾</span>
+                    </div>
+                    <div class="insights-strip__body">${rows}</div>
+                </div>`;
+        }
+
+        // Pitches
+        if (pitches.length) {
+            html += `<div class="pitches-list">`;
+            pitches.forEach((p, i) => {
+                const num = String(i + 1).padStart(2, '0');
+                html += `
+                    <article class="pitch" id="pitch-${num}">
+                        <div class="pitch__num">${num}</div>
+                        <div class="pitch__body">
+                            <div class="pitch__rule"></div>
+                            <h2 class="pitch__title">${esc(p.title)}</h2>
+                            <div class="pitch__fields">
+                                ${p.pitch ? `
+                                <div class="field field--pitch">
+                                    <span class="field__label">The Pitch</span>
+                                    <p class="field__text">${esc(p.pitch)}</p>
+                                </div>` : ''}
+                                ${p.hypothesis ? `
+                                <div class="field field--hypothesis">
+                                    <span class="field__label">Hypothesis</span>
+                                    <p class="field__text">${esc(p.hypothesis)}</p>
+                                </div>` : ''}
+                                ${p.whyNow ? `
+                                <div class="field field--why">
+                                    <span class="field__label">Why Now</span>
+                                    <p class="field__text">${esc(p.whyNow)}</p>
+                                </div>` : ''}
+                                ${p.edge ? `
+                                <div class="field field--edge">
+                                    <span class="field__label">The Edge</span>
+                                    <p class="field__text">${esc(p.edge)}</p>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </article>`;
+            });
+            html += `</div>`;
+        } else {
+            showEmpty('No pitches parsed', 'The engine ran but the structured output could not be extracted.');
+            return;
+        }
+
+        content.innerHTML = html;
+
+        // Insights toggle
+        const strip  = document.getElementById('insights-strip');
+        const toggle = document.getElementById('insights-toggle');
+        if (toggle && strip) {
+            toggle.addEventListener('click', () => strip.classList.toggle('is-open'));
+        }
+    }
+
+    // ── Utilities ─────────────────────────────────────────────
+    function esc(s) {
+        return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── Back nav ──────────────────────────────────────────────
+    document.getElementById('back-link').addEventListener('click', e => {
+        e.preventDefault();
+        pageWrap.classList.add('is-leaving');
+        setTimeout(() => { window.location.href = '../'; }, 360);
+    });
+
+    // ── Keyboard: ← → to switch issues ───────────────────────
+    document.addEventListener('keydown', e => {
+        if (!data) return;
+        const entries = data.entries;
+        const idx = entries.findIndex(en => en.date === activeDate);
+        if (e.key === 'ArrowRight' && idx > 0) select(entries[idx - 1].date);
+        if (e.key === 'ArrowLeft'  && idx < entries.length - 1) select(entries[idx + 1].date);
+    });
+
+    // ── Generate Pitches (Via Local Server) ──────────────────────
+    async function generatePitches() {
+        const btn = document.getElementById('generate-btn');
+        const icon = document.getElementById('generate-icon');
+        const text = document.getElementById('generate-text');
+
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        btn.style.cursor = 'not-allowed';
+        icon.style.animation = 'spin 1.5s linear infinite';
+        text.innerText = "Generating (takes ~3 mins)...";
+
+        // Add a spin animation if not exists
+        if (!document.getElementById('spin-style')) {
+            const style = document.createElement('style');
+            style.id = 'spin-style';
+            style.textContent = '@keyframes spin { 100% { transform: rotate(360deg); } }';
+            document.head.appendChild(style);
+        }
+
+        try {
+            const res = await fetch('/generate', { method: 'POST' });
+            if (!res.ok) {
+                const errJson = await res.json().catch(()=>({}));
+                throw new Error(errJson.logs || 'Server returned ' + res.status);
+            }
+            // If successful, reload JSON data and repopulate the UI!🍯
+            await boot();
+        } catch (e) {
+            alert("Error running generator:\\n" + e.message);
+        } finally {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            icon.style.animation = 'none';
+            text.innerText = "Generate Today's";
+        }
+    }
+
+    // ── Boot ──────────────────────────────────────────────────
+-->
+</body>
+</html>

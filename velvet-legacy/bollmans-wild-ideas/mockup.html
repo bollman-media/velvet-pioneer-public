@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Hero Mockup</title>
+    <!-- Google Symbols -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Variables mapping the design tokens */
+            --bg-color: rgb(0, 0, 0);
+            --text-primary: rgb(255, 255, 255);
+        }
+
+        body {
+            margin: 0;
+            background-color: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'SF Pro Display', 'Inter', -apple-system, sans-serif;
+            color: var(--text-primary);
+        }
+
+        /* Essential Icon Setup */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+            color: #fff;
+        }
+
+        /* Root Frame */
+        .device {
+            position: relative;
+            width: 402px;
+            height: 874px;
+            background-color: var(--bg-color);
+            border-radius: 66px;
+            overflow: hidden;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.1);
+        }
+
+        /* 1: Action Bar (Mobile) */
+        .action-bar {
+            position: absolute;
+            width: 122px;
+            height: 36px;
+            left: 140px;
+            top: 645px;
+            display: flex;
+            justify-content: center; /* based on flex layout */
+            gap: 7px;
+            align-items: center;
+            z-index: 10;
+        }
+        .action-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 74px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255,255,255,0.08); /* Mimic implied glass interactions */
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+        .action-button .material-symbols-outlined {
+            font-size: 20px;
+        }
+
+        /* 2: Omni Live Input */
+        .omni-input {
+            position: absolute;
+            width: 402px;
+            height: 168px;
+            left: 0;
+            top: 706px;
+            z-index: 20;
+            pointer-events: none;
+        }
+        /* Skrim */
+        .omni-skrim {
+            position: absolute;
+            width: 402px;
+            height: 168px;
+            left: 0;
+            top: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
+            z-index: 1;
+        }
+        .omni-controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+        
+        /* Buttons inside Omni */
+        .omni-btn-left, .omni-btn-right {
+            position: absolute;
+            width: 56px;
+            height: 56px;
+            top: 56px;
+            border-radius: 6999px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,1);
+            box-shadow: inset 0 -1.93px 34px rgba(15,23,58,1), inset 0 -2.8px 19.6px rgba(106,100,253,1);
+            pointer-events: auto;
+            cursor: pointer;
+        }
+        .omni-btn-left {
+            left: 56px;
+        }
+        .omni-btn-right {
+            left: 290px;
+        }
+        .omni-btn-left .material-symbols-outlined, 
+        .omni-btn-right .material-symbols-outlined {
+            font-size: 28px;
+        }
+
+        /* Omni Orb */
+        .omni-orb-container {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            left: 161px; /* 112 + 49 */
+            top: 44px;
+            border-radius: 144px;
+            background: rgba(31,59,155,0.66);
+            box-shadow: inset 0 0 36px rgba(150,157,255,1), inset 0 -6px 24px rgba(255,181,232,1);
+            pointer-events: auto;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+        }
+        .omni-orb-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 144px;
+            background: rgba(49,134,255,0.56);
+            filter: blur(36px);
+        }
+
+        /* 3: Content */
+        .content-frame {
+            position: absolute;
+            width: 380px;
+            height: 26px;
+            left: 25px;
+            top: 162px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* 4: Magic Island */
+        .magic-island {
+            position: absolute;
+            width: 126px;
+            height: 37px;
+            left: 138px;
+            top: 14px;
+            border-radius: 20px;
+            background: url('https://placehold.co/126x37/000000/000000') center/cover no-repeat;
+            z-index: 100;
+        }
+
+        /* 5: Status Bar */
+        .status-bar {
+            position: absolute;
+            width: 402px;
+            height: 62px;
+            left: 0;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 21px 24px 19px 24px;
+            box-sizing: border-box;
+            background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+            z-index: 90;
+            pointer-events: none;
+        }
+        .status-time {
+            width: 100px;
+            height: 22px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: 0px;
+        }
+        .status-levels {
+            width: 100px;
+            height: 22px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 7px;
+            position: relative;
+        }
+        .status-icon {
+            font-size: 16px;
+            color: #fff;
+        }
+        
+        /* Hardware icons manual mockups given shapes in JSON */
+        .battery-icon {
+            width: 25px;
+            height: 13px;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 4.3px;
+            box-sizing: border-box;
+        }
+        .battery-level {
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            height: 9px;
+            width: 21px;
+            background: #fff;
+            border-radius: 2.5px;
+        }
+        .battery-cap {
+            position: absolute;
+            right: -2px;
+            top: 4px;
+            width: 1.32px;
+            height: 4.07px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* 6: Rectangle 4 (Hero Image) */
+        .hero-image {
+            position: absolute;
+            width: 384px;
+            height: 493px;
+            left: 9px;
+            top: 126px;
+            border-radius: 60px;
+            background: url('https://placehold.co/384x493') center/cover no-repeat;
+            /* In real use case this would be an actual Gemini output image */
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+        }
+
+        /* 7: Gradient Overlay */
+        .bottom-gradient {
+            position: absolute;
+            width: 563px;
+            height: 332px;
+            left: -80px; /* derived to center roughly given JSON bounds */
+            top: 600px;
+            background: radial-gradient(circle at 50% 50%, rgba(0,0,0,1) 44%, rgba(49,40,55,1) 93%);
+            filter: blur(156px);
+            border-radius: 170px;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* 8: Toolbar */
+        .toolbar {
+            position: absolute;
+            width: 402px;
+            height: 54px;
+            left: 0;
+            top: 62px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            box-sizing: border-box;
+            z-index: 50;
+        }
+
+        .glass-btn {
+            height: 44px;
+            border-radius: 296px;
+            background: rgba(51, 51, 51, 0.45);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(40px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-effect {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.004);
+            border-radius: 296px;
+            mix-blend-mode: color-dodge;
+        }
+
+        .btn-icon-lg {
+            width: 44px;
+        }
+
+        .btn-model-picker {
+            width: 72px;
+            height: 44px;
+            border-radius: 999px;
+            margin-left: 20px;
+        }
+
+        .btn-compose-more {
+            width: 82px;
+            gap: 8px;
+            padding: 0 12px;
+            box-sizing: border-box;
+            justify-content: center;
+        }
+
+        .btn-compose-more .material-symbols-outlined {
+            font-size: 24px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="device">
+        
+        <!-- Bottom atmospheric glow placed behind inputs -->
+        <div class="bottom-gradient"></div>
+
+        <!-- 6: Hero Image -->
+        <!-- Replacing placeholder with a gorgeous high res mockup for product design emphasis -->
+        <div class="hero-image" style="background-image: url('https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=3000&auto=format&fit=crop');"></div>
+
+        <!-- 5: Status Bar -->
+        <div class="status-bar">
+            <div class="status-time">9:41</div>
+            <div class="status-levels">
+                <span class="material-symbols-outlined status-icon" style="font-size: 16px; margin-right: -4px;">signal_cellular_4_bar</span>
+                <span class="material-symbols-outlined status-icon" style="font-size: 16px; margin-right: -2px;">wifi</span>
+                <div class="battery-icon">
+                    <div class="battery-level"></div>
+                    <div class="battery-cap"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4: Magic Island -->
+        <div class="magic-island"></div>
+
+        <!-- 8: Toolbar -->
+        <div class="toolbar">
+            <div class="glass-btn btn-icon-lg">
+                <div class="glass-effect"></div>
+                <span class="material-symbols-outlined">menu</span>
+            </div>
+
+            <!-- Empty frame for model picker from JSON struct -->
+            <div style="flex-grow: 1;">
+               <div class="glass-btn btn-model-picker">
+                   <div class="glass-effect"></div>
+               </div>
+            </div>
+            
+            <div class="glass-btn btn-compose-more">
+                <div class="glass-effect"></div>
+                <span class="material-symbols-outlined">edit_square</span>
+                <span class="material-symbols-outlined">more_horiz</span>
+            </div>
+        </div>
+
+        <!-- 3: Content area -->
+        <div class="content-frame">
+            <!-- Empty in JSON, reserved for text/content -->
+        </div>
+
+        <!-- 1: Action Bar (Mobile) -->
+        <div class="action-bar">
+            <div class="action-button">
+                <span class="material-symbols-outlined">download</span>
+            </div>
+            <div class="action-button">
+                <span class="material-symbols-outlined">content_copy</span>
+            </div>
+            <div class="action-button">
+                <!-- Using ios_share to match Apple-like share icon usually defined in product mockups -->
+                <span class="material-symbols-outlined">ios_share</span>
+            </div>
+        </div>
+
+        <!-- 2: Omni Live Input -->
+        <div class="omni-input">
+            <div class="omni-skrim"></div>
+            
+            <div class="omni-controls">
+                <div class="omni-btn-left">
+                    <span class="material-symbols-outlined">videocam</span>
+                </div>
+                
+                <div class="omni-orb-container">
+                    <div class="omni-orb-glow"></div>
+                </div>
+
+                <div class="omni-btn-right">
+                    <span class="material-symbols-outlined">keyboard</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
