@@ -1170,46 +1170,31 @@
         }
 
         // ══════════════════════════════════════════
-        // Lyria Music Generation
+        // Lyria Music Generation — via server proxy
         // ══════════════════════════════════════════
-        let genaiModule = null;
         async function generateTrack(prompt, bpm) {
-            if (!genaiModule) genaiModule = await import('@google/genai');
-            const { GoogleGenAI } = genaiModule;
-            const client = new GoogleGenAI({ apiKey: GEMINI_KEY, apiVersion: 'v1alpha' });
-            const SR = 48000, CH = 2, BD = 16, DUR = 30;
-            const targetBytes = SR * CH * (BD / 8) * DUR;
-
             for (let attempt = 0; attempt < 3; attempt++) {
-                if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
-                const chunks = []; let total = 0, done = false;
-                const result = await new Promise(async (resolve) => {
-                    const fin = () => { if (done) return; done = true; if (!total) { resolve(null); return; }
-                        const buf = new Uint8Array(total); let off = 0;
-                        for (const c of chunks) { buf.set(c, off); off += c.length; }
-                        const len = Math.min(buf.length, targetBytes);
-                        const wav = new ArrayBuffer(44 + len); const v = new DataView(wav);
-                        const ws = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
-                        ws(0,'RIFF'); v.setUint32(4, 36+len, true); ws(8,'WAVE'); ws(12,'fmt ');
-                        v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,CH,true);
-                        v.setUint32(24,SR,true); v.setUint32(28,SR*CH*(BD/8),true); v.setUint16(32,CH*(BD/8),true);
-                        v.setUint16(34,BD,true); ws(36,'data'); v.setUint32(40,len,true);
-                        new Uint8Array(wav, 44).set(buf.subarray(0, len));
-                        resolve(URL.createObjectURL(new Blob([wav], { type: 'audio/wav' })));
-                    };
-                    const to = setTimeout(fin, 90000);
-                    try {
-                        const session = await client.live.music.connect({ model: 'models/lyria-realtime-exp', callbacks: {
-                            onmessage: (msg) => { if (msg.serverContent?.audioChunks) { for (const ck of msg.serverContent.audioChunks) { const raw = atob(ck.data); const arr = new Uint8Array(raw.length); for (let i=0;i<raw.length;i++) arr[i]=raw.charCodeAt(i); chunks.push(arr); total+=arr.length; } if (total>=targetBytes){clearTimeout(to);try{session.stop();}catch(e){}fin();}} },
-                            onerror: () => { clearTimeout(to); fin(); }, onclose: () => { clearTimeout(to); fin(); },
-                        }});
-                        await session.setWeightedPrompts({ weightedPrompts: [{ text: prompt, weight: 1.0 }] });
-                        await session.setMusicGenerationConfig({ musicGenerationConfig: { bpm, temperature: 1.0 } });
-                        await new Promise(r => setTimeout(r, 500));
-                        await session.play();
-                    } catch (e) { clearTimeout(to); resolve(null); }
-                });
-                if (result) return result;
+                if (attempt > 0) await new Promise(r => setTimeout(r, 1500));
+                try {
+                    const res = await fetch('/api/generate-track', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt, bpm })
+                    });
+                    if (!res.ok) {
+                        console.warn(`[Lyria] Server error attempt ${attempt + 1}:`, await res.text());
+                        continue;
+                    }
+                    const { audio } = await res.json();
+                    if (!audio) continue;
+                    // Server returns base64 WAV — decode to blob URL for the turntable
+                    const bytes = atob(audio);
+                    const arr = new Uint8Array(bytes.length);
+                    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+                    return URL.createObjectURL(new Blob([arr], { type: 'audio/wav' }));
+                } catch (e) {
+                    console.warn(`[Lyria] Track gen attempt ${attempt + 1} failed:`, e);
+                }
             }
             return null;
         }

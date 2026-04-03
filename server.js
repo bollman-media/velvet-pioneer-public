@@ -989,7 +989,7 @@ Requirements:
   }
 
   // ========== API: Generate Music Track via Lyria ==========
-  if (req.method === 'POST' && req.url === './api/generate-track') {
+  if (req.method === 'POST' && req.url === '/api/generate-track') {
     try {
       if (!GEMINI_API_KEY) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
