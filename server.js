@@ -846,12 +846,96 @@ Requirements:
         result = await tryModel(FALLBACK);
       }
 
+      console.log(`  [Studio] Generate → HTTP ${result.status}`);
+      if (result.body) {
+        console.log(`  [Studio] Body preview: ${result.body.substring(0, 300).replace(/\n/g, ' ')}`);
+      }
       res.writeHead(result.status, { 'Content-Type': 'application/json' });
       res.end(result.body);
-      console.log(`  [Studio] Generate → HTTP ${result.status}`);
 
     } catch (err) {
       console.error('  [Studio] Generate error:', err.message);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
+  // ========== API: Studio — Analyze / Text-only (server-side proxy) ==========
+  // Uses gemini-2.5-flash which supports responseMimeType: application/json
+  // for structured text-detection and analysis tasks.
+  if (req.method === 'POST' && req.url === '/api/studio-analyze') {
+    try {
+      if (!GEMINI_API_KEY) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'GEMINI_API_KEY not set on server' }));
+        return;
+      }
+
+      const body = await parseBody(req);
+      const { contents, generationConfig } = body;
+
+      if (!contents) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'contents is required' }));
+        return;
+      }
+
+      const MODEL = 'gemini-2.5-flash';
+      const BASE  = 'https://generativelanguage.googleapis.com/v1beta/models';
+      const reqBody = JSON.stringify({ contents, generationConfig: generationConfig || { responseModalities: ['TEXT'] } });
+
+      const result = await new Promise((resolve, reject) => {
+        const url = `${BASE}/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+        const apiReq = https.request(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } }, (apiRes) => {
+          let chunks = '';
+          apiRes.on('data', c => chunks += c);
+          apiRes.on('end', () => resolve({ status: apiRes.statusCode, body: chunks }));
+        });
+        apiReq.on('error', reject);
+        apiReq.write(reqBody);
+        apiReq.end();
+      });
+
+      console.log(`  [Studio] Analyze → HTTP ${result.status}`);
+      if (result.body) {
+        console.log(`  [Studio] Body preview: ${result.body.substring(0, 300).replace(/\n/g, ' ')}`);
+      }
+      res.writeHead(result.status, { 'Content-Type': 'application/json' });
+      res.end(result.body);
+
+    } catch (err) {
+      console.error('  [Studio] Analyze error:', err.message);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
+  // ========== API: Bollman's Wild Ideas — Generate (Runs Python Script) ==========
+  if (req.method === 'POST' && req.url === '/generate') {
+    try {
+      const { exec } = require('child_process');
+      const scriptPath = '/Users/bollman/.gemini/jetski/scratch/idea-engine/run.py';
+      
+      console.log(`  [Ideas] Running generator script: ${scriptPath}`);
+      
+      exec(`python3 "${scriptPath}"`, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`  [Ideas] Error: ${error.message}`);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: error.message }));
+          return;
+        }
+        if (stderr) {
+          console.warn(`  [Ideas] Stderr: ${stderr}`);
+        }
+        console.log(`  [Ideas] Stdout: ${stdout}`);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, output: stdout }));
+      });
+    } catch (err) {
+      console.error('  [Ideas] Generate error:', err.message);
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: err.message }));
     }

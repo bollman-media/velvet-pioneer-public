@@ -5289,7 +5289,7 @@ ERASE RULES:
                 }
             };
 
-            const data = await callStudioProxy(STUDIO_GENERATE_URL, requestBody.contents, requestBody.generationConfig);
+                const data = await callStudioProxy(STUDIO_ANALYZE_URL, requestBody.contents, requestBody.generationConfig);
             const candidates = data.candidates || [];
             let detectedText = '';
 
@@ -6164,6 +6164,7 @@ ERASE RULES:
     // No key is ever exposed to the browser or the user.
     const STUDIO_GENERATE_URL = '/api/studio-generate';
     const STUDIO_EDIT_URL     = '/api/studio-edit';
+    const STUDIO_ANALYZE_URL  = '/api/studio-analyze'; // gemini-2.5-flash, supports JSON response mode
 
     // Legacy constants kept for reference / potential direct-call fallback in dev
     const GEMINI_API_URL      = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent';
@@ -8537,8 +8538,15 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
                 generationConfig: { responseMimeType: 'application/json' }
             };
 
-            const data = await callStudioProxy(STUDIO_GENERATE_URL, requestBody.contents, requestBody.generationConfig);
-            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
+            const data = await callStudioProxy(STUDIO_ANALYZE_URL, requestBody.contents, requestBody.generationConfig);
+            // Gemini sometimes wraps text parts—find first text part
+            let rawText = '[]';
+            for (const candidate of (data.candidates || [])) {
+                for (const part of (candidate.content?.parts || [])) {
+                    if (part.text) { rawText = part.text; break; }
+                }
+                if (rawText !== '[]') break;
+            }
             const cleaned = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
             const regions = JSON.parse(cleaned);
             if (!Array.isArray(regions) || !regions.length) {
@@ -10284,7 +10292,7 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
                 }
             };
 
-            const data = await callStudioProxy(STUDIO_GENERATE_URL, requestBody.contents, requestBody.generationConfig);
+                const data = await callStudioProxy(STUDIO_ANALYZE_URL, requestBody.contents, requestBody.generationConfig);
             const candidates = data.candidates || [];
             let detectedText = '';
 
@@ -13684,7 +13692,7 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
                     generationConfig: { responseModalities: ['TEXT'] }
                 };
 
-                const data = await callStudioProxy(STUDIO_GENERATE_URL, requestBody.contents, requestBody.generationConfig);
+                    const data = await callStudioProxy(STUDIO_ANALYZE_URL, requestBody.contents, requestBody.generationConfig);
                 let detectedText = '';
                 for (const c of (data.candidates || [])) {
                     for (const p of (c.content?.parts || [])) {
@@ -13751,7 +13759,7 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
                     generationConfig: { responseModalities: ['TEXT'] }
                 };
 
-                const data = await callStudioProxy(STUDIO_GENERATE_URL, requestBody.contents, requestBody.generationConfig);
+                    const data = await callStudioProxy(STUDIO_ANALYZE_URL, requestBody.contents, requestBody.generationConfig);
                 let resultText = '';
                 for (const c of (data.candidates || [])) {
                     for (const p of (c.content?.parts || [])) {

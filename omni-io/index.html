@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni i/o — Prototypes</title>
+    <link rel="stylesheet" href="../styles.css"> <!-- Try to reuse styles -->
+    <style>
+        :root {
+            --bg: #030303;
+            --text-primary: #ededed;
+            --text-secondary: #a0a0a0;
+            --text-tertiary: #666666;
+            --accent: #FF007F; /* Neon Pink */
+            --accent-glow: rgba(255, 0, 127, 0.15);
+            --line: rgba(255, 255, 255, 0.05);
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .eyebrow {
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.2rem;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            margin: 0;
+            background: linear-gradient(to bottom, #fff, #a0a0a0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            font-weight: 400;
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.4s var(--ease);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, var(--accent-glow), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s var(--ease);
+            z-index: 0;
+        }
+
+        .item:hover {
+            border-color: rgba(255, 0, 127, 0.3);
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .item:hover::before {
+            opacity: 1;
+        }
+
+        .item-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .item-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #fff;
+            transition: color 0.3s var(--ease);
+        }
+
+        .item:hover .item-title {
+            color: var(--accent);
+        }
+
+        .item-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .item-meta {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status {
+            font-size: 0.55rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-tertiary);
+        }
+
+        .status--active {
+            color: var(--accent);
+            border-color: rgba(255, 0, 127, 0.2);
+        }
+
+        .arrow {
+            font-size: 1.2rem;
+            font-weight: 200;
+            color: var(--text-tertiary);
+            transition: transform 0.3s var(--ease), color 0.3s var(--ease);
+        }
+
+        .item:hover .arrow {
+            transform: translateX(4px);
+            color: var(--accent);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 40px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.3s var(--ease);
+        }
+
+        .back-link:hover {
+            color: #fff;
+        }
+
+        .back-link span {
+            transition: transform 0.3s var(--ease);
+        }
+
+        .back-link:hover span {
+            transform: translateX(-4px);
+        }
+
+        /* Ambient glow in background */
+        .ambient-glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(40px);
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <div class="container">
+        <div class="header">
+            <span class="eyebrow">Project Hub</span>
+            <h1 class="title">Omni i/o</h1>
+            <p class="desc">Experimental tools and media processing prototypes.</p>
+        </div>
+
+        <div class="list">
+            <!-- Item 1: Video Trimmer -->
+            <a href="../video-trimmer/" class="item">
+                <div class="item-content">
+                    <span class="item-title">Video Trimmer</span>
+                    <span class="item-desc">High-fidelity video cutting and framing prototype.</span>
+                </div>
+                <div class="item-meta">
+                    <span class="status status--active">Prototype</span>
+                    <span class="arrow">→</span>
+                </div>
+            </a>
+
+        </div>
+
+        <a href="../" class="back-link">
+            <span>←</span> Back to Dashboard
+        </a>
+    </div>
+</body>
+</html>
