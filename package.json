@@ -1,0 +1,10 @@
+{
+  "name": "velvet-pioneer",
+  "version": "1.0.0",
+  "description": "GenMedia OS - Studio and Prototypes",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {}
+}
