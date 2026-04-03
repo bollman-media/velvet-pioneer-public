@@ -988,8 +988,98 @@ Requirements:
     return;
   }
 
+  // ========== API: AudiBrief — Text to Audio Briefing ==========
+  if (req.method === 'POST' && req.url === '/api/audibrief') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    try {
+      if (!GEMINI_API_KEY) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'GEMINI_API_KEY not set' }));
+        return;
+      }
+      const body = await parseBody(req);
+      const { text, simplify = false, tldrOnly = false } = body;
+      if (!text || typeof text !== 'string' || !text.trim()) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'No text provided.' }));
+        return;
+      }
+      const BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+      const geminiCall = (model, payload) => new Promise((resolve) => {
+        const bodyStr = JSON.stringify(payload);
+        const apiReq = https.request(
+          `${BASE}/${model}:generateContent?key=${GEMINI_API_KEY}`,
+          { method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(bodyStr) } },
+          (apiRes) => {
+            let chunks = '';
+            apiRes.on('data', c => chunks += c);
+            apiRes.on('end', () => resolve({ ok: apiRes.statusCode < 300, status: apiRes.statusCode, data: JSON.parse(chunks) }));
+          }
+        );
+        apiReq.on('error', (e) => resolve({ ok: false, status: 500, data: { error: e.message } }));
+        apiReq.write(bodyStr);
+        apiReq.end();
+      });
+
+      const isFigma = text.startsWith('Figma Design Comments');
+
+      if (tldrOnly) {
+        const r = await geminiCall('gemini-2.5-flash', { contents: [{ parts: [{ text: `Summarize these Figma comments in 3-5 plain-text sentences.\n\n${text.slice(0, 20000)}` }] }], generationConfig: { temperature: 0.4, maxOutputTokens: 512 } });
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ tldr: r.data?.candidates?.[0]?.content?.parts?.[0]?.text || '' }));
+        return;
+      }
+
+      // Step 1: Script
+      console.log(`[AudiBrief] Generating ${isFigma ? 'Figma' : 'general'} script…`);
+      const scriptR = await geminiCall('gemini-2.5-flash', {
+        contents: [{ parts: [{ text: isFigma
+          ? `You are a sharp design lead giving a daily podcast briefing. Cover EVERY Figma comment. 600-900 words, spoken naturally.\n${simplify ? 'Be extra concise.' : ''}\n\nFIGMA COMMENTS:\n---\n${text.slice(0, 20000)}\n---\nWrite ONLY the script.`
+          : `You are a sharp design lead giving a podcast briefing. Write to be spoken aloud. 100-800 words based on content length. Warm, direct, professional.\n${simplify ? 'Be extra concise.' : ''}\n\nTEXT:\n---\n${text.slice(0, 15000)}\n---\nWrite ONLY the script.`
+        }] }],
+        generationConfig: { temperature: 0.6, maxOutputTokens: 3000 }
+      });
+      if (!scriptR.ok) throw new Error(`Script failed: ${scriptR.status}`);
+      const script = scriptR.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      if (!script) throw new Error('No script generated.');
+
+      // Step 2: Takeaways
+      const tkR = await geminiCall('gemini-2.5-flash', {
+        contents: [{ parts: [{ text: `Extract 3-5 key takeaways as short clear sentences from this text. Return ONLY a JSON array of strings.\n\n${text.slice(0, 8000)}` }] }],
+        generationConfig: { temperature: 0.3, maxOutputTokens: 512 }
+      });
+      let takeaways = [];
+      try { takeaways = JSON.parse((tkR.data?.candidates?.[0]?.content?.parts?.[0]?.text || '[]').replace(/```json\n?|```\n?/g, '').trim()); } catch { takeaways = []; }
+
+      // Step 3: TTS
+      console.log('[AudiBrief] Converting to speech…');
+      const ttsR = await geminiCall('gemini-2.5-flash-preview-tts', {
+        contents: [{ parts: [{ text: `Read this in a confident, crisp voice. Sharp design lead. Brisk but clear.\n\n${script}` }] }],
+        generationConfig: {
+          responseModalities: ['AUDIO'],
+          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: isFigma ? 'Orus' : 'Kore' } } }
+        }
+      });
+      if (!ttsR.ok) throw new Error(`TTS failed: ${ttsR.status}`);
+      const audioPart = ttsR.data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+      if (!audioPart) throw new Error('No audio from TTS.');
+
+      console.log('[AudiBrief] ✅ Done');
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ script, takeaways, audio: { data: audioPart.inlineData.data, mimeType: audioPart.inlineData.mimeType || 'audio/L16;rate=24000' } }));
+    } catch (err) {
+      console.error('[AudiBrief] Error:', err.message);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
   // ========== API: Studio — Edit Image (server-side proxy) ==========
   if (req.method === 'POST' && req.url === '/api/studio-edit') {
+
     try {
       if (!GEMINI_API_KEY) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
