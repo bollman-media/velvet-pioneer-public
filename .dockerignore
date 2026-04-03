@@ -1,0 +1,26 @@
+# Dependencies - rebuilt during docker build
+node_modules/
+
+# Local secrets - NEVER bake into image
+.env
+.env.local
+.env.*.local
+
+# Git
+.git/
+.gitignore
+
+# Local dev only
+*.log
+npm-debug.log*
+
+# Large binary assets served from CDN or static hosting
+# (comment out if Cloud Run serves these directly)
+# bollmans-wild-ideas/audio/
+
+# macOS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor config
+.vscode/
