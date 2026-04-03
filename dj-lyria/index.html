@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script type="importmap">
     { "imports": { 
-        "@google/genai": "https://cdn.jsdelivr.net/npm/@google/genai/+esm",
         "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
     } }
     </script>
@@ -1165,8 +1164,12 @@
         // Lyria Music Generation — via server proxy
         // ══════════════════════════════════════════
         async function generateTrack(prompt, bpm) {
-            for (let attempt = 0; attempt < 3; attempt++) {
-                if (attempt > 0) await new Promise(r => setTimeout(r, 1500));
+            for (let attempt = 0; attempt < 4; attempt++) {
+                if (attempt > 0) {
+                    const wait = attempt * 2000;
+                    console.log(`[Lyria] Retry ${attempt}/3 — waiting ${wait}ms…`);
+                    await new Promise(r => setTimeout(r, wait));
+                }
                 try {
                     const res = await fetch('/api/generate-track', {
                         method: 'POST',
@@ -1220,7 +1223,7 @@
         // Small delay to let the disco ball canvas initialize
         setTimeout(() => generate(), 100);
 
-        // Safety watchdog: if still on loading screen after 60s, show an error
+        // Safety watchdog: if still on loading screen after 3 minutes, show an error
         const loadingWatchdog = setTimeout(() => {
             if (loading.classList.contains('is-visible')) {
                 loadingText.textContent = 'Generation timed out';
@@ -1231,7 +1234,7 @@
                     emptyState.classList.remove('is-hidden');
                 };
             }
-        }, 60000);
+        }, 180000);
 
         async function generate() {
             if (!ensureApiKey()) return;
