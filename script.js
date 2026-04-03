@@ -8823,9 +8823,6 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
     async function detectAllTextInImage() {
         try {
             const imageBase64 = await imgSrcToBase64(editModalImage);
-            const apiKey = getApiKey();
-            if (!apiKey) throw new Error('No API key provided');
-
             const requestBody = {
                 contents: [{
                     parts: [
@@ -8845,14 +8842,7 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
                 }
             };
 
-            const response = await fetchWithFallback(apiKey, requestBody);
-
-            if (!response.ok) {
-                const error = await response.json().catch(() => ({}));
-                throw new Error(error.error?.message || `API error: ${response.status}`);
-            }
-
-            const data = await response.json();
+            const data = await callStudioProxy('/api/studio-analyze', requestBody.contents, requestBody.generationConfig);
             const candidates = data.candidates || [];
             let rawText = '';
             for (const candidate of candidates) {
@@ -10366,9 +10356,6 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
 
         try {
             const imageBase64 = await imgSrcToBase64(editModalImage);
-            const apiKey = getApiKey();
-            if (!apiKey) throw new Error('No API key provided');
-
             // Calculate click position as percentage of the image
             // The image is centered in the container, so we need to map canvas coords to image coords
             const img = editModalImage;
@@ -10400,14 +10387,7 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
                 }
             };
 
-            const response = await fetchWithFallback(apiKey, requestBody);
-
-            if (!response.ok) {
-                const error = await response.json().catch(() => ({}));
-                throw new Error(error.error?.message || `API error: ${response.status}`);
-            }
-
-            const data = await response.json();
+            const data = await callStudioProxy('/api/studio-analyze', requestBody.contents, requestBody.generationConfig);
             const candidates = data.candidates || [];
             let resultText = '';
 
@@ -10819,16 +10799,7 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
         portraitBtns.forEach(btn => { btn.style.display = 'none'; });
 
         try {
-            const apiKey = getApiKey();
-            if (!apiKey) {
-                // No API key — show button as fallback
-                portraitBtns.forEach(btn => { btn.style.display = ''; });
-                return;
-            }
-
             const imageBase64 = await imgSrcToBase64(editModalImage);
-            // Use gemini-2.0-flash for fast, reliable text classification
-            const classifyUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
             const requestBody = {
                 contents: [{
                     parts: [
@@ -10846,18 +10817,7 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
                 }
             };
 
-            const response = await fetch(`${classifyUrl}?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestBody),
-            });
-
-            if (!response.ok) {
-                console.warn('[Portrait] Classification API error:', response.status);
-                portraitBtns.forEach(btn => { btn.style.display = ''; });
-                return;
-            }
-            const data = await response.json();
+            const data = await callStudioProxy('/api/studio-analyze', requestBody.contents, requestBody.generationConfig);
             const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toLowerCase() || '';
             const isPhoto = text.startsWith('yes');
 
@@ -11355,29 +11315,18 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
                     let detectedTexts = [];
                     try {
                         const currentBase64 = await imgSrcToBase64(editModalImage);
-                        const apiKey = getApiKey();
-                        if (apiKey) {
-                            const ocrBody = {
-                                contents: [{
-                                    parts: [
-                                        { text: 'List ALL text visible in this image. Return a JSON array of strings, one per distinct text element. If no text is found, return []. Return ONLY the JSON array, no other text.' },
-                                        { inline_data: { mime_type: 'image/png', data: currentBase64 } }
-                                    ]
-                                }],
-                                generationConfig: { responseMimeType: 'application/json' }
-                            };
-                            const ocrResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(ocrBody),
-                                signal: ac.signal,
-                            });
-                            if (ocrResp.ok) {
-                                const ocrData = await ocrResp.json();
-                                const ocrText = ocrData.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
-                                detectedTexts = JSON.parse(ocrText);
-                            }
-                        }
+                        const ocrBody = {
+                            contents: [{
+                                parts: [
+                                    { text: 'List ALL text visible in this image. Return a JSON array of strings, one per distinct text element. If no text is found, return []. Return ONLY the JSON array, no other text.' },
+                                    { inline_data: { mime_type: 'image/png', data: currentBase64 } }
+                                ]
+                            }],
+                            generationConfig: { responseMimeType: 'application/json' }
+                        };
+                        const data = await callStudioProxy('/api/studio-analyze', ocrBody.contents, ocrBody.generationConfig, ac.signal);
+                        const ocrText = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
+                        detectedTexts = JSON.parse(ocrText);
                     } catch (ocrErr) {
                         if (ocrErr.name === 'AbortError') throw ocrErr;
                         console.warn('Text detection before resize skipped:', ocrErr);
@@ -13676,8 +13625,7 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
             // Run text detection in the background — pre-fill if text is found
             try {
                 const imageBase64 = await imgSrcToBase64(webCanvasImg);
-                const apiKey = getApiKey();
-                if (!apiKey) throw new Error('No API key provided');
+
 
                 const x1Pct = Math.round((webMarqueeSelection.x / webDrawCanvas.width) * 100);
                 const y1Pct = Math.round((webMarqueeSelection.y / webDrawCanvas.height) * 100);
@@ -13745,8 +13693,7 @@ Return ONLY a JSON array of these objects, sorted from largest to smallest by bo
             }
             try {
                 const imageBase64 = await imgSrcToBase64(webCanvasImg);
-                const apiKey = getApiKey();
-                if (!apiKey) throw new Error('No API key provided');
+
 
                 const xPct = Math.round((clickX / webDrawCanvas.width) * 100);
                 const yPct = Math.round((clickY / webDrawCanvas.height) * 100);
