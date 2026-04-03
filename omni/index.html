@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omni — Trim</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <link href="https://fonts.cdnfonts.com/css/google-sans" rel="stylesheet">
+  <style>
+    /* ── Motion Tokens (Velvet Pioneer Standard) ─────────────── */
+    :root {
+      --motion-enter:   480ms cubic-bezier(0.16, 1, 0.3, 1);
+      --motion-exit:    320ms cubic-bezier(0.4, 0, 1, 1);
+      --motion-settle:  620ms cubic-bezier(0.16, 1, 0.3, 1);
+      --motion-micro:   180ms cubic-bezier(0.4, 0, 0.2, 1);
+      --motion-stagger:  60ms;
+
+      /* Palette */
+      --c-surface:      #000;
+      --c-surface-2:    #0e0e0e;
+      --c-border:       rgba(255,255,255,0.08);
+      --c-text-primary: rgba(255,255,255,0.88);
+      --c-text-dim:     rgba(255,255,255,0.42);
+      --c-white:        #ffffff;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #060606;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 40px 0 64px;
+      font-family: 'Google Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Reduced Motion ───────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+      .playhead { box-shadow: none !important; }
+    }
+
+    /* ── Orientation Toggle ───────────────────────────────────── */
+    .orient-toggle {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--c-border);
+      border-radius: 100px;
+      padding: 4px;
+      margin-bottom: 32px;
+      /* Temporal: staggered children enter → container first */
+      animation: slideDown var(--motion-enter) both;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .orient-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      min-width: 44px; min-height: 44px;
+      padding: 8px 20px;
+      border-radius: 100px;
+      border: none; cursor: pointer;
+      font-family: 'Google Sans', sans-serif;
+      font-size: 13px; font-weight: 500;
+      color: var(--c-text-dim);
+      background: transparent;
+      /* Micro — state change */
+      transition: background var(--motion-micro), color var(--motion-micro);
+      position: relative;
+    }
+    .orient-btn:focus-visible {
+      outline: 2px solid rgba(255,255,255,0.6);
+      outline-offset: 2px;
+    }
+    .orient-btn .material-symbols-outlined { font-size: 16px; }
+    .orient-btn.active {
+      background: rgba(255,255,255,0.11);
+      color: var(--c-text-primary);
+    }
+    /* Tonal: active pill ripple */
+    .orient-btn.active::after {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: 100px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+    }
+
+    /* ── Phone Shell ─────────────────────────────────────────── */
+    .device-stage {
+      position: relative;
+      /* contain layout changes to stage — prevents page reflow */
+      width: 390px;
+      height: 844px;
+      /* height transitions via transform, not height — GPU only */
+      will-change: transform;
+    }
+    .device {
+      background: var(--c-surface);
+      border-radius: 44px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow:
+        0 0 0 1px var(--c-border),
+        0 0 0 2px rgba(255,255,255,0.03),
+        0 48px 96px rgba(0,0,0,0.9),
+        0 16px 32px rgba(0,0,0,0.6);
+      /* Enter: device arrives with weight */
+      animation: deviceEnter var(--motion-settle) both;
+      animation-delay: 80ms;
+    }
+    @keyframes deviceEnter {
+      from { opacity: 0; transform: translateY(24px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Landscape: 390×844 */
+    .device.landscape { width: 390px; height: 844px; }
+    /* Portrait: also 844px */
+    .device.portrait  { width: 390px; height: 844px; }
+
+    /* Spatial: orientation swap — use transform, not width/height */
+    .device {
+      transition: height var(--motion-settle);
+    }
+
+    /* ── Status Bar ──────────────────────────────────────────── */
+    .status-bar {
+      height: 44px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 30px 0 34px;
+      flex-shrink: 0;
+    }
+    .status-time {
+      font-size: 15px; font-weight: 600;
+      color: var(--c-text-primary); letter-spacing: -0.3px;
+    }
+    .status-right { display: flex; align-items: center; gap: 7px; }
+    .signal-bars { display: flex; align-items: flex-end; gap: 1.5px; height: 11px; }
+    .signal-bars span {
+      background: var(--c-text-primary);
+      width: 3px; border-radius: 0.5px; display: block;
+    }
+    .signal-bars span:nth-child(1) { height: 4px; }
+    .signal-bars span:nth-child(2) { height: 6px; }
+    .signal-bars span:nth-child(3) { height: 9px; }
+    .signal-bars span:nth-child(4) { height: 11px; }
+
+    /* ── App Bar ─────────────────────────────────────────────── */
+    .app-bar {
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 4px; flex-shrink: 0;
+    }
+    .icon-btn {
+      width: 48px; height: 48px; /* ≥44px touch target */
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 999px; background: none; border: none; cursor: pointer;
+      transition: background var(--motion-micro), transform var(--motion-micro);
+    }
+    .icon-btn:hover  { background: rgba(255,255,255,0.06); }
+    .icon-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.92); }
+    .icon-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.5); outline-offset: 2px; }
+    .icon-btn .material-symbols-outlined { font-size: 24px; color: var(--c-text-primary); }
+    .app-bar-title {
+      font-size: 16px; font-weight: 500;
+      color: var(--c-text-primary); flex: 1; text-align: center;
+    }
+
+    /* ── Media wrapper ───────────────────────────────────────── */
+    .media-wrapper {
+      flex-shrink: 0;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      background: #080808;
+      /* Spatial: height transitions via GPU (no layout repaint) */
+      transition: height var(--motion-settle);
+      will-change: height;
+    }
+    .device.landscape .media-wrapper { width: 390px; height: 219px; }
+    .device.portrait  .media-wrapper {
+      width: 290px; height: 516px;
+      align-self: center;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .placeholder-img {
+      display: block;
+      /* GPU-composited fade on orient swap */
+      transition: opacity var(--motion-exit), transform var(--motion-exit);
+      will-change: opacity, transform;
+    }
+    .device.landscape .placeholder-img { width: 390px; height: 219px; object-fit: cover; }
+    .device.portrait  .placeholder-img {
+      width: 290px; height: 516px;
+      object-fit: cover;
+      border-radius: 16px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.7);
+    }
+
+    /* Portrait border frame */
+    .portrait-frame {
+      position: absolute;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      pointer-events: none; display: none;
+      transition: opacity var(--motion-enter);
+    }
+    .device.portrait .portrait-frame {
+      display: block;
+      width: 290px; height: 516px;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Tap overlay — pause/play flash */
+    .tap-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      /* GPU-only */
+      transition: opacity var(--motion-micro);
+      will-change: opacity;
+    }
+    .tap-overlay.show { opacity: 1; }
+    .tap-icon {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: rgba(0,0,0,0.52);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.14);
+      display: flex; align-items: center; justify-content: center;
+      /* Bounce: draws attention on tap */
+      transition: transform var(--motion-micro);
+      will-change: transform, opacity;
+    }
+    .tap-overlay.show .tap-icon {
+      animation: tapPop 240ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes tapPop {
+      from { transform: scale(0.78); }
+      to   { transform: scale(1); }
+    }
+    .tap-icon .material-symbols-outlined { font-size: 32px; color: var(--c-white); }
+
+    /* ── Editing area (spacer) ───────────────────────────────── */
+    .editing-area { flex: 1; }
+
+    /* ── Education / context image ───────────────────────────── */
+    .trim-context-img {
+      flex-shrink: 0;
+      width: 100%;
+      line-height: 0;
+    }
+    .trim-context-img img {
+      width: 100%; height: auto;
+      display: block; object-fit: cover;
+    }
+
+    /* ── Timestamp ───────────────────────────────────────────── */
+    .time-row {
+      flex-shrink: 0;
+      padding: 8px 20px 4px;
+      margin-bottom: 10px;
+      display: flex; align-items: center;
+    }
+    .time-display {
+      font-size: 12px; font-weight: 400;
+      color: var(--c-text-dim);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.04em;
+      /* GPU: opacity update every frame */
+      will-change: opacity;
+    }
+    .time-display strong {
+      color: var(--c-text-primary); font-weight: 500; font-size: 13px;
+    }
+
+    /* ── Filmstrip ───────────────────────────────────────────── */
+    .trim-area { flex-shrink: 0; padding-bottom: 8px; }
+    .filmstrip-wrap {
+      position: relative; height: 60px;
+      margin: 0 16px;
+    }
+    .filmstrip {
+      position: absolute;
+      top: 6px; left: 0; right: 0; height: 47px;
+      border-radius: 10px; overflow: hidden; display: flex;
+    }
+    .frame-cell { flex: 1; height: 100%; overflow: hidden; }
+    .frame-cell canvas { display: block; width: 100%; height: 100%; }
+
+    /* Scrim dims out-of-selection frames */
+    .scrim {
+      position: absolute; top: 6px; height: 47px;
+      background: rgba(0,0,0,0.68); pointer-events: none; z-index: 2;
+      /* GPU: width updated by JS inline style */
+      will-change: width;
+    }
+    #scrim-left  { left: 0;  border-radius: 10px 0 0 10px; }
+    #scrim-right { right: 0; border-radius: 0 10px 10px 0; }
+
+    /* ── Trim Window ─────────────────────────────────────────── */
+    .trim-window {
+      position: absolute; top: 0; height: 60px;
+      z-index: 3; cursor: grab; touch-action: none;
+      /* GPU: left + width driven by JS transform equiv via inline style */
+      will-change: transform;
+      background: rgba(0,0,0,0.45);
+    }
+    /* Disable transitions during gesture drag — prevents fighting */
+    .trim-window.is-dragging { cursor: grabbing; }
+    .trim-window:active       { cursor: grabbing; }
+
+    .trim-top, .trim-bot {
+      position: absolute; left: 12px; right: 12px; height: 3px;
+      background: var(--c-white); pointer-events: none;
+      border-radius: 1px;
+    }
+    .trim-top { top: 0; } .trim-bot { bottom: 0; }
+
+    .trim-label {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 11px; font-weight: 700; color: var(--c-white);
+      letter-spacing: 0.06em; pointer-events: none; z-index: 6;
+      white-space: nowrap; 
+      font-family: 'Google Sans', sans-serif;
+      /* Micro: text updates */
+      transition: opacity var(--motion-micro);
+      will-change: opacity;
+    }
+
+    /* Hairline playhead — GPU only via translateX */
+    .playhead {
+      position: absolute; top: 0; left: 0;
+      width: 2px; height: 60px;
+      background: var(--c-white); border-radius: 1px;
+      pointer-events: none; z-index: 5;
+      /* Use transform: translateX — GPU composited, not 'left' */
+      will-change: transform;
+      /* Glow: filter is GPU-composited */
+      filter: drop-shadow(0 0 4px rgba(255,255,255,0.9));
+    }
+
+    /* Handles */
+    .trim-handle {
+      position: absolute; top: 0; width: 12px; height: 60px;
+      background: var(--c-white);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 7; cursor: ew-resize; touch-action: none;
+      /* min touch target padding */
+    }
+    .trim-handle::before {
+      /* extend touch area without visual change */
+      content: '';
+      position: absolute;
+      inset: 0 -8px;
+    }
+    .trim-handle.left  { left: 0;  border-radius: 10px 0 0 10px; }
+    .trim-handle.right { right: 0; border-radius: 0 10px 10px 0; }
+    .handle-grip {
+      width: 3px; height: 22px;
+      background: rgba(0,0,0,0.45); border-radius: 100px;
+    }
+
+    /* ── Gesture bar ─────────────────────────────────────────── */
+    .gesture-bar {
+      height: 34px; display: flex; align-items: center;
+      justify-content: center; padding-bottom: 8px; flex-shrink: 0;
+    }
+    .home-indicator {
+      width: 139px; height: 5px;
+      background: rgba(255,255,255,0.55); border-radius: 100px;
+    }
+    /* ── Tabs ─────────────────────────────────────────────────── */
+    .nav-tabs {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      animation: slideDown var(--motion-enter) both;
+    }
+    .tab-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--c-border);
+      border-radius: 100px;
+      padding: 10px 24px;
+      color: var(--c-text-dim);
+      font-family: 'Google Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--motion-micro), color var(--motion-micro);
+    }
+    .tab-btn.active {
+      background: rgba(255,255,255,0.15);
+      color: var(--c-text-primary);
+      border-color: rgba(255,255,255,0.2);
+    }
+    .tab-content {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+    }
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* ── Web Layout (JSON based) ────────────────────────────── */
+    .web-container {
+      width: 1391px;
+      height: 900px;
+      background: #ffffff;
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 32px 64px rgba(0,0,0,0.3);
+      color: #000;
+      font-family: 'Google Sans Flex', 'Google Sans', sans-serif;
+    }
+    
+    .web-header {
+      position: absolute;
+      top: 1px;
+      left: 0;
+      width: 1391px;
+      height: 104px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: #ffffff;
+      z-index: 10;
+    }
+    
+    .web-header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .web-header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .web-close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #5f6368;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .web-close-btn:hover { background: #f1f3f4; }
+    
+    .web-logo {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: #1a73e8;
+    }
+    
+    .web-model-picker {
+      background: #f1f3f4;
+      border-radius: 28px;
+      padding: 4px 12px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #3c4043;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    
+    .web-done-btn {
+      background: #1a73e8;
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .web-done-btn:hover { background: #1765c1; }
+    
+    .web-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .web-video-area {
+      position: absolute;
+      left: 280px;
+      top: 127px;
+      width: 904px;
+      height: 509px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #000;
+    }
+    
+    .web-video-area video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .web-trimmer {
+      position: absolute;
+      left: 280px;
+      top: 708px;
+      width: 904px;
+      height: 45px;
+      background: #f1f3f4;
+      border-radius: 0 12px 12px 0;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    
+    .web-trim-window {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      background: rgba(26, 115, 232, 0.2);
+      border: 2px solid #1a73e8;
+      box-sizing: border-box;
+      border-radius: 4px;
+    }
+    
+    .web-tooltip {
+      position: absolute;
+      left: 622px;
+      top: 609px;
+      width: 312px;
+      height: 64px;
+      background: #d3e3fd;
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      z-index: 20;
+      transition: opacity 320ms cubic-bezier(0.4, 0, 1, 1);
+    }
+    .web-tooltip.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .web-tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 20px;
+      border-width: 8px 8px 0;
+      border-style: solid;
+      border-color: #d3e3fd transparent;
+      display: block;
+      width: 0;
+    }
+    
+    .web-tooltip-text {
+      font-family: 'Google Sans Flex', sans-serif;
+      font-size: 15px;
+      line-height: 20px;
+      color: #041e49;
+    }
+    /* Web Trimmer Overrides to fit 45px height */
+    .web-container .trim-window { height: 64px; top: -9.5px; background: transparent; border: none; }
+    .web-container .trim-handle { height: 64px; }
+    .web-container .playhead { height: 64px; }
+    .web-container .filmstrip { height: 45px; top: 0; border-radius: 12px; overflow: hidden; }
+    .web-container .scrim { height: 45px; top: 0; background: transparent; }
+    .web-container .trim-top, .web-container .trim-bot { display: none; } /* Hide mobile thick bars */
+
+    /* Light theme toggle for web header */
+    .orient-toggle.light {
+      background: #f1f3f4;
+      border: 1px solid #e0e0e0;
+      margin-bottom: 0; /* Reset margin for header */
+    }
+    .orient-toggle.light .orient-btn {
+      color: #5f6368;
+    }
+    .orient-toggle.light .orient-btn.active {
+      background: #ffffff;
+      color: #1a73e8;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-tabs">
+  <button class="tab-btn active" onclick="switchTab('mobile', this)">Mobile</button>
+  <button class="tab-btn" onclick="switchTab('web', this)">Web</button>
+</div>
+
+<div class="tab-content active" id="tab-mobile">
+<!-- Orientation Toggle — enters before device (Motion Hierarchy: large before small → device is larger but toggle has shorter stagger) -->
+<div class="orient-toggle" role="group" aria-label="Video orientation">
+  <button class="orient-btn active" id="btn-landscape"
+          aria-pressed="true"
+          onclick="setOrient('landscape')">
+    <span class="material-symbols-outlined" aria-hidden="true">crop_landscape</span>
+    Landscape
+  </button>
+  <button class="orient-btn" id="btn-portrait"
+          aria-pressed="false"
+          onclick="setOrient('portrait')">
+    <span class="material-symbols-outlined" aria-hidden="true">crop_portrait</span>
+    Portrait
+  </button>
+</div>
+
+<div class="device-stage">
+<div class="device landscape" id="device" role="application" aria-label="Video trimmer">
+
+  <!-- Status Bar -->
+  <div class="status-bar" aria-hidden="true">
+    <div class="status-time">9:41</div>
+    <div class="status-right">
+      <div class="signal-bars">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true">
+        <path d="M8 9.8L6.3 11.5 8 13.2 9.7 11.5Z" fill="#e3e3e3"/>
+        <path d="M8 6.5c-1.3 0-2.5.5-3.4 1.4l1.1 1.1C6.3 8.4 7.1 8 8 8s1.7.4 2.3 1l1.1-1.1C10.5 7 9.3 6.5 8 6.5z" fill="#e3e3e3"/>
+        <path d="M8 3C5.6 3 3.4 4 1.9 5.6l1.1 1.1C4.2 5.4 6 4.6 8 4.6s3.8.8 5 2.1l1.1-1.1C12.6 4 10.4 3 8 3z" fill="#e3e3e3"/>
+        <path d="M8 0C4.7 0 1.7 1.4 0 3.6l1.1 1.1C2.5 2.9 5 1.6 8 1.6s5.5 1.3 6.9 3.1L16 3.6C14.3 1.4 11.3 0 8 0z" fill="#e3e3e3"/>
+      </svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none" aria-hidden="true">
+        <rect x="0.5" y="0.5" width="21" height="11" rx="2.5" stroke="#e3e3e3" stroke-opacity="0.35"/>
+        <rect x="2" y="2" width="17" height="8" rx="1.5" fill="#e3e3e3"/>
+        <path d="M23 4.5v3c.9-.4 1.4-1 1.4-1.5S23.9 4.9 23 4.5z" fill="#e3e3e3" opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- App Bar -->
+  <div class="app-bar">
+    <button class="icon-btn" id="btn-close" aria-label="Cancel trim">
+      <span class="material-symbols-outlined" aria-hidden="true">close</span>
+    </button>
+    <div class="app-bar-title" aria-live="polite">Trim</div>
+    <button class="icon-btn" id="btn-check" aria-label="Apply trim">
+      <span class="material-symbols-outlined" aria-hidden="true">check</span>
+    </button>
+  </div>
+
+  <!-- Media placeholder (tap to pause) -->
+  <div class="media-wrapper" id="media-wrapper"
+       role="button" tabindex="0"
+       aria-label="Video preview — tap to pause">
+    <video class="placeholder-img" id="media-video"
+           src="landscape_video.mp4"
+           loop muted playsinline autoplay
+           style="object-fit: cover; width: 100%; height: 100%;">
+    </video>
+    <div class="portrait-frame" aria-hidden="true"></div>
+    <div class="tap-overlay" id="tap-overlay" aria-hidden="true">
+      <div class="tap-icon">
+        <span class="material-symbols-outlined" id="tap-glyph">pause</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spacer -->
+  <div class="editing-area" aria-hidden="true"></div>
+
+  <!-- Education image above trimmer -->
+  <div class="trim-context-img" aria-hidden="true">
+    <img src="education_trim_video.png" alt="" draggable="false">
+  </div>
+
+  <!-- Timestamp — below education image -->
+  <div class="time-row">
+    <div class="time-display" id="time-display" aria-live="polite" aria-atomic="true">
+      <strong>0:00</strong>&nbsp;/ 0:15
+    </div>
+  </div>
+
+  <!-- Filmstrip + Trim strip -->
+  <div class="trim-area">
+    <div class="filmstrip-wrap" id="fw">
+      <div class="filmstrip" id="filmstrip" aria-hidden="true"></div>
+      <div class="scrim" id="scrim-left"  aria-hidden="true"></div>
+      <div class="scrim" id="scrim-right" aria-hidden="true"></div>
+      <div class="trim-window" id="trim-win"
+           role="slider"
+           aria-label="Trim selection"
+           aria-valuemin="0"
+           aria-valuenow="10"
+           aria-valuemax="15"
+           aria-valuetext="10 seconds">
+        <div class="trim-top" aria-hidden="true"></div>
+        <div class="trim-bot" aria-hidden="true"></div>
+        <div class="trim-label" id="trim-label" aria-hidden="true">10s</div>
+        <div class="playhead" id="playhead" aria-hidden="true"></div>
+        <div class="trim-handle left"  id="h-left"  aria-hidden="true"><div class="handle-grip"></div></div>
+        <div class="trim-handle right" id="h-right" aria-hidden="true"><div class="handle-grip"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gesture bar -->
+  <div class="gesture-bar" aria-hidden="true">
+    <div class="home-indicator"></div>
+  </div>
+
+</div><!-- .device -->
+</div><!-- .device-stage -->
+</div><!-- #tab-mobile -->
+
+<div class="tab-content" id="tab-web">
+  <div class="web-container">
+    <!-- Tooltip -->
+    <div class="web-tooltip">
+      <div class="web-tooltip-text">Gemini can reference videos up to 10 seconds long</div>
+    </div>
+
+    <!-- Video Area -->
+    <div class="web-video-area">
+      <video src="landscape_video.mp4" loop muted playsinline autoplay></video>
+    </div>
+
+    <!-- Timestamp -->
+    <div style="position: absolute; left: 280px; top: 675px; font-family: 'Google Sans', sans-serif; font-size: 13px; color: #202124; letter-spacing: 0.2px;">
+      <span id="web-time-display">0:00 / 0:15</span>
+    </div>
+
+    <!-- Trimmer -->
+    <div class="filmstrip-wrap" id="web-fw" style="width: 904px; height: 45px; margin: 0; position: absolute; left: 280px; top: 708px;">
+      <div class="filmstrip" id="web-filmstrip" aria-hidden="true"></div>
+      <div class="scrim" id="web-scrim-left"  aria-hidden="true"></div>
+      <div class="scrim" id="web-scrim-right" aria-hidden="true"></div>
+      <div class="trim-window" id="web-trim-win"
+           role="slider"
+           aria-label="Trim selection"
+           aria-valuemin="0"
+           aria-valuenow="10"
+           aria-valuemax="15"
+           aria-valuetext="10 seconds"
+           style="height: 64px; top: -9.5px; background: rgba(0, 0, 0, 0.45); border: none; box-shadow: 0 4px 16px rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden;">
+        <!-- Left Cap (Solid White End) -->
+        <div class="trim-handle" id="web-h-left" style="position: absolute; left: 0; top: 0; width: 24px; height: 64px; background: #ffffff; cursor: ew-resize;">
+          <div style="width: 4px; height: 23px; background: rgba(0,0,0,0.54); border-radius: 100px; position: absolute; left: 10px; top: 20.5px;"></div>
+        </div>
+        
+        <!-- Right Cap (Solid White End) -->
+        <div class="trim-handle" id="web-h-right" style="position: absolute; right: 0; top: 0; width: 24px; height: 64px; background: #ffffff; cursor: ew-resize;">
+          <div style="width: 4px; height: 23px; background: rgba(0,0,0,0.54); border-radius: 100px; position: absolute; right: 10px; top: 20.5px;"></div>
+        </div>
+        
+        <!-- Top Bar -->
+        <div style="position: absolute; left: 24px; right: 24px; top: 0; height: 8px; background: #ffffff;"></div>
+        
+        <!-- Bottom Bar -->
+        <div style="position: absolute; left: 24px; right: 24px; bottom: 0; height: 8px; background: #ffffff;"></div>
+        
+        <div class="trim-label" id="web-trim-label" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ffffff; font-weight: bold; font-size: 14px; text-shadow: 0 1px 3px rgba(0,0,0,0.6); z-index: 5;">8s</div>
+        <div class="playhead" id="web-playhead" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <!-- App Bar Desktop -->
+    <div class="web-header">
+      <div class="web-header-left">
+        <button class="web-close-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <div class="web-header-center">
+        <div class="orient-toggle light" role="group" aria-label="Web video orientation">
+          <button class="orient-btn active" id="web-btn-landscape" onclick="setWebOrient('landscape', this)">
+            <span class="material-symbols-outlined" aria-hidden="true">crop_landscape</span>
+            Landscape
+          </button>
+          <button class="orient-btn" id="web-btn-portrait" onclick="setWebOrient('portrait', this)">
+            <span class="material-symbols-outlined" aria-hidden="true">crop_portrait</span>
+            Portrait
+          </button>
+        </div>
+      </div>
+
+      <div class="web-header-right">
+        <button class="web-done-btn">Done</button>
+      </div>
+    </div>
+  </div>
+</div><!-- #tab-web -->
+
+<script>
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  
+  document.getElementById('tab-' + tabId).classList.add('active');
+  btn.classList.add('active');
+  
+  window.currentTab = tabId;
+  
+  if (tabId === 'web') {
+    setTimeout(() => {
+      buildWebStrip();
+      initWebTrim();
+    }, 100);
+  }
+}
+
+function setWebOrient(mode, btn) {
+  const video = document.querySelector('.web-video-area video');
+  const area = document.querySelector('.web-video-area');
+  
+  if (!video || !area) return;
+  
+  document.querySelectorAll('.orient-toggle.light .orient-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  if (mode === 'portrait') {
+    video.src = 'portait_video.mp4';
+    // Maintain visual center: original left 280, width 904 -> center 732
+    // New width 286 -> new left 732 - 143 = 589
+    area.style.width = '286px';
+    area.style.left = '589px';
+  } else {
+    video.src = 'landscape_video.mp4';
+    area.style.width = '904px';
+    area.style.left = '280px';
+  }
+  
+  // Update filmstrip to match the new video source
+  buildWebStrip(video.src);
+}
+
+let webTrimL = 0;
+let webTrimR = 0;
+let fWidthWeb = 904;
+let pxPerSecWeb = 904 / 15;
+
+function buildWebStrip(videoSrc) {
+  const webFw = document.getElementById('web-fw');
+  const webStrip = document.getElementById('web-filmstrip');
+  if (!webFw || !webStrip) return;
+  
+  fWidthWeb = webFw.offsetWidth;
+  pxPerSecWeb = fWidthWeb / DURATION;
+  webStrip.innerHTML = '';
+  
+  const cells = [];
+  for (let i = 0; i < N_FRAMES; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'frame-cell';
+    cell.style.width = Math.max(1, Math.ceil(fWidthWeb / N_FRAMES)) + 'px';
+    webStrip.appendChild(cell);
+    cells.push(cell);
+  }
+  
+  const vid = document.createElement('video');
+  vid.src = videoSrc || 'landscape_video.mp4';
+  vid.muted = true;
+  vid.playsInline = true;
+  
+  vid.addEventListener('loadedmetadata', () => {
+    const duration = vid.duration || 15;
+    const interval = duration / N_FRAMES;
+    
+    function extract(i) {
+      if (i >= N_FRAMES) { vid.remove(); return; }
+      vid.currentTime = i * interval;
+      vid.addEventListener('seeked', function onSeeked() {
+        vid.removeEventListener('seeked', onSeeked);
+        const canvas = document.createElement('canvas');
+        canvas.width = cells[i].offsetWidth || 80;
+        canvas.height = 45;
+        const ctx = canvas.getContext('2d');
+        
+        const videoRatio = vid.videoWidth / vid.videoHeight;
+        const canvasRatio = canvas.width / canvas.height;
+        let sWidth, sHeight, sx, sy;
+        
+        if (videoRatio > canvasRatio) {
+          sHeight = vid.videoHeight; sWidth = sHeight * canvasRatio;
+          sx = (vid.videoWidth - sWidth) / 2; sy = 0;
+        } else {
+          sWidth = vid.videoWidth; sHeight = sWidth / canvasRatio;
+          sx = 0; sy = (vid.videoHeight - sHeight) / 2;
+        }
+        ctx.drawImage(vid, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+        cells[i].innerHTML = '';
+        cells[i].appendChild(canvas);
+        extract(i + 1);
+      });
+    }
+    extract(0);
+  });
+}
+
+function initWebTrim() {
+  const webFw = document.getElementById('web-fw');
+  if (webFw) fWidthWeb = webFw.offsetWidth;
+  pxPerSecWeb = fWidthWeb / DURATION;
+  webTrimL = 0;
+  webTrimR = 8 * pxPerSecWeb;
+  renderWebTrim();
+  
+  const hLeft = document.getElementById('web-h-left');
+  const hRight = document.getElementById('web-h-right');
+  const trimWin = document.getElementById('web-trim-win');
+  
+  if (hLeft) makeWebResizeHandle(hLeft, true);
+  if (hRight) makeWebResizeHandle(hRight, false);
+  if (trimWin) makeWebPanHandle(trimWin);
+}
+
+function renderWebTrim() {
+  const webTrimWin = document.getElementById('web-trim-win');
+  const webScrimL = document.getElementById('web-scrim-left');
+  const webScrimR = document.getElementById('web-scrim-right');
+  const webTrimLabel = document.getElementById('web-trim-label');
+  
+  if (!webTrimWin) return;
+  
+  const sel = webTrimR - webTrimL;
+  webTrimWin.style.left = webTrimL + 'px';
+  webTrimWin.style.width = sel + 'px';
+  
+  webScrimL.style.width = webTrimL + 'px';
+  webScrimR.style.width = (fWidthWeb - webTrimR) + 'px';
+  
+  const secs = Math.round(sel / pxPerSecWeb);
+  webTrimLabel.textContent = secs + 's';
+}
+
+function makeWebResizeHandle(handle, isLeft) {
+  let sx, stL, stR;
+  const down = e => {
+    e.preventDefault(); e.stopPropagation();
+    sx = clientX(e); stL = webTrimL; stR = webTrimR;
+    const tooltip = document.querySelector('.web-tooltip');
+    if (tooltip) tooltip.classList.add('fade-out');
+    on('mousemove', move); on('touchmove', move);
+    on('mouseup', up);     on('touchend', up);
+  };
+  const move = e => {
+    e.preventDefault();
+    const dx = clientX(e) - sx;
+    const mn = MIN_S * pxPerSecWeb;
+    const mx = MAX_S * pxPerSecWeb;
+    if (isLeft) {
+      let nl = clamp(stL + dx, 0, webTrimR - mn);
+      if (webTrimR - nl > mx) nl = webTrimR - mx;
+      webTrimL = nl;
+    } else {
+      let nr = clamp(stR + dx, webTrimL + mn, fWidthWeb);
+      if (nr - webTrimL > mx) nr = webTrimL + mx;
+      webTrimR = nr;
+    }
+    renderWebTrim();
+  };
+  const up = () => {
+    off('mousemove', move); off('touchmove', move);
+    off('mouseup', up);     off('touchend', up);
+  };
+  handle.addEventListener('mousedown', down);
+}
+
+function makeWebPanHandle(win) {
+  let sx, stL, stR;
+  const isHandle = e => e.target.classList.contains('trim-handle') || e.target.parentElement.classList.contains('trim-handle');
+  const down = e => {
+    if (isHandle(e)) return;
+    e.preventDefault();
+    sx = clientX(e); stL = webTrimL; stR = webTrimR;
+    const tooltip = document.querySelector('.web-tooltip');
+    if (tooltip) tooltip.classList.add('fade-out');
+    on('mousemove', move); on('touchmove', move);
+    on('mouseup', up);     on('touchend', up);
+  };
+  const move = e => {
+    e.preventDefault();
+    const dx = clientX(e) - sx;
+    const sel = stR - stL;
+    let nl = stL + dx, nr = stR + dx;
+    if (nl < 0) { nl = 0; nr = sel; }
+    if (nr > fWidthWeb) { nr = fWidthWeb; nl = fWidthWeb - sel; }
+    webTrimL = nl; webTrimR = nr;
+    renderWebTrim();
+  };
+  const up = () => {
+    off('mousemove', move); off('touchmove', move);
+    off('mouseup', up);     off('touchend', up);
+  };
+  win.addEventListener('mousedown', down);
+}
+// ─── Config ──────────────────────────────────────────────────────
+const DURATION = 15;
+const MIN_S    = 8;
+const MAX_S    = 15;
+const N_FRAMES = 12;
+
+// ─── State ───────────────────────────────────────────────────────
+let fWidth   = 0;
+let pxPerSec = 0;
+let trimL    = 0;
+let trimR    = 0;
+let playing  = true;
+let elapsedT = 0;
+let lastRAF  = null;
+let prevTS   = null;
+let flashTmr = null;
+let orient   = 'landscape';
+
+// ─── Elements ────────────────────────────────────────────────────
+const device    = document.getElementById('device');
+const mediaWrap = document.getElementById('media-wrapper');
+const mediaVideo = document.getElementById('media-video');
+const tapOv     = document.getElementById('tap-overlay');
+const tapGlyph  = document.getElementById('tap-glyph');
+const timeDisp  = document.getElementById('time-display');
+const fw        = document.getElementById('fw');
+const strip     = document.getElementById('filmstrip');
+const scrimL    = document.getElementById('scrim-left');
+const scrimR    = document.getElementById('scrim-right');
+const trimWin   = document.getElementById('trim-win');
+const trimLabel = document.getElementById('trim-label');
+const playhead  = document.getElementById('playhead');
+const hLeft     = document.getElementById('h-left');
+const hRight    = document.getElementById('h-right');
+
+// ─── Orientation ─────────────────────────────────────────────────
+function setOrient(mode) {
+  orient = mode;
+  device.className = 'device ' + mode;
+
+  // Fade out, swap src, fade in
+  if (mediaVideo) {
+    mediaVideo.style.opacity = '0';
+    mediaVideo.style.transform = 'scale(0.98)';
+  }
+
+  setTimeout(() => {
+    if (mediaVideo) {
+      mediaVideo.src = mode === 'portrait' ? 'portait_video.mp4' : 'landscape_video.mp4';
+      mediaVideo.style.opacity = '1';
+      mediaVideo.style.transform = 'scale(1)';
+      playing = true;
+      mediaVideo.play();
+      startLoop();
+    }
+  }, 180); // --motion-exit duration
+
+  const btnL = document.getElementById('btn-landscape');
+  const btnP = document.getElementById('btn-portrait');
+  btnL.classList.toggle('active', mode === 'landscape');
+  btnP.classList.toggle('active', mode === 'portrait');
+  btnL.setAttribute('aria-pressed', mode === 'landscape');
+  btnP.setAttribute('aria-pressed', mode === 'portrait');
+
+  // Rebuild after layout settles (next macrotask)
+  setTimeout(() => { buildStrip(); initTrim(); }, 400);
+}
+
+// ─── Filmstrip ───────────────────────────────────────────────────
+function buildStrip() {
+  void fw.offsetWidth;           // force layout flush
+  fWidth   = fw.offsetWidth;
+  pxPerSec = fWidth / DURATION;
+  strip.innerHTML = '';
+  
+  const cells = [];
+  for (let i = 0; i < N_FRAMES; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'frame-cell';
+    const cellWidth = Math.max(1, Math.ceil(fWidth / N_FRAMES));
+    cell.style.width = cellWidth + 'px';
+    const hue1 = (i * 30) % 360;
+    cell.style.background = `linear-gradient(135deg, hsl(${hue1}, 40%, 25%), #111)`;
+    strip.appendChild(cell);
+    cells.push(cell);
+  }
+  
+  const videoSrc = orient === 'portrait' ? 'portait_video.mp4' : 'landscape_video.mp4';
+  
+  const vid = document.createElement('video');
+  vid.src = videoSrc;
+  vid.muted = true;
+  vid.playsInline = true;
+  
+  vid.addEventListener('loadedmetadata', () => {
+    const duration = vid.duration || 15;
+    const interval = duration / N_FRAMES;
+    
+    function extract(i) {
+      if (i >= N_FRAMES) {
+        vid.remove();
+        return;
+      }
+      
+      vid.currentTime = i * interval;
+      vid.addEventListener('seeked', function onSeeked() {
+        vid.removeEventListener('seeked', onSeeked);
+        const canvas = document.createElement('canvas');
+        canvas.width = cells[i].offsetWidth || 80;
+        canvas.height = 47; // match previous height
+        const ctx = canvas.getContext('2d');
+        
+        // Handle aspect ratio (cover fill)
+        const videoRatio = vid.videoWidth / vid.videoHeight;
+        const canvasRatio = canvas.width / canvas.height;
+        let sWidth, sHeight, sx, sy;
+        
+        if (videoRatio > canvasRatio) {
+          sHeight = vid.videoHeight;
+          sWidth = sHeight * canvasRatio;
+          sx = (vid.videoWidth - sWidth) / 2;
+          sy = 0;
+        } else {
+          sWidth = vid.videoWidth;
+          sHeight = sWidth / canvasRatio;
+          sx = 0;
+          sy = (vid.videoHeight - sHeight) / 2;
+        }
+        
+        ctx.drawImage(vid, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+        
+        cells[i].style.background = 'none';
+        cells[i].innerHTML = '';
+        cells[i].appendChild(canvas);
+        
+        extract(i + 1);
+      });
+    }
+    
+    extract(0);
+  });
+}
+
+// ─── Trim UI ─────────────────────────────────────────────────────
+function initTrim() {
+  fWidth   = fw.offsetWidth;
+  pxPerSec = fWidth / DURATION;
+  const prevSel = (trimR - trimL) > 0 ? (trimR - trimL) / pxPerSec : 10;
+  const sel = Math.min(Math.max(prevSel, MIN_S), MAX_S);
+  trimL = 0;
+  trimR = sel * pxPerSec;
+  elapsedT = 0;
+  renderTrim();
+}
+
+function renderTrim() {
+  const sel = trimR - trimL;
+
+  // Trim window position via left/width (no transform to keep handle offsets natural)
+  trimWin.style.left  = trimL + 'px';
+  trimWin.style.width = sel + 'px';
+
+  scrimL.style.width = trimL + 'px';
+  scrimR.style.width = (fWidth - trimR) + 'px';
+
+  const secs = Math.round(sel / pxPerSec);
+  trimLabel.textContent = secs + 's';
+
+  // ARIA
+  trimWin.setAttribute('aria-valuenow',  secs);
+  trimWin.setAttribute('aria-valuetext', secs + ' seconds');
+}
+
+// ─── Playback loop — rAF driven, GPU only ─────────────────────────
+function tick(ts) {
+  if (!playing) return;
+  
+  const isWeb = window.currentTab === 'web';
+  
+  if (prevTS !== null) {
+    const dt     = Math.min((ts - prevTS) / 1000, 0.05);
+    const startT = isWeb ? (webTrimL / pxPerSecWeb) : (trimL / pxPerSec);
+    const endT   = isWeb ? (webTrimR / pxPerSecWeb) : (trimR / pxPerSec);
+    elapsedT += dt;
+    if (elapsedT >= endT) elapsedT = startT || 0;
+  }
+  prevTS = ts;
+
+  if (isWeb) {
+    const webPlayhead = document.getElementById('web-playhead');
+    const webTimeDisp = document.getElementById('web-time-display');
+    const startTWeb = webTrimL / pxPerSecWeb;
+    const endTWeb = webTrimR / pxPerSecWeb;
+    const selWWeb = webTrimR - webTrimL;
+    const progWeb = Math.max(0, Math.min(1, (elapsedT - startTWeb) / (endTWeb - startTWeb)));
+    
+    if (webPlayhead) webPlayhead.style.transform = `translateX(${progWeb * selWWeb}px)`;
+    if (webTimeDisp) webTimeDisp.textContent = `${fmt(elapsedT)} / ${fmt(DURATION)}`;
+  } else {
+    const startT = trimL / pxPerSec;
+    const endT   = trimR / pxPerSec;
+    const selW   = trimR - trimL;
+    const prog   = Math.max(0, Math.min(1, (elapsedT - startT) / (endT - startT)));
+    
+    playhead.style.transform = `translateX(${prog * selW}px)`;
+    timeDisp.innerHTML = `<strong>${fmt(elapsedT)}</strong>&nbsp;/ ${fmt(DURATION)}`;
+  }
+
+  lastRAF = requestAnimationFrame(tick);
+}
+
+function startLoop() { cancelAnimationFrame(lastRAF); prevTS = null; lastRAF = requestAnimationFrame(tick); }
+function stopLoop()  { cancelAnimationFrame(lastRAF); prevTS = null; }
+
+// ─── Tap to pause/play ────────────────────────────────────────────
+function handleTap() {
+  playing = !playing;
+  const isWeb = window.currentTab === 'web';
+  const vid = isWeb ? document.querySelector('.web-video-area video') : mediaVideo;
+  
+  if (playing) { 
+    startLoop(); 
+    flashOverlay('pause'); 
+    if (vid) vid.play();
+  }
+  else { 
+    stopLoop();  
+    flashOverlay('play_arrow'); 
+    if (vid) vid.pause();
+  }
+  
+  const targetWrap = isWeb ? document.querySelector('.web-video-area') : mediaWrap;
+  if (targetWrap) {
+    targetWrap.setAttribute('aria-label',
+      playing ? 'Video preview — tap to pause' : 'Video preview — tap to play');
+  }
+}
+mediaWrap.addEventListener('click', handleTap);
+setTimeout(() => {
+  const webVideoArea = document.querySelector('.web-video-area');
+  if (webVideoArea) webVideoArea.addEventListener('click', handleTap);
+}, 500);
+mediaWrap.addEventListener('keydown', e => {
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); handleTap(); }
+});
+
+function flashOverlay(icon) {
+  tapGlyph.textContent = icon;
+  tapOv.classList.add('show');
+  clearTimeout(flashTmr);
+  flashTmr = setTimeout(() => tapOv.classList.remove('show'), 700);
+}
+
+// ─── Drag: Resize handles ─────────────────────────────────────────
+// Critical: direct rAF-style update via inline style during drag (no CSS transition)
+function makeResizeHandle(handle, isLeft) {
+  let sx, stL, stR;
+  const down = e => {
+    e.preventDefault(); e.stopPropagation();
+    sx = clientX(e); stL = trimL; stR = trimR;
+    trimWin.classList.add('is-dragging');
+    on('mousemove', move); on('touchmove', move, { passive: false });
+    on('mouseup', up);     on('touchend', up);
+  };
+  const move = e => {
+    e.preventDefault();
+    const dx  = clientX(e) - sx;
+    const mn  = MIN_S * pxPerSec;
+    const mx  = MAX_S * pxPerSec;
+    if (isLeft) {
+      let nl = clamp(stL + dx, 0, trimR - mn);
+      if (trimR - nl > mx) nl = trimR - mx;
+      trimL = nl;
+    } else {
+      let nr = clamp(stR + dx, trimL + mn, fWidth);
+      if (nr - trimL > mx) nr = trimL + mx;
+      trimR = nr;
+    }
+    renderTrim();
+    if (!playing) { elapsedT = trimL / pxPerSec; playhead.style.transform = 'translateX(0)'; }
+  };
+  const up = () => {
+    trimWin.classList.remove('is-dragging');
+    off('mousemove', move); off('touchmove', move);
+    off('mouseup', up);     off('touchend', up);
+    if (playing) elapsedT = trimL / pxPerSec;
+  };
+  handle.addEventListener('mousedown',  down);
+  handle.addEventListener('touchstart', down, { passive: false });
+}
+makeResizeHandle(hLeft,  true);
+makeResizeHandle(hRight, false);
+
+// ─── Drag: Pan trim window ────────────────────────────────────────
+(function() {
+  let sx, stL, stR, active = false;
+  const isHandle = e => hLeft.contains(e.target) || hRight.contains(e.target);
+  const down = e => {
+    if (isHandle(e)) return;
+    active = true;
+    sx = clientX(e); stL = trimL; stR = trimR;
+    trimWin.classList.add('is-dragging');
+    on('mousemove', move); on('touchmove', move, { passive: false });
+    on('mouseup', up);     on('touchend', up);
+  };
+  const move = e => {
+    if (!active) return;
+    e.preventDefault();
+    const dx  = clientX(e) - sx;
+    const sel = stR - stL;
+    let nl = stL + dx, nr = stR + dx;
+    if (nl < 0)      { nl = 0;     nr = sel; }
+    if (nr > fWidth) { nr = fWidth; nl = fWidth - sel; }
+    trimL = nl; trimR = nr;
+    renderTrim();
+    if (!playing) { elapsedT = trimL / pxPerSec; playhead.style.transform = 'translateX(0)'; }
+  };
+  const up = () => {
+    active = false;
+    trimWin.classList.remove('is-dragging');
+    off('mousemove', move); off('touchmove', move);
+    off('mouseup', up);     off('touchend', up);
+    if (playing) elapsedT = trimL / pxPerSec;
+  };
+  trimWin.addEventListener('mousedown',  down);
+  trimWin.addEventListener('touchstart', down, { passive: false });
+})();
+
+// ─── Utilities ────────────────────────────────────────────────────
+const on  = (ev, fn, opts) => document.addEventListener(ev, fn, opts);
+const off = (ev, fn)       => document.removeEventListener(ev, fn);
+const clientX = e => e.touches ? e.touches[0].clientX : e.clientX;
+const clamp   = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+function fmt(s) {
+  s = clamp(s || 0, 0, Infinity);
+  return `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, '0')}`;
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────
+// Motion hierarchy: background (body bg) → device → content
+function init() {
+  void fw.offsetWidth;   // layout flush
+  buildStrip();
+  initTrim();
+  startLoop();           // auto-play on load
+  const mediaVideo = document.getElementById('media-video');
+  if (mediaVideo) mediaVideo.play();
+}
+
+if (document.readyState === 'complete') init();
+else window.addEventListener('load', init);
+
+window.addEventListener('resize', () => {
+  buildStrip();
+  initTrim();
+});
+
+// Header actions
+document.getElementById('btn-close').addEventListener('click', () => {
+  playing = false;
+  stopLoop();
+});
+document.getElementById('btn-check').addEventListener('click', () => {
+  const s = trimL / pxPerSec;
+  const e = trimR / pxPerSec;
+  alert(`Trim applied: ${fmt(s)} → ${fmt(e)} (${Math.round(e - s)}s)`);
+});
+</script>
+</body>
+</html>

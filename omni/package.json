@@ -1,0 +1,16 @@
+{
+  "name": "omni",
+  "version": "1.0.0",
+  "description": "",
+  "main": "generate-video.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@google/genai": "^1.48.0"
+  }
+}
