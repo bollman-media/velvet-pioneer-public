@@ -1058,18 +1058,10 @@
         })();
 
         // ══════════════════════════════════════════
-        // API Key Management
+        // API Key Management — handled server-side
         // ══════════════════════════════════════════
-        const DEFAULT_GEMINI_KEY = '';
-        // Always clear stale cached keys — force fresh default key
-        localStorage.removeItem('gemini_api_key');
-        let GEMINI_KEY = DEFAULT_GEMINI_KEY;
-        function ensureApiKey() {
-            if (GEMINI_KEY) return true;
-            const key = window.prompt('Enter your Gemini API Key to enable generation:');
-            if (key && key.trim()) { GEMINI_KEY = key.trim(); return true; }
-            return false;
-        }
+        // API key is stored in server .env — no client key needed
+        function ensureApiKey() { return true; }
 
         // ══════════════════════════════════════════
         // DOM refs
