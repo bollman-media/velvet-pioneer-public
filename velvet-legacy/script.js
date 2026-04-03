@@ -6222,7 +6222,7 @@ ERASE RULES:
         return Promise.race([fallbackFetch, fallbackTimeout]);
     }
 
-    const DEFAULT_API_KEY = 'AIzaSyBB_UX81p6Cm_Y8MMvTdgySZKdD-R2oItA';
+    const DEFAULT_API_KEY = ''; // Key must be set via localStorage or the prompt below
 
     function getApiKey() {
         let key = localStorage.getItem('gemini_api_key');

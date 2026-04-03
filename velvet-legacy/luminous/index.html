@@ -4163,7 +4163,7 @@
             console.log(`[Luminous] 🎨 Generation Request: "${promptMsg.substring(0, 40)}..." [Style: ${style}]`);
             
             // Priority: Direct API Call (Compatibility fallback for Zipline/Static hosts)
-            let apiKey = localStorage.getItem('gemini_api_key') || 'AIzaSyBB_UX81p6Cm_Y8MMvTdgySZKdD-R2oItA';
+            let apiKey = localStorage.getItem('gemini_api_key') || '';
             const STYLE_DIRECTION = {
                 'salon':          'Luxury salon portrait: warm golden-hour lighting, soft film halation, elegant neutral palette, shot on Hasselblad',
                 'monochrome':     'High-contrast black and white editorial: deep shadows, specular highlights, Helmut Newton gravitas, 35mm grain',

@@ -2568,8 +2568,7 @@ Not all music is from the US or Europe. The image should feel native to the cult
 4. Generate.`;
 
     async function generateAlbumCover(genre, userPrompt, signal, referenceImageDataUrl) {
-        const apiKey = getApiKey();
-        if (!apiKey) throw new Error('No API key provided');
+        // API key is handled by the server proxy
 
         // Hard timeout — don't let the entire call hang more than 20s
         const hardTimeout = new Promise((_, reject) => {
@@ -2613,14 +2612,7 @@ Generate a square album cover artwork for this track. Remember: NO text, NO peop
                 }
             };
 
-            const response = await fetchWithFallback(apiKey, requestBody, signal);
-
-            if (!response.ok) {
-                const error = await response.json().catch(() => ({}));
-                throw new Error(error.error?.message || `API error: ${response.status}`);
-            }
-
-            const data = await response.json();
+            const data = await callStudioProxy(STUDIO_GENERATE_URL, requestBody.contents, requestBody.generationConfig, signal);
             const candidates = data.candidates || [];
 
             for (const candidate of candidates) {
@@ -5269,8 +5261,7 @@ ERASE RULES:
 
         try {
             const imageBase64 = await imgSrcToBase64(musicEditArtworkImg);
-            const apiKey = getApiKey();
-            if (!apiKey) throw new Error('No API key provided');
+            // API key is handled by the server proxy
 
             const canvasW = musicArtCanvas.width;
             const canvasH = musicArtCanvas.height;
@@ -5298,14 +5289,7 @@ ERASE RULES:
                 }
             };
 
-            const response = await fetchWithFallback(apiKey, requestBody);
-
-            if (!response.ok) {
-                const error = await response.json().catch(() => ({}));
-                throw new Error(error.error?.message || `API error: ${response.status}`);
-            }
-
-            const data = await response.json();
+            const data = await callStudioProxy(STUDIO_GENERATE_URL, requestBody.contents, requestBody.generationConfig);
             const candidates = data.candidates || [];
             let detectedText = '';
 
@@ -6175,66 +6159,39 @@ ERASE RULES:
         });
     });
 
-    // ---------- Gemini API ----------
-    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent';
+    // ---------- Gemini API — routed through server proxy ----------
+    // The server proxy (/api/studio-generate, /api/studio-edit) holds the API key.
+    // No key is ever exposed to the browser or the user.
+    const STUDIO_GENERATE_URL = '/api/studio-generate';
+    const STUDIO_EDIT_URL     = '/api/studio-edit';
+
+    // Legacy constants kept for reference / potential direct-call fallback in dev
+    const GEMINI_API_URL      = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent';
     const GEMINI_FALLBACK_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent';
 
-    // Fetch with automatic fallback: if primary takes >5s or returns 503/429, use fallback model
-    async function fetchWithFallback(apiKey, requestBody, signal) {
-        const bodyStr = JSON.stringify(requestBody);
-        const makeOptions = () => ({
+    async function callStudioProxy(endpoint, contents, generationConfig, signal) {
+        const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: bodyStr,
+            body: JSON.stringify({ contents, generationConfig }),
             signal: signal || undefined,
         });
-
-        // Race primary against a 5-second timeout
-        let primaryTimedOut = false;
-        const timeoutPromise = new Promise(resolve => {
-            setTimeout(() => { primaryTimedOut = true; resolve('TIMEOUT'); }, 5000);
-        });
-
-        const primaryPromise = fetch(`${GEMINI_API_URL}?key=${apiKey}`, makeOptions())
-            .catch(err => {
-                // If aborted by user, re-throw immediately
-                if (err.name === 'AbortError') throw err;
-                return err; // network error — will trigger fallback
-            });
-
-        const result = await Promise.race([primaryPromise, timeoutPromise]);
-
-        // If primary won the race and returned a good response, use it
-        if (result !== 'TIMEOUT' && result instanceof Response && result.status !== 503 && result.status !== 429) {
-            return result;
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.error?.message || err.error || `Server error: ${response.status}`);
         }
-
-        // Fallback: primary timed out, errored, or returned 503/429
-        const reason = result === 'TIMEOUT' ? 'timeout (>5s)' :
-            (result instanceof Response ? `status ${result.status}` : 'network error');
-        console.warn(`Primary model ${reason}, falling back to gemini-2.0-flash-exp-image-generation`);
-
-        // Fallback also gets a timeout (15s) so it can't hang forever
-        const fallbackTimeout = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Fallback API timeout (>15s)')), 15000);
-        });
-        const fallbackFetch = fetch(`${GEMINI_FALLBACK_URL}?key=${apiKey}`, makeOptions());
-        return Promise.race([fallbackFetch, fallbackTimeout]);
+        return response.json();
     }
 
-    const DEFAULT_API_KEY = 'AIzaSyBB_UX81p6Cm_Y8MMvTdgySZKdD-R2oItA';
-
+    // getApiKey is retained for the auto-text-scan (detectTextInRegion / autoScanTextRegions)
+    // which calls Gemini directly. Image generate/edit/restyle go through the server proxy.
+    const REVOKED_KEY = 'AIzaSyBB_UX81p6Cm_Y8MMvTdgySZKdD-R2oItA';
     function getApiKey() {
         let key = localStorage.getItem('gemini_api_key');
+        if (key === REVOKED_KEY) { localStorage.removeItem('gemini_api_key'); key = null; }
         if (!key) {
-            // Use default key if available, otherwise prompt
-            if (DEFAULT_API_KEY) {
-                key = DEFAULT_API_KEY;
-                localStorage.setItem('gemini_api_key', key);
-            } else {
-                key = prompt('Enter your Gemini API key to enable AI image restyling.\n\nGet one free at: https://aistudio.google.com/apikey');
-                if (key) localStorage.setItem('gemini_api_key', key.trim());
-            }
+            key = prompt('Enter your Gemini API key for text detection.\n\nGet one free at: https://aistudio.google.com/apikey');
+            if (key) localStorage.setItem('gemini_api_key', key.trim());
         }
         return key ? key.trim() : null;
     }
@@ -6291,46 +6248,19 @@ ERASE RULES:
         });
     }
 
-    // Erase using Gemini API — sends original image + mask (white = erase region)
     async function eraseWithGemini(imageBase64, maskBase64, editPrompt, signal) {
-        const apiKey = getApiKey();
-        if (!apiKey) throw new Error('No API key provided');
-
-        const requestBody = {
-            contents: [{
-                parts: [
-                    { text: `Edit this image: ${editPrompt}` },
-                    { inline_data: { mime_type: 'image/png', data: imageBase64 } },
-                    { inline_data: { mime_type: 'image/png', data: maskBase64 } }
-                ]
-            }],
-            generationConfig: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            }
-        };
-
-        const timeout = setTimeout(() => { if (signal && !signal.aborted) cancelActiveRequest(); }, 60000);
-        // Route erase directly to Gemini 3 Pro — mask-based inpainting needs
-        // the more capable model and the 5s fallback timeout is too aggressive
-        const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody),
-            signal: signal || undefined,
-        }).finally(() => clearTimeout(timeout));
-
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.error?.message || `API error: ${response.status}`);
-        }
-
-        const data = await response.json();
+        const parts = [
+            { text: `Edit this image: ${editPrompt}` },
+            { inline_data: { mime_type: 'image/png', data: imageBase64 } },
+            { inline_data: { mime_type: 'image/png', data: maskBase64 } },
+        ];
+        const contents = [{ parts }];
+        const generationConfig = { responseModalities: ['TEXT', 'IMAGE'] };
+        const data = await callStudioProxy(STUDIO_EDIT_URL, contents, generationConfig, signal);
         const candidates = data.candidates || [];
         for (const candidate of candidates) {
             for (const part of (candidate.content?.parts || [])) {
-                if (part.inlineData) {
-                    return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                }
+                if (part.inlineData) return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
             }
         }
         throw new Error('No image returned from Gemini API');
@@ -6338,149 +6268,59 @@ ERASE RULES:
 
     // Edit image using Gemini API — sends current image + edit prompt
     async function editWithGemini(imageBase64, editPrompt, signal, referenceImageBase64, maskBase64, preCompositeBase64) {
-
-        const apiKey = getApiKey();
-        if (!apiKey) throw new Error('No API key provided');
-
         const parts = [
             { text: `Edit this image: ${editPrompt}` },
-            {
-                inline_data: {
-                    mime_type: 'image/png',
-                    data: imageBase64,
-                }
-            }
+            { inline_data: { mime_type: 'image/png', data: imageBase64 } },
         ];
-
-        // If a reference image is provided, include it as a second image part
         if (referenceImageBase64) {
             parts.push(
                 { text: 'REFERENCE IMAGE (the subject to insert):' },
-                {
-                    inline_data: {
-                        mime_type: 'image/png',
-                        data: referenceImageBase64,
-                    }
-                }
+                { inline_data: { mime_type: 'image/png', data: referenceImageBase64 } }
             );
         }
-
-        // If a mask image is provided, include it to show the exact doodle shape
         if (maskBase64) {
             parts.push(
                 { text: 'MASK IMAGE (white = where to place the subject, black = preserve). The shape, contour, and proportions of the white area define how the reference subject should be reshaped and cropped:' },
-                {
-                    inline_data: {
-                        mime_type: 'image/png',
-                        data: maskBase64,
-                    }
-                }
+                { inline_data: { mime_type: 'image/png', data: maskBase64 } }
             );
         }
-
-        // If a pre-composite is provided, include it — shows the reference image roughly pasted at the doodle location
         if (preCompositeBase64) {
             parts.push(
                 { text: 'PRE-COMPOSITE IMAGE (the reference image has been roughly pasted at the doodle location on the base image — use this as your starting point for placement, then refine the edges, style, and blending to make it seamless):' },
-                {
-                    inline_data: {
-                        mime_type: 'image/png',
-                        data: preCompositeBase64,
-                    }
-                }
+                { inline_data: { mime_type: 'image/png', data: preCompositeBase64 } }
             );
         }
-
-        const requestBody = {
-            contents: [{ parts }],
-            generationConfig: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            }
-        };
-
-        const timeout = setTimeout(() => { if (signal && !signal.aborted) cancelActiveRequest(); }, 60000);
-
-        // Multi-image edits (reference + mask) go directly to Gemini 3 Pro — 
-        // skip fetchWithFallback since its 5s timeout is too aggressive for large payloads
-        const isMultiImage = !!(referenceImageBase64 || maskBase64);
-        let response;
-        if (isMultiImage) {
-            console.log('[editWithGemini] Multi-image edit → calling Gemini 3 Pro directly');
-            response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestBody),
-                signal: signal || undefined,
-            }).finally(() => clearTimeout(timeout));
-        } else {
-            response = await fetchWithFallback(apiKey, requestBody, signal)
-                .finally(() => clearTimeout(timeout));
-        }
-
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.error?.message || `API error: ${response.status}`);
-        }
-
-        const data = await response.json();
+        const contents = [{ parts }];
+        const generationConfig = { responseModalities: ['TEXT', 'IMAGE'] };
+        const data = await callStudioProxy(STUDIO_EDIT_URL, contents, generationConfig, signal);
         const candidates = data.candidates || [];
-
         for (const candidate of candidates) {
             for (const part of (candidate.content?.parts || [])) {
-                if (part.inlineData) {
-                    return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                }
+                if (part.inlineData) return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
             }
         }
-
         throw new Error('No image returned from Gemini API');
     }
 
     async function restyleWithGemini(file, style, userPrompt, signal) {
-        const apiKey = getApiKey();
-        if (!apiKey) throw new Error('No API key provided');
-
         const base64Image = await fileToBase64(file);
         const mimeType = file.type || 'image/jpeg';
-
-        // Build the restyle prompt
         const baseStylePrompt = stylePrompts[style] || `Restyle this image in a ${style} art style.`;
         const fullPrompt = userPrompt
             ? `${baseStylePrompt} Additional instructions: ${userPrompt}`
             : baseStylePrompt;
-
-        const requestBody = {
-            contents: [{
-                parts: [
-                    { text: fullPrompt },
-                    {
-                        inline_data: {
-                            mime_type: mimeType,
-                            data: base64Image,
-                        }
-                    }
-                ]
-            }],
-            generationConfig: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            }
-        };
-
-        const response = await fetchWithFallback(apiKey, requestBody, signal);
-
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.error?.message || `API error: ${response.status}`);
-        }
-
-        const data = await response.json();
+        const contents = [{
+            parts: [
+                { text: fullPrompt },
+                { inline_data: { mime_type: mimeType, data: base64Image } },
+            ]
+        }];
+        const generationConfig = { responseModalities: ['TEXT', 'IMAGE'] };
+        const data = await callStudioProxy(STUDIO_GENERATE_URL, contents, generationConfig, signal);
         const candidates = data.candidates || [];
-
         for (const candidate of candidates) {
             for (const part of (candidate.content?.parts || [])) {
-                if (part.inlineData) {
-                    return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                }
+                if (part.inlineData) return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
             }
         }
 
@@ -6488,9 +6328,6 @@ ERASE RULES:
     }
 
     async function generateWithGemini(style, userPrompt, signal) {
-        const apiKey = getApiKey();
-        if (!apiKey) throw new Error('No API key provided');
-
         let fullPrompt;
         if (style) {
             const baseStylePrompt = stylePrompts[style] || `Generate an image in a ${style} art style.`;
@@ -6498,31 +6335,13 @@ ERASE RULES:
                 ? `Generate an image with the following style: ${baseStylePrompt}. Subject/scene: ${userPrompt}`
                 : `Generate an image with the following style: ${baseStylePrompt}`;
         } else {
-            // No template — use the user prompt directly
             fullPrompt = userPrompt || 'Generate a beautiful image';
         }
 
-        const requestBody = {
-            contents: [{
-                parts: [
-                    { text: fullPrompt }
-                ]
-            }],
-            generationConfig: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            }
-        };
-
-        const response = await fetchWithFallback(apiKey, requestBody, signal);
-
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.error?.message || `API error: ${response.status}`);
-        }
-
-        const data = await response.json();
+        const contents = [{ parts: [{ text: fullPrompt }] }];
+        const generationConfig = { responseModalities: ['TEXT', 'IMAGE'] };
+        const data = await callStudioProxy(STUDIO_GENERATE_URL, contents, generationConfig, signal);
         const candidates = data.candidates || [];
-
         for (const candidate of candidates) {
             for (const part of (candidate.content?.parts || [])) {
                 if (part.inlineData) {
@@ -6530,7 +6349,6 @@ ERASE RULES:
                 }
             }
         }
-
         throw new Error('No image returned from Gemini API');
     }
 
@@ -8509,6 +8327,9 @@ ERASE RULES:
     let marqueeAlt = false;
     let marchingAntsOffset = 0;
     let marchingAntsRAF = null;
+    let autoTextRegions = [];   // [{text, x, y, w, h, area}] from auto-scan
+    let ghostBoxRAF = null;     // for ghost box pulse animation
+    let ghostBoxPhase = 0;      // 0→1 pulse phase
     const HANDLE_SIZE = 8;
     const HANDLE_HIT = 12;
 
@@ -8620,6 +8441,134 @@ ERASE RULES:
 
     function stopMarchingAnts() {
         if (marchingAntsRAF) { cancelAnimationFrame(marchingAntsRAF); marchingAntsRAF = null; }
+    }
+
+    // ─── Ghost Text Boxes ────────────────────────────────────────────────
+    // Renders auto-detected text bounding boxes as glowing ghost outlines.
+    // Larger text = more opaque (more prominent in the image hierarchy)
+    // Smaller text = more transparent (secondary, subtle)
+    function renderGhostBoxes() {
+        if (!autoTextRegions.length) return;
+        const pulse = Math.sin(ghostBoxPhase) * 0.12 + 0.88; // gentle 12% breath
+        const maxArea = autoTextRegions[0].area; // sorted descending
+        const minArea = autoTextRegions[autoTextRegions.length - 1].area;
+        const areaRange = Math.max(maxArea - minArea, 1);
+
+        drawCtx.save();
+        drawCtx.setLineDash([]);
+        for (const region of autoTextRegions) {
+            const { x, y, w, h, area } = region;
+            // Opacity: largest text → 0.85, smallest text → 0.25
+            const norm = (area - minArea) / areaRange; // 0..1
+            const opacity = (0.25 + norm * 0.60) * pulse;
+
+            // Corner radius for elegance
+            const r = Math.min(4, w * 0.1, h * 0.1);
+
+            // Background fill — very subtle, so the image shows through
+            drawCtx.globalAlpha = opacity * 0.12;
+            drawCtx.fillStyle = '#A8C7FA';
+            drawCtx.beginPath();
+            drawCtx.roundRect(x, y, w, h, r);
+            drawCtx.fill();
+
+            // Border — crisp white + Material You blue inner glow
+            drawCtx.globalAlpha = opacity;
+            drawCtx.strokeStyle = 'rgba(255,255,255,0.9)';
+            drawCtx.lineWidth = 1.5;
+            drawCtx.beginPath();
+            drawCtx.roundRect(x, y, w, h, r);
+            drawCtx.stroke();
+
+            // Inner accent stroke
+            drawCtx.globalAlpha = opacity * 0.55;
+            drawCtx.strokeStyle = '#A8C7FA';
+            drawCtx.lineWidth = 0.75;
+            drawCtx.beginPath();
+            drawCtx.roundRect(x + 1.5, y + 1.5, w - 3, h - 3, Math.max(r - 1.5, 0));
+            drawCtx.stroke();
+        }
+        drawCtx.globalAlpha = 1;
+        drawCtx.restore();
+    }
+
+    function startGhostBoxPulse() {
+        if (ghostBoxRAF) return;
+        function animate() {
+            if (!autoTextRegions.length) { ghostBoxRAF = null; return; }
+            ghostBoxPhase += 0.022; // ~60fps → ~2.8s period
+            drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+            renderGhostBoxes();
+            ghostBoxRAF = requestAnimationFrame(animate);
+        }
+        ghostBoxRAF = requestAnimationFrame(animate);
+    }
+
+    function stopGhostBoxPulse() {
+        if (ghostBoxRAF) { cancelAnimationFrame(ghostBoxRAF); ghostBoxRAF = null; }
+    }
+
+    // Gemini scan: ask for ALL text regions in the image at once
+    async function autoScanTextRegions() {
+        autoTextRegions = [];
+        stopGhostBoxPulse();
+        drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+
+        // Show scanning indicator
+        const editInput = document.getElementById('edit-input-text');
+        if (editInput) { editInput.placeholder = 'Scanning for text…'; editInput.disabled = true; }
+
+        try {
+            const imageBase64 = await imgSrcToBase64(editModalImage);
+
+            const requestBody = {
+                contents: [{
+                    parts: [
+                        {
+                            text: `Analyze this image and detect ALL visible text elements. For each distinct text element (headline, body copy, caption, label, etc.), return a JSON object with:
+- "text": the exact text string
+- "bounds": { "x1": left%, "y1": top%, "x2": right%, "y2": bottom% } as percentages of image dimensions
+
+Return ONLY a JSON array of these objects, sorted from largest to smallest by bounding box area. If there is no text in the image return []. Example: [{"text":"Hello World","bounds":{"x1":5,"y1":8,"x2":60,"y2":22}}]`
+                        },
+                        { inline_data: { mime_type: 'image/png', data: imageBase64 } }
+                    ]
+                }],
+                generationConfig: { responseMimeType: 'application/json' }
+            };
+
+            const data = await callStudioProxy(STUDIO_GENERATE_URL, requestBody.contents, requestBody.generationConfig);
+            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
+            const cleaned = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+            const regions = JSON.parse(cleaned);
+            if (!Array.isArray(regions) || !regions.length) {
+                if (editInput) { editInput.placeholder = 'Tap text or draw a selection'; editInput.disabled = false; }
+                return;
+            }
+
+            // Convert percentage bounds → canvas pixel coords
+            // Use imgRect (the rendered image rect inside the canvas)
+            const imgRect = editModalImage.getBoundingClientRect();
+            const canvasRect = drawCanvas.getBoundingClientRect();
+            const imgOffsetX = imgRect.left - canvasRect.left;
+            const imgOffsetY = imgRect.top  - canvasRect.top;
+
+            autoTextRegions = regions.map(r => {
+                const b = r.bounds;
+                const rx = imgOffsetX + (b.x1 / 100) * imgRect.width;
+                const ry = imgOffsetY + (b.y1 / 100) * imgRect.height;
+                const rw = ((b.x2 - b.x1) / 100) * imgRect.width;
+                const rh = ((b.y2 - b.y1) / 100) * imgRect.height;
+                return { text: r.text, x: rx, y: ry, w: rw, h: rh, area: rw * rh };
+            }).sort((a, b) => b.area - a.area);
+
+            if (editInput) { editInput.placeholder = 'Tap a text region to select'; editInput.disabled = false; }
+            startGhostBoxPulse();
+
+        } catch (err) {
+            console.warn('[AutoScan] Text scan failed:', err);
+            if (editInput) { editInput.placeholder = 'Tap text or draw a selection'; editInput.disabled = false; }
+        }
     }
 
     // --- Floating Text (draggable text overlay for Text tool) ---
@@ -10270,6 +10219,9 @@ ERASE RULES:
         marqueeSelection = null;
         marqueeMode = 'idle';
         stopMarchingAnts();
+        // Also kill any ghost box animation
+        stopGhostBoxPulse();
+        autoTextRegions = [];
         removeFloatingText();
         removeTextCursor();
         removeTextHighlights();
@@ -10306,8 +10258,6 @@ ERASE RULES:
 
         try {
             const imageBase64 = await imgSrcToBase64(editModalImage);
-            const apiKey = getApiKey();
-            if (!apiKey) throw new Error('No API key provided');
 
             // Calculate region as percentage
             const x1Pct = Math.round((marqueeSelection.x / drawCanvas.width) * 100);
@@ -10334,14 +10284,7 @@ ERASE RULES:
                 }
             };
 
-            const response = await fetchWithFallback(apiKey, requestBody);
-
-            if (!response.ok) {
-                const error = await response.json().catch(() => ({}));
-                throw new Error(error.error?.message || `API error: ${response.status}`);
-            }
-
-            const data = await response.json();
+            const data = await callStudioProxy(STUDIO_GENERATE_URL, requestBody.contents, requestBody.generationConfig);
             const candidates = data.candidates || [];
             let detectedText = '';
 
@@ -10560,6 +10503,41 @@ ERASE RULES:
             marqueeShift = e.shiftKey;
             marqueeAlt = e.altKey;
 
+            // ── Ghost box hit test ────────────────────────────────────────
+            // If the user taps inside a pre-detected ghost box, select it
+            // immediately without waiting for another Gemini round-trip.
+            if (autoTextRegions.length) {
+                const hitRegion = autoTextRegions.find(r =>
+                    pos.x >= r.x && pos.x <= r.x + r.w &&
+                    pos.y >= r.y && pos.y <= r.y + r.h
+                );
+                if (hitRegion) {
+                    stopGhostBoxPulse();
+                    autoTextRegions = [];
+                    drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+                    marqueeSelection = { x: hitRegion.x, y: hitRegion.y, w: hitRegion.w, h: hitRegion.h };
+                    detectedOriginalText = hitRegion.text;
+                    allStrokes = [{ type: 'marquee', bounds: { ...marqueeSelection } }];
+                    pushEditAction({ type: 'stroke', data: { type: 'marquee', bounds: { ...marqueeSelection } } });
+                    createFloatingText(hitRegion.text, marqueeSelection);
+                    const editInput = document.getElementById('edit-input-text');
+                    const editSendBtn = document.getElementById('edit-send-btn');
+                    if (editInput) {
+                        editInput.value = hitRegion.text;
+                        editInput.disabled = false;
+                        editInput.placeholder = 'Edit the text';
+                        editInput.focus();
+                        editInput.select();
+                    }
+                    if (editSendBtn) editSendBtn.disabled = false;
+                    updateToolButtonStates();
+                    showToast(`Selected: "${hitRegion.text}"`);
+                    marqueeMode = 'idle';
+                    return;
+                }
+            }
+            // ─────────────────────────────────────────────────────────────
+
             const hit = hitTestSelection(pos);
             if (hit.type === 'handle' && marqueeSelection) {
                 marqueeMode = 'resizing';
@@ -10570,6 +10548,9 @@ ERASE RULES:
                 marqueeMode = 'moving';
                 marqueeDragOffset = { x: pos.x - marqueeSelection.x, y: pos.y - marqueeSelection.y };
             } else {
+                // User is drawing a custom marquee — clear ghost boxes
+                stopGhostBoxPulse();
+                autoTextRegions = [];
                 marqueeMode = 'drawing';
                 marqueeOrigin = pos;
                 marqueeSelection = { x: pos.x, y: pos.y, w: 0, h: 0 };
@@ -10801,11 +10782,11 @@ ERASE RULES:
         // Store original image for Resize "Original" revert
         originalImageSrc = responseImageImg.src;
 
-        // Always show tools row — Select, Resize, and Effects are always available.
-        // Only hide the Text tool if the image was NOT generated from a text-related prompt.
+        // Always show tools row — Select, Text, Resize, and Effects are always available.
+        // Text detection is now handled dynamically via auto-scan when the Text tool is activated.
         editToolsRow.hidden = false;
         const textToolBtn = document.getElementById('edit-tool-text');
-        if (textToolBtn) textToolBtn.hidden = !imageHasText();
+        if (textToolBtn) textToolBtn.hidden = false;
 
         // Enter starter page state
         enterStarterPage();
@@ -11270,6 +11251,8 @@ ERASE RULES:
                 allStrokes = [];
 
                 drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+                // Auto-scan: detect all text in the image and show ghost boxes
+                autoScanTextRegions();
             } else {
                 drawCanvas.style.pointerEvents = 'none';
                 drawCanvas.style.cursor = '';
@@ -11301,13 +11284,13 @@ ERASE RULES:
             } else if (toolId === 'text') {
                 hideAllSubtools();
                 setEditInputVisible(true);
-                // Disable input until user draws marquee
+                // Disable input until auto-scan completes or user draws marquee
                 const editInput = document.getElementById('edit-input-text');
                 const editSendBtn = document.getElementById('edit-send-btn');
                 if (editInput) {
                     editInput.disabled = true;
                     editInput.value = '';
-                    editInput.placeholder = 'Tap text or draw a selection';
+                    editInput.placeholder = 'Scanning for text…';
                 }
                 if (editSendBtn) editSendBtn.disabled = true;
             } else {
@@ -13701,10 +13684,7 @@ ERASE RULES:
                     generationConfig: { responseModalities: ['TEXT'] }
                 };
 
-                const response = await fetchWithFallback(apiKey, requestBody);
-                if (!response.ok) throw new Error(`API error: ${response.status}`);
-
-                const data = await response.json();
+                const data = await callStudioProxy(STUDIO_GENERATE_URL, requestBody.contents, requestBody.generationConfig);
                 let detectedText = '';
                 for (const c of (data.candidates || [])) {
                     for (const p of (c.content?.parts || [])) {
@@ -13771,10 +13751,7 @@ ERASE RULES:
                     generationConfig: { responseModalities: ['TEXT'] }
                 };
 
-                const response = await fetchWithFallback(apiKey, requestBody);
-                if (!response.ok) throw new Error(`API error: ${response.status}`);
-
-                const data = await response.json();
+                const data = await callStudioProxy(STUDIO_GENERATE_URL, requestBody.contents, requestBody.generationConfig);
                 let resultText = '';
                 for (const c of (data.candidates || [])) {
                     for (const p of (c.content?.parts || [])) {

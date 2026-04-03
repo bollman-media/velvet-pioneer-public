@@ -9,7 +9,7 @@ const { GoogleGenAI } = require('@google/genai');
 const fs = require('fs');
 const path = require('path');
 
-const API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBB_UX81p6Cm_Y8MMvTdgySZKdD-R2oItA';
+const API_KEY = process.env.GEMINI_API_KEY;
 const OUTPUT_DIR = path.join(__dirname, 'assets', 'tracks');
 const SAMPLE_RATE = 48000;   // Lyria outputs 48kHz
 const CHANNELS = 2;

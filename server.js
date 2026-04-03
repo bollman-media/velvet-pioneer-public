@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5000;
 const ROOT = __dirname;
 
 // Gemini API key from environment variable
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBB_UX81p6Cm_Y8MMvTdgySZKdD-R2oItA';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const VEO_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 // Models tried in order — falls back to next on 429 quota exhaustion
 const VEO_MODELS = [
@@ -795,6 +795,109 @@ Requirements:
       }
     } catch (err) {
       console.error('  [Luminous] Error:', err.message);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
+  // ========== API: Studio — Generate Image (server-side proxy) ==========
+  // All client-side image generation is routed through here so the API key
+  // stays on the server and users never see a key prompt.
+  if (req.method === 'POST' && req.url === '/api/studio-generate') {
+    try {
+      if (!GEMINI_API_KEY) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'GEMINI_API_KEY not set on server' }));
+        return;
+      }
+
+      const body = await parseBody(req);
+      const { contents, generationConfig } = body;
+
+      if (!contents) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'contents is required' }));
+        return;
+      }
+
+      // Try primary model first, fall back to flash-image on 503/429
+      const PRIMARY   = 'gemini-3-pro-image-preview';
+      const FALLBACK  = 'gemini-2.5-flash-image';
+      const BASE      = 'https://generativelanguage.googleapis.com/v1beta/models';
+
+      const reqBody = JSON.stringify({ contents, generationConfig: generationConfig || { responseModalities: ['TEXT', 'IMAGE'] } });
+
+      const tryModel = (model) => new Promise((resolve, reject) => {
+        const url = `${BASE}/${model}:generateContent?key=${GEMINI_API_KEY}`;
+        const apiReq = https.request(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } }, (apiRes) => {
+          let chunks = '';
+          apiRes.on('data', c => chunks += c);
+          apiRes.on('end', () => resolve({ status: apiRes.statusCode, body: chunks }));
+        });
+        apiReq.on('error', reject);
+        apiReq.write(reqBody);
+        apiReq.end();
+      });
+
+      let result = await tryModel(PRIMARY);
+      if (result.status === 503 || result.status === 429) {
+        console.warn(`  [Studio] Primary model ${result.status}, falling back to ${FALLBACK}`);
+        result = await tryModel(FALLBACK);
+      }
+
+      res.writeHead(result.status, { 'Content-Type': 'application/json' });
+      res.end(result.body);
+      console.log(`  [Studio] Generate → HTTP ${result.status}`);
+
+    } catch (err) {
+      console.error('  [Studio] Generate error:', err.message);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
+  // ========== API: Studio — Edit Image (server-side proxy) ==========
+  if (req.method === 'POST' && req.url === '/api/studio-edit') {
+    try {
+      if (!GEMINI_API_KEY) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'GEMINI_API_KEY not set on server' }));
+        return;
+      }
+
+      const body = await parseBody(req);
+      const { contents, generationConfig } = body;
+
+      if (!contents) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'contents is required' }));
+        return;
+      }
+
+      const MODEL = 'gemini-3-pro-image-preview';
+      const BASE  = 'https://generativelanguage.googleapis.com/v1beta/models';
+      const reqBody = JSON.stringify({ contents, generationConfig: generationConfig || { responseModalities: ['TEXT', 'IMAGE'] } });
+
+      const result = await new Promise((resolve, reject) => {
+        const url = `${BASE}/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+        const apiReq = https.request(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } }, (apiRes) => {
+          let chunks = '';
+          apiRes.on('data', c => chunks += c);
+          apiRes.on('end', () => resolve({ status: apiRes.statusCode, body: chunks }));
+        });
+        apiReq.on('error', reject);
+        apiReq.write(reqBody);
+        apiReq.end();
+      });
+
+      res.writeHead(result.status, { 'Content-Type': 'application/json' });
+      res.end(result.body);
+      console.log(`  [Studio] Edit → HTTP ${result.status}`);
+
+    } catch (err) {
+      console.error('  [Studio] Edit error:', err.message);
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: err.message }));
     }

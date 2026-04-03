@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5000;
 const ROOT = __dirname;
 
 // Gemini API key from environment variable
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBB_UX81p6Cm_Y8MMvTdgySZKdD-R2oItA';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const VEO_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 // Models tried in order — falls back to next on 429 quota exhaustion
 const VEO_MODELS = [
