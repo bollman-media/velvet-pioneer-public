@@ -1145,12 +1145,12 @@
         const COVER_SI = `You are a visionary Art Director. Create an iconic 2D album cover. CONSTRAINTS: ZERO PEOPLE. FULL BLEED. SQUARE 1:1. No borders. Bold, tactile, premium. Apply organic film grain and analog patina.`;
 
         async function generateCover(promptText, vibe) {
-            const coverPrompt = `Vibe: ${vibe}\nCaption: ${promptText}\n\nGenerate a striking album cover for a vinyl record label. Square, full bleed, no humans, iconic.`;
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_KEY}`;
+            const coverPrompt = `Vibe: ${vibe}\nCaption: ${promptText}\n\n${COVER_SI}\n\nGenerate a striking album cover for a vinyl record label. Square, full bleed, no humans, iconic.`;
             try {
-                const resp = await fetch(url, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: COVER_SI + '\n\n---\n\n' + coverPrompt }] }], generationConfig: { responseModalities: ['IMAGE', 'TEXT'] } })
+                const resp = await fetch('/api/generate-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: coverPrompt })
                 });
                 if (!resp.ok) return null;
                 const json = await resp.json();
@@ -1216,15 +1216,9 @@
 
         btnStart.addEventListener('click', () => generate());
 
-        // Auto-launch: if API key is already saved, go straight into generating
-        if (GEMINI_KEY) {
-            // Small delay to let the disco ball canvas initialize
-            setTimeout(() => generate(), 100);
-        } else {
-            // No API key yet — hide loading, show empty state with Start button
-            loading.classList.remove('is-visible');
-            loading.classList.add('is-hidden');
-        }
+        // Auto-launch: go straight into generating (key is handled server-side)
+        // Small delay to let the disco ball canvas initialize
+        setTimeout(() => generate(), 100);
 
         // Safety watchdog: if still on loading screen after 60s, show an error
         const loadingWatchdog = setTimeout(() => {
@@ -1233,9 +1227,6 @@
                 loadingSub.textContent = 'Tap to retry';
                 loading.style.cursor = 'pointer';
                 loading.onclick = () => { loading.onclick = null; loading.style.cursor = '';
-                    // Clear any saved key so fresh key is tried
-                    localStorage.removeItem('gemini_api_key');
-                    GEMINI_KEY = DEFAULT_GEMINI_KEY;
                     loading.classList.remove('is-visible'); loading.classList.add('is-hidden');
                     emptyState.classList.remove('is-hidden');
                 };

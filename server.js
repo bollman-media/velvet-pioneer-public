@@ -587,8 +587,54 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ========== API: Generic Image Generation (used by DJ Lyria covers) ==========
+  if (req.method === 'POST' && req.url === '/api/generate-image') {
+    try {
+      if (!GEMINI_API_KEY) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'GEMINI_API_KEY not set' }));
+        return;
+      }
+      const body = await parseBody(req);
+      const { prompt } = body;
+      if (!prompt) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'prompt is required' }));
+        return;
+      }
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_API_KEY}`;
+      const reqBody = JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseModalities: ['IMAGE', 'TEXT'] }
+      });
+      const result = await new Promise((resolve) => {
+        const apiReq = https.request(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' } }, apiRes => {
+          let chunks = '';
+          apiRes.on('data', c => chunks += c);
+          apiRes.on('end', () => {
+            try { resolve(JSON.parse(chunks)); } catch (e) { resolve(null); }
+          });
+        });
+        apiReq.on('error', () => resolve(null));
+        apiReq.write(reqBody);
+        apiReq.end();
+      });
+      if (result) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } else {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Image generation failed' }));
+      }
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+    return;
+  }
+
   // ========== API: Generate Album Cover via Gemini ==========
-  if (req.method === 'POST' && req.url === './api/generate-cover') {
+  if (req.method === 'POST' && req.url === '/api/generate-cover') {
     try {
       if (!GEMINI_API_KEY) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
