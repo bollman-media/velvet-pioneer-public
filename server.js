@@ -1064,13 +1064,13 @@ Requirements:
       const DURATION_SECONDS = 30;
       const targetBytes = SAMPLE_RATE * CHANNELS * (BIT_DEPTH / 8) * DURATION_SECONDS;
 
-      const MAX_RETRIES = 2;
+      const MAX_RETRIES = 0; // Client handles retries; server does one clean attempt
       let result = null;
 
       for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
         if (attempt > 0) {
           console.log(`  [Lyria] ↻ Retry ${attempt}/${MAX_RETRIES}...`);
-          await new Promise(r => setTimeout(r, 1000)); // Wait 1s between retries
+          await new Promise(r => setTimeout(r, 1000));
         }
 
         const audioChunks = [];
@@ -1115,7 +1115,7 @@ Requirements:
             resolve(wavBuffer.toString('base64'));
           }
 
-          const timeout = setTimeout(() => finish('timeout'), 90000);
+          const timeout = setTimeout(() => finish('timeout'), 55000);
 
           try {
             const session = await client.live.music.connect({
