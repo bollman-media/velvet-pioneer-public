@@ -69,7 +69,7 @@
        SIDE NAVIGATION (52px image-based)
     ══════════════════════════════════════════ */
     .sidebar {
-      width: 52px;
+      width: 55px;
       min-height: 100vh;
       background: transparent;
       border-right: none;
@@ -79,7 +79,7 @@
       overflow: hidden;
     }
     .sidebar-img {
-      width: 52px;
+      width: 55px;
       height: 100vh;
       object-fit: cover;
       object-position: top left;
@@ -281,8 +281,9 @@
       position: fixed;
       inset: 0;
       z-index: 2000;
-      align-items: flex-end;
-      justify-content: flex-start;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
       padding: 0 0 110px 72px; /* above collapsed player, offset from sidebar */
       pointer-events: none;
     }
@@ -972,6 +973,51 @@
       .greeting { padding: 32px 24px 16px; }
       .player-wrap, .input-wrap { padding-left: 16px; padding-right: 16px; }
     }
+
+    /* Remix Button Hover */
+    .community-remix-btn:hover {
+      color: #000 !important;
+      opacity: 1 !important;
+    }
+
+    /* DJ Cover Image */
+    .dj-cover-wrap {
+      margin-bottom: 20px;
+      width: 300px;
+      height: 300px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+      pointer-events: auto;
+      animation: djCoverIn 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .dj-cover-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .dj-cover-wrap.dj-cover-out {
+      animation: djCoverOut 320ms cubic-bezier(0.4, 0, 1, 1) both !important;
+    }
+    
+    /* Stagger the text content */
+    .dj-break > div:nth-child(2) {
+      animation: djCoverIn 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-delay: 60ms;
+    }
+    .dj-break > div:nth-child(2).dj-cover-out {
+      animation: djCoverOut 320ms cubic-bezier(0.4, 0, 1, 1) both !important;
+    }
+    
+    @keyframes djCoverIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes djCoverOut {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(20px); }
+    }
   </style>
 </head>
 <body>
@@ -993,11 +1039,14 @@
 
     <!-- DJ BREAK -->
     <div class="dj-break" id="djBreak">
-      <div class="dj-icon"><span class="material-symbols-outlined">radio</span></div>
-      <div class="dj-text">
-        <div class="dj-label">AI DJ · Lyria Break</div>
-        <div class="dj-message" id="djMessage">Generating a Lyria jingle for your break…</div>
-        <div class="dj-progress"><div class="dj-progress-fill" id="djProgressFill"></div></div>
+      <div class="dj-cover-wrap">
+        <img src="remix_track_cover.png" alt="Remix a track" class="dj-cover-img">
+      </div>
+      <div style="display:flex; align-items:center; gap: 12px;">
+        <div class="dj-icon"><span class="material-symbols-outlined">radio</span></div>
+        <div class="dj-text">
+          <div class="dj-progress"><div class="dj-progress-fill" id="djProgressFill"></div></div>
+        </div>
       </div>
     </div>
 
@@ -1089,7 +1138,7 @@
         <span class="material-symbols-outlined">play_arrow</span>
       </div>
       <span class="material-symbols-outlined" id="btnExpandedNext">skip_next</span>
-      <span class="material-symbols-outlined" id="btnExpandedRemix">add</span>
+      <span class="material-symbols-outlined" id="btnExpandedRemix" title="Remix this track">music_note_add</span>
     </div>
 
     <!-- Community track list -->
@@ -1191,7 +1240,6 @@ const TRACK_DURATION = 30;
 const sidebarQueue  = document.getElementById('sidebarQueue'); // null — compact sidebar
 const promptInput   = document.getElementById('promptInput');
 const djBreakEl     = document.getElementById('djBreak');
-const djMessage     = document.getElementById('djMessage');
 // Non-critical refs (may not exist after layout changes)
 const getPlayPauseIcon = () => document.getElementById('playPauseIcon');
 const getProgressFill  = () => document.getElementById('progressFill');
@@ -1282,7 +1330,7 @@ function renderCommunityPanel() {
         <span class="user-name">${t.creator}</span>
       </div>
       <div class="trailing-icons" style="display:flex;align-items:center;gap:4px;">
-        <span class="material-symbols-outlined community-remix-btn" data-idx="${i}" title="Remix" style="font-size:18px;cursor:pointer;opacity:0.6;transition:opacity 0.2s;">add</span>
+        <span class="material-symbols-outlined community-remix-btn" data-idx="${i}" title="Remix this track" style="font-size:18px;cursor:pointer;opacity:0.6;transition:opacity 0.2s;">music_note_add</span>
         <span class="material-symbols-outlined community-play-btn" data-idx="${i}" style="cursor:pointer;">play_arrow</span>
       </div>
     `;
@@ -1371,7 +1419,14 @@ function crossfadeToSlot(nextIdx, blobUrl, onEnded) {
   next.audio.src = blobUrl;
   next.audio.load();
 
-  next.audio.addEventListener('canplaythrough', () => {
+  const onError = (e) => {
+    console.warn('[Crossfade] Audio load error, advancing to next track.');
+    next.audio.removeEventListener('canplaythrough', onCanPlay);
+    if (onEnded) onEnded();
+  };
+
+  const onCanPlay = () => {
+    next.audio.removeEventListener('error', onError);
     next.audio.play().catch(e => console.warn('[Crossfade] play():', e.message));
     next.gain.gain.cancelScheduledValues(now);
     next.gain.gain.setValueAtTime(0, now);
@@ -1386,7 +1441,10 @@ function crossfadeToSlot(nextIdx, blobUrl, onEnded) {
     next.audio.addEventListener('ended', onEnded, { once: true });
     activeSlot = nextIdx;
     attachProgressToSlot(next);
-  }, { once: true });
+  };
+
+  next.audio.addEventListener('error', onError, { once: true });
+  next.audio.addEventListener('canplaythrough', onCanPlay, { once: true });
 
   next.audio.addEventListener('error', e => {
     console.error('[Audio] Slot error:', e.message || e);
@@ -1396,6 +1454,7 @@ function crossfadeToSlot(nextIdx, blobUrl, onEnded) {
 function attachProgressToSlot(slot) {
   if (progressRAF) cancelAnimationFrame(progressRAF);
   const audio = slot.audio;
+  let crossfadeTriggered = false;
   function tick() {
     if (!audio || audio.paused || audio.ended) return;
     const t = audio.currentTime || 0;
@@ -1415,9 +1474,22 @@ function attachProgressToSlot(slot) {
     if (expTimeCurrent) expTimeCurrent.textContent = fmt(t);
     if (expTimeTotal)   expTimeTotal.textContent   = fmt(d);
     updateWaveform(pct / 100);
-    if (d - t < 8 && pendingIndex !== currentIndex + 1) {
+    
+    // Preload next track
+    if (d - t < 15 && pendingIndex !== currentIndex + 1) {
       preloadTrack(currentIndex + 1);
     }
+    
+    // Trigger crossfade early if preloaded and NOT a DJ break transition
+    if (d - t < FADE_SECS && !crossfadeTriggered && pendingIndex === currentIndex + 1 && pendingBlobUrl) {
+      if ((currentIndex + 1) % 3 !== 0) {
+        crossfadeTriggered = true;
+        console.log('[Crossfade] Triggering early crossfade to idx', pendingIndex);
+        audio.removeEventListener('ended', onTrackEnd);
+        onTrackEnd();
+      }
+    }
+    
     progressRAF = requestAnimationFrame(tick);
   }
   progressRAF = requestAnimationFrame(tick);
@@ -1425,8 +1497,14 @@ function attachProgressToSlot(slot) {
 
 async function preloadTrack(idx) {
   if (idx < 0 || idx >= COMMUNITY_TRACKS.length) return;
-  if (pendingIndex === idx && pendingBlobUrl) return;
+  if (pendingIndex === idx) return;
+  pendingIndex = idx;
   const track = COMMUNITY_TRACKS[idx];
+  if (track.localPath) {
+    pendingBlobUrl = track.localPath;
+    console.log(`[Preload] local path ready idx ${idx}`);
+    return;
+  }
   if (!track.audioData) {
     try {
       console.log(`[Preload] idx ${idx}: "${track.prompt.slice(0,40)}..."`);
@@ -1461,6 +1539,18 @@ async function playTrack(idx) {
   
   currentIndex = idx;
   const track = COMMUNITY_TRACKS[idx];
+  
+  // Prefetch DJ voice if this track will end with a DJ break
+  if ((idx + 1) % 3 === 0) {
+    if (!track.djScript) track.djScript = generateDjScript(track);
+    getDjVoice(track.djScript).then(url => {
+      if (url) {
+        track.djVoiceUrl = url;
+        console.log(`[DJ Voice] Pregenerated for idx ${idx}`);
+      }
+    });
+  }
+
   const nextSlot = 1 - activeSlot;
 
   buildWaveform();
@@ -1696,24 +1786,24 @@ function crossfadeArt(backEl, frontEl, newSrc) {
 // Generates a personalized, witty 10-second DJ break script for the previous track.
 const DJ_JOKES = [
   (title, creator, prompt) => [
-    `That was "${title}" by ${creator}.`,
-    `Sound like someone melted a dream and sold it as music — in the best way.`,
-    `Honestly, I'd frame it and hang it in a gallery.`,
-    `Feeling inspired? Hit that Remix button and make your own version right now.`,
+    `Wow, okay... that was "${title}" by ${creator}.`,
+    `Honestly, it sounds like someone melted a dream and sold it as music, in the best way possible.`,
+    `I don't know about you, but I'd frame that track if I could.`,
+    `Feeling that vibe? Hit that Remix button and let's see what you can create with it.`,
   ].join(' '),
 
   (title, creator, prompt) => [
-    `You just heard "${title}" from ${creator}.`,
-    `Which sounds like — and I mean this affectionately — a robot having a profound moment at 2am.`,
-    `Absolutely beautiful. Zero complaints from me.`,
-    `Want that sound but make it you? Tap Remix and Lyria will build it from scratch.`,
+    `So, you just heard "${title}" from ${creator}.`,
+    `Which sounds like — and I mean this with total respect — a robot having a really profound moment at 2 AM.`,
+    `Absolutely beautiful. I have zero complaints about that.`,
+    `If you want that sound but with your own spin, just tap Remix and make it yours.`,
   ].join(' '),
 
   (title, creator, prompt) => [
-    `That was "${title}" created by ${creator} — right here in the Lyria community.`,
-    `It sounds like if a sunset learned to code. Deeply moving. Mildly confusing. Ten out of ten.`,
-    `Your ears deserved that.`,
-    `Now hit Remix on any track you loved and make one of your own.`,
+    `That was "${title}" created by ${creator} — fresh from the Lyria community.`,
+    `It kind of sounds like if a beautiful sunset learned to write code. Deeply moving, maybe a little confusing, but definitely a ten out of ten.`,
+    `Your ears definitely deserved that treat.`,
+    `Now go hit Remix on any track you loved and show us what you've got.`,
   ].join(' '),
 ];
 
@@ -1781,34 +1871,68 @@ function startCountdownArc(durationMs) {
   step();
 }
 
-// ── Speak via Web Speech API ──
-function speakDjText(text, onEnd) {
-  if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
-  window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.rate  = 0.95;
-  utter.pitch = 1.0;
-  utter.volume = 0.95;
-  // Pick a natural-sounding voice
-  const voices = speechSynthesis.getVoices();
-  const preferred = voices.find(v =>
-    v.name.includes('Google') && v.lang.startsWith('en')
-  ) || voices.find(v =>
-    v.lang.startsWith('en') && !v.name.toLowerCase().includes('compact')
-  ) || voices[0];
-  if (preferred) utter.voice = preferred;
-  // Animate bars while speaking
+async function getDjVoice(text) {
+  try {
+    const res = await fetch('/api/dj-voice', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.audio && data.audio.data) {
+        return `data:${data.audio.mimeType};base64,${data.audio.data}`;
+      }
+    }
+  } catch(e) { console.warn('[DJ Voice Preload] failed:', e); }
+  return null;
+}
+
+function speakDjText(text, onEnd, audioUrl = null) {
   const bars = document.querySelectorAll('.dj-bar');
-  bars.forEach(b => b.classList.add('speaking'));
-  utter.onend = () => {
-    bars.forEach(b => b.classList.remove('speaking'));
-    if (onEnd) onEnd();
+  
+  const playAudio = (url) => {
+    const audio = new Audio(url);
+    bars.forEach(b => b.classList.add('speaking'));
+    audio.onended = () => {
+      bars.forEach(b => b.classList.remove('speaking'));
+      if (onEnd) onEnd();
+    };
+    audio.onerror = () => {
+      bars.forEach(b => b.classList.remove('speaking'));
+      if (onEnd) onEnd();
+    };
+    audio.play().catch(e => {
+      console.warn('[DJ Voice] play() failed:', e);
+      bars.forEach(b => b.classList.remove('speaking'));
+      if (onEnd) onEnd();
+    });
   };
-  utter.onerror = () => {
-    bars.forEach(b => b.classList.remove('speaking'));
+
+  if (audioUrl) {
+    playAudio(audioUrl);
+    return;
+  }
+
+  fetch('/api/dj-voice', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text })
+  })
+  .then(res => res.ok ? res.json() : Promise.reject('API failed'))
+  .then(data => {
+    if (data.audio && data.audio.data) {
+      const url = `data:${data.audio.mimeType};base64,${data.audio.data}`;
+      playAudio(url);
+    } else {
+      console.warn('[DJ Voice] No audio data');
+      if (onEnd) onEnd();
+    }
+  })
+  .catch(err => {
+    console.error('[DJ Voice] Error:', err);
     if (onEnd) onEnd();
-  };
-  window.speechSynthesis.speak(utter);
+  });
 }
 
 // ── DJ Break Orchestrator ──
@@ -1824,7 +1948,16 @@ async function showDjBreak(onComplete) {
 
   // Build personalized script for the track that just finished
   const prevTrack = COMMUNITY_TRACKS[currentIndex];
-  const script = generateDjScript(prevTrack);
+  if (!prevTrack.djScript) prevTrack.djScript = generateDjScript(prevTrack);
+  const script = prevTrack.djScript;
+
+  // Auto-assign static pregenerated DJ voice if available
+  if (!prevTrack.djVoiceUrl) {
+    const breakNum = currentIndex + 1;
+    // Rotate through the 3 available static DJ break files to ensure audio always plays
+    const fileIndex = ((breakNum - 1) % 3) + 1;
+    prevTrack.djVoiceUrl = `tracks/dj_break_${fileIndex}.wav`;
+  }
 
   // Show overlay
   const djBreakEl = document.getElementById('djBreak');
@@ -1832,6 +1965,11 @@ async function showDjBreak(onComplete) {
   if (!djBreakEl) { if (onComplete) onComplete(); return; }
   djBreakEl.classList.add('is-active');
   if (djCard) djCard.classList.remove('dj-card-out');
+
+  // Update album art in player to the remix cover
+  const remixArtSrc = 'remix_track_cover.png';
+  crossfadeArt(document.getElementById('collapsedArtBack'), document.getElementById('collapsedArtFront'), remixArtSrc);
+  crossfadeArt(document.getElementById('expandedArtBack'), document.getElementById('expandedArtFront'), remixArtSrc);
 
   // Wire up remix CTA
   const ctaBtn = document.getElementById('djCtaBtn');
@@ -1875,7 +2013,7 @@ async function showDjBreak(onComplete) {
 
   // Speak the DJ script
   // Voices load async on first call — give a short delay
-  setTimeout(() => speakDjText(script, null), 300);
+  setTimeout(() => speakDjText(script, null, prevTrack.djVoiceUrl), 300);
 
   // Auto-dismiss after 10 seconds
   setTimeout(() => {
@@ -1891,17 +2029,18 @@ async function showDjBreak(onComplete) {
 
 function dismissDjBreak(el, card, onComplete) {
   if (!el) return;
-  if (card) {
-    card.classList.add('dj-card-out');
-    setTimeout(() => {
-      el.classList.remove('is-active');
-      card.classList.remove('dj-card-out');
-      if (onComplete) onComplete();
-    }, 340);
-  } else {
+  const cover = el.querySelector('.dj-cover-wrap');
+  const details = el.querySelector('.dj-break > div:nth-child(2)');
+  
+  if (cover) cover.classList.add('dj-cover-out');
+  if (details) details.classList.add('dj-cover-out');
+  
+  setTimeout(() => {
     el.classList.remove('is-active');
+    if (cover) cover.classList.remove('dj-cover-out');
+    if (details) details.classList.remove('dj-cover-out');
     if (onComplete) onComplete();
-  }
+  }, 320); // wait for 320ms (--motion-exit)
 }
 
 // Preload voices as early as possible (needed for Web Speech API on Chrome)

@@ -880,10 +880,10 @@
                     }
                 </style>
             </a>
-            <!-- Card 9: Gemini Radio — COMING SOON -->
-            <a href="#" class="project-card project-card--disabled" id="card-radio">
-                <div class="card-symbol" id="card-symbol-radio" style="filter: grayscale(1) brightness(0.5); transition: filter 0.8s;">
-                    <svg class="card-symbol__lines" viewBox="0 0 400 400" preserveAspectRatio="none" aria-hidden="true" style="opacity: 0.05;">
+            <!-- Card 9: Lyria Radio -->
+            <a href="lyria-radio/" class="project-card project-card--animated" id="card-radio">
+                <div class="card-symbol" id="card-symbol-radio" style="filter: grayscale(1) brightness(0.85); transition: filter 0.8s, transform 0.6s;">
+                    <svg class="card-symbol__lines" viewBox="0 0 400 400" preserveAspectRatio="none" aria-hidden="true" style="opacity: 0.1;">
                         <circle cx="200" cy="200" r="150" fill="none" stroke="#FFFF00" stroke-width="0.5"/>
                         <circle cx="200" cy="200" r="100" fill="none" stroke="#FFFF00" stroke-width="0.5"/>
                         <circle cx="200" cy="200" r="50" fill="none" stroke="#FFFF00" stroke-width="0.5"/>
@@ -892,9 +892,9 @@
                 <div class="card-info">
                     <div class="card-info__header">
                         <span class="card-info__number">09</span>
-                        <span class="card-info__status card-info__status--coming">Coming Soon</span>
+                        <span class="card-info__status card-info__status--active" style="color:#FFFF00;border-color:rgba(255,255,0,0.3);">Live Prototype</span>
                     </div>
-                    <h2 class="card-info__title">Gemini Radio</h2>
+                    <h2 class="card-info__title">Lyria Radio</h2>
                     <p class="card-info__desc">AI-generated live radio streams and audio content.</p>
                     <div class="card-info__tags">
                         <span class="card-info__tag">Audio</span>
@@ -903,6 +903,18 @@
                     </div>
                     <span class="card-info__arrow">↗</span>
                 </div>
+                
+                <style>
+                    #card-radio:hover .card-symbol {
+                        filter: grayscale(0) brightness(1.2) !important;
+                    }
+                    #card-radio:hover .card-info__title {
+                        color: #FFFF00 !important;
+                    }
+                    #card-radio:hover {
+                        background: rgba(255, 255, 0, 0.05) !important;
+                    }
+                </style>
             </a>
 
         </div><!-- end project-grid -->
