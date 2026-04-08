@@ -4,215 +4,478 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Omni i/o — Prototypes</title>
-    <link rel="stylesheet" href="../styles.css"> <!-- Try to reuse styles -->
+    <meta name="description" content="Experimental tools and media processing prototypes from the Velvet Pioneer studio.">
+    <link href="https://fonts.cdnfonts.com/css/google-sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
     <style>
+        /* ── Motion Tokens (Sovereign Motion Architect) ────── */
         :root {
+            --motion-enter:   480ms cubic-bezier(0.16, 1, 0.3, 1);
+            --motion-exit:    320ms cubic-bezier(0.4, 0, 1, 1);
+            --motion-settle:  620ms cubic-bezier(0.16, 1, 0.3, 1);
+            --motion-micro:   180ms cubic-bezier(0.4, 0, 0.2, 1);
+            --motion-stagger:  60ms;
+            --motion-reveal:  1200ms cubic-bezier(0.16, 1, 0.3, 1);
+
             --bg: #030303;
+            --surface-1: rgba(255, 255, 255, 0.02);
+            --surface-2: rgba(255, 255, 255, 0.04);
             --text-primary: #ededed;
-            --text-secondary: #a0a0a0;
-            --text-tertiary: #666666;
-            --accent: #FF007F; /* Neon Pink */
-            --accent-glow: rgba(255, 0, 127, 0.15);
-            --line: rgba(255, 255, 255, 0.05);
-            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --text-secondary: #9aa0a6;
+            --text-tertiary: #5f6368;
+            --accent: #8ab4f8;
+            --accent-glow: rgba(138, 180, 248, 0.08);
+            --line: rgba(255, 255, 255, 0.06);
         }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background-color: var(--bg);
             color: var(--text-primary);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: 'Google Sans', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
             width: 100%;
-            max-width: 600px;
-            padding: 40px 20px;
-            box-sizing: border-box;
+            max-width: 720px;
+            padding: 80px 24px 64px;
         }
 
+        /* ── Header ──────────────────────────────────────────── */
         .header {
-            margin-bottom: 60px;
+            margin-bottom: 56px;
             text-align: center;
+            animation: fadeUp var(--motion-settle) both;
         }
 
         .eyebrow {
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             font-weight: 600;
             letter-spacing: 0.2rem;
             text-transform: uppercase;
             color: var(--accent);
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             display: block;
         }
 
         .title {
-            font-size: clamp(2rem, 5vw, 3rem);
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
             font-weight: 800;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.04em;
             margin: 0;
-            background: linear-gradient(to bottom, #fff, #a0a0a0);
+            background: linear-gradient(to bottom, #fff 30%, #666);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .desc {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
-            margin-top: 12px;
+            margin-top: 14px;
             font-weight: 400;
+            line-height: 1.5;
         }
 
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Section Labels ──────────────────────────────────── */
+        .section-label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.18rem;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-bottom: 16px;
+            padding-left: 2px;
+        }
+
+        /* ── List Items ──────────────────────────────────────── */
         .list {
             display: flex;
             flex-direction: column;
             gap: 12px;
+            margin-bottom: 48px;
         }
 
         .item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 24px;
-            background: rgba(255, 255, 255, 0.01);
+            padding: 22px 24px;
+            background: var(--surface-1);
             border: 1px solid var(--line);
-            border-radius: 4px;
+            border-radius: 12px;
             text-decoration: none;
             color: inherit;
-            transition: all 0.4s var(--ease);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
+            animation: fadeUp var(--motion-settle) both;
         }
+        .item:nth-child(1) { animation-delay: 100ms; }
+        .item:nth-child(2) { animation-delay: 160ms; }
+        .item:nth-child(3) { animation-delay: 220ms; }
 
         .item::before {
             content: '';
-            position: absolute;
-            inset: 0;
+            position: absolute; inset: 0;
             background: radial-gradient(circle at center, var(--accent-glow), transparent 70%);
             opacity: 0;
-            transition: opacity 0.4s var(--ease);
-            z-index: 0;
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .item:hover {
-            border-color: rgba(255, 0, 127, 0.3);
+            border-color: rgba(138, 180, 248, 0.2);
             transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--surface-2);
+        }
+        .item:hover::before { opacity: 1; }
+
+        .item-content { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 5px; }
+        .item-title { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; color: #fff; transition: color 0.3s; }
+        .item:hover .item-title { color: var(--accent); }
+        .item-desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+        .item-meta { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; }
+
+        .status {
+            font-size: 0.55rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+            padding: 4px 10px; border-radius: 100px; border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-tertiary);
+        }
+        .status--active { color: var(--accent); border-color: rgba(138, 180, 248, 0.2); background: rgba(138, 180, 248, 0.05); }
+
+        .arrow {
+            font-size: 1.2rem; font-weight: 200; color: var(--text-tertiary);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s;
+        }
+        .item:hover .arrow { transform: translateX(4px); color: var(--accent); }
+
+        /* ════════════════════════════════════════════════════════
+           FLOW LOADING ANIMATION — Blurry Amorphous System
+           Motion Type: Tonal (ambient shimmer, mood setting)
+           ════════════════════════════════════════════════════════ */
+        .loading-section {
+            margin-bottom: 48px;
+            animation: fadeUp var(--motion-settle) both;
+            animation-delay: 300ms;
         }
 
-        .item:hover::before {
-            opacity: 1;
-        }
-
-        .item-content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .item-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: #fff;
-            transition: color 0.3s var(--ease);
-        }
-
-        .item:hover .item-title {
-            color: var(--accent);
-        }
-
-        .item-desc {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .item-meta {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            align-items: center;
+        .loading-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
 
-        .status {
-            font-size: 0.55rem;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            padding: 3px 8px;
-            border-radius: 2px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-tertiary);
+        /* ── Loading Card Container ─────────────────────────── */
+        .loading-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            aspect-ratio: 16 / 10;
+            border: 1px solid rgba(255,255,255,0.04);
+            background: #0a0a0a;
         }
 
-        .status--active {
-            color: var(--accent);
-            border-color: rgba(255, 0, 127, 0.2);
+        /* ── LAYER 1: Amorphous blurred color blobs ─────────── */
+        .loading-card .amorph-layer {
+            position: absolute;
+            inset: -30%;       /* Oversized to allow organic movement */
+            z-index: 1;
+            filter: blur(60px);
+            opacity: 0.7;
+            will-change: transform, filter;
+            animation: amorphDrift 14s ease-in-out infinite alternate;
         }
 
-        .arrow {
-            font-size: 1.2rem;
-            font-weight: 200;
-            color: var(--text-tertiary);
-            transition: transform 0.3s var(--ease), color 0.3s var(--ease);
+        .loading-card .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(20px);
+            will-change: transform;
         }
 
-        .item:hover .arrow {
-            transform: translateX(4px);
-            color: var(--accent);
+        .blob-1 {
+            width: 55%; height: 65%;
+            top: 10%; left: 5%;
+            background: radial-gradient(circle, hsla(220, 30%, 28%, 0.9), transparent 70%);
+            animation: blobFloat1 10s ease-in-out infinite alternate;
         }
 
+        .blob-2 {
+            width: 50%; height: 55%;
+            bottom: 5%; right: 5%;
+            background: radial-gradient(circle, hsla(280, 25%, 22%, 0.8), transparent 70%);
+            animation: blobFloat2 12s ease-in-out infinite alternate;
+        }
+
+        .blob-3 {
+            width: 40%; height: 40%;
+            top: 30%; left: 35%;
+            background: radial-gradient(circle, hsla(180, 20%, 25%, 0.6), transparent 70%);
+            animation: blobFloat3 8s ease-in-out infinite alternate;
+        }
+
+        /* Stagger: per-card blobs drift at different phase offsets */
+        .loading-card:nth-child(2) .amorph-layer { animation-delay: -3s; }
+        .loading-card:nth-child(2) .blob-1 { animation-delay: -2s; }
+        .loading-card:nth-child(2) .blob-2 { animation-delay: -4s; }
+        .loading-card:nth-child(2) .blob-3 { animation-delay: -1s; }
+
+        .loading-card:nth-child(3) .amorph-layer { animation-delay: -7s; }
+        .loading-card:nth-child(4) .amorph-layer { animation-delay: -5s; }
+        .loading-card:nth-child(4) .blob-1 { animation-delay: -6s; }
+        .loading-card:nth-child(4) .blob-2 { animation-delay: -3s; }
+
+        /* ── LAYER 2: Shimmer sweep — soft, blurred glint ──── */
+        .loading-card .shimmer-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .loading-card .shimmer-layer::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 300%;
+            height: 100%;
+            background: linear-gradient(
+                105deg,
+                transparent 20%,
+                rgba(255,255,255,0.03) 35%,
+                rgba(255,255,255,0.06) 50%,
+                rgba(255,255,255,0.03) 65%,
+                transparent 80%
+            );
+            filter: blur(8px);
+            animation: shimmerSweep 3s infinite linear;
+            will-change: transform;
+        }
+
+        /* Stagger shimmer per card */
+        .loading-card:nth-child(1) .shimmer-layer::after { animation-delay: 0s; }
+        .loading-card:nth-child(2) .shimmer-layer::after { animation-delay: 0.5s; }
+        .loading-card:nth-child(3) .shimmer-layer::after { animation-delay: 1s; }
+        .loading-card:nth-child(4) .shimmer-layer::after { animation-delay: 1.5s; }
+
+        /* ── LAYER 3: Content overlay (spinner + text) ──────── */
+        .loading-card .card-status {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            z-index: 4;
+            transition: opacity 800ms cubic-bezier(0.4, 0, 1, 1);
+        }
+
+        .loading-spinner {
+            width: 20px; height: 20px;
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-top-color: rgba(255,255,255,0.35);
+            border-radius: 50%;
+            animation: spin 1.4s linear infinite;
+            will-change: transform;
+        }
+
+        .loading-text {
+            font-size: 0.68rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 0.08em;
+        }
+
+        /* ── VIDEO LAYER ─────────────────────────────────────── */
+        .loading-card .video-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            opacity: 0;
+            /* Start blurred — matching the amorphous background */
+            filter: blur(40px) saturate(1.2);
+            transform: scale(1.1);
+            will-change: opacity, filter, transform;
+        }
+
+        .loading-card .video-layer video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* ── REVEAL STATE: blur dissolves into sharp video ──── */
+        .loading-card.revealing .video-layer {
+            opacity: 1;
+            filter: blur(0px) saturate(1);
+            transform: scale(1);
+            transition:
+                opacity 1400ms cubic-bezier(0.16, 1, 0.3, 1),
+                filter 1800ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 1600ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .loading-card.revealing .amorph-layer {
+            opacity: 0;
+            transition: opacity 1400ms cubic-bezier(0.4, 0, 1, 1);
+        }
+
+        .loading-card.revealing .shimmer-layer {
+            opacity: 0;
+            transition: opacity 800ms cubic-bezier(0.4, 0, 1, 1);
+        }
+
+        .loading-card.revealing .card-status {
+            opacity: 0;
+            transition: opacity 400ms cubic-bezier(0.4, 0, 1, 1);
+        }
+
+        /* ── COMPLETE STATE: fully resolved ─────────────────── */
+        .loading-card.complete .amorph-layer,
+        .loading-card.complete .shimmer-layer { display: none; }
+        .loading-card.complete .card-status { display: none; }
+        .loading-card.complete .video-layer {
+            opacity: 1;
+            filter: none;
+            transform: none;
+        }
+        .loading-card.complete { cursor: pointer; }
+
+        .loading-card .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.7) 100%);
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: flex-end;
+            padding: 14px;
+            z-index: 5;
+        }
+
+        .loading-card.complete:hover .card-overlay { opacity: 1; }
+
+        .card-overlay-text { font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.85); }
+
+        .play-icon-overlay {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.85);
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 6;
+        }
+
+        .loading-card.complete:hover .play-icon-overlay {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .play-icon-overlay .material-symbols-outlined { font-size: 22px; color: #fff; margin-left: 2px; }
+
+        /* ── Keyframes ───────────────────────────────────────── */
+        @keyframes amorphDrift {
+            0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+            33%  { transform: translate(5%, -3%) rotate(2deg) scale(1.03); }
+            66%  { transform: translate(-3%, 5%) rotate(-1deg) scale(0.98); }
+            100% { transform: translate(2%, 2%) rotate(1deg) scale(1.01); }
+        }
+
+        @keyframes blobFloat1 {
+            0%   { transform: translate(0, 0) scale(1); }
+            50%  { transform: translate(12%, -8%) scale(1.15); }
+            100% { transform: translate(-5%, 10%) scale(0.9); }
+        }
+
+        @keyframes blobFloat2 {
+            0%   { transform: translate(0, 0) scale(1); }
+            50%  { transform: translate(-10%, 6%) scale(1.1); }
+            100% { transform: translate(8%, -12%) scale(0.95); }
+        }
+
+        @keyframes blobFloat3 {
+            0%   { transform: translate(0, 0) scale(1); }
+            50%  { transform: translate(8%, 10%) scale(1.2); }
+            100% { transform: translate(-8%, -5%) scale(0.85); }
+        }
+
+        @keyframes shimmerSweep {
+            from { transform: translateX(-100%); }
+            to   { transform: translateX(100%); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ── Back Link ───────────────────────────────────────── */
         .back-link {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            margin-top: 40px;
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.8rem;
             font-weight: 500;
-            transition: color 0.3s var(--ease);
+            transition: color 0.3s;
+            animation: fadeUp var(--motion-settle) both;
+            animation-delay: 400ms;
         }
+        .back-link:hover { color: #fff; }
+        .back-link .material-symbols-outlined { font-size: 16px; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .back-link:hover .material-symbols-outlined { transform: translateX(-4px); }
 
-        .back-link:hover {
-            color: #fff;
-        }
-
-        .back-link span {
-            transition: transform 0.3s var(--ease);
-        }
-
-        .back-link:hover span {
-            transform: translateX(-4px);
-        }
-
-        /* Ambient glow in background */
-        .ambient-glow {
+        /* ── Ambient Background ──────────────────────────────── */
+        .ambient {
             position: fixed;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: -1;
-            filter: blur(40px);
+        }
+        .ambient-1 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(138, 180, 248, 0.03) 0%, transparent 70%);
+            top: 10%; left: 20%; filter: blur(60px);
+        }
+        .ambient-2 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(197, 138, 249, 0.025) 0%, transparent 70%);
+            bottom: 15%; right: 15%; filter: blur(60px);
+        }
+
+        /* ── Reduced Motion ──────────────────────────────────── */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+            .loading-card .amorph-layer { filter: blur(40px); animation: none !important; }
+            .loading-card .blob { animation: none !important; }
+            .loading-card .shimmer-layer::after { animation: none !important; }
         }
     </style>
 </head>
 <body>
-    <div class="ambient-glow"></div>
+    <div class="ambient ambient-1"></div>
+    <div class="ambient ambient-2"></div>
 
     <div class="container">
         <div class="header">
@@ -221,9 +484,10 @@
             <p class="desc">Experimental tools and media processing prototypes.</p>
         </div>
 
+        <!-- ── Prototypes ── -->
+        <div class="section-label">Prototypes</div>
         <div class="list">
-            <!-- Item 1: Video Trimmer -->
-            <a href="../omni/" class="item">
+            <a href="../video-trimmer/" class="item" id="item-trimmer">
                 <div class="item-content">
                     <span class="item-title">Video Trimmer</span>
                     <span class="item-desc">High-fidelity video cutting and framing prototype.</span>
@@ -234,11 +498,178 @@
                 </div>
             </a>
 
+            <a href="../omni/" class="item" id="item-studio">
+                <div class="item-content">
+                    <span class="item-title">Omni Studio</span>
+                    <span class="item-desc">Full editing workspace with mobile & web trim views.</span>
+                </div>
+                <div class="item-meta">
+                    <span class="status status--active">Prototype</span>
+                    <span class="arrow">→</span>
+                </div>
+            </a>
+
+            <a href="../genmedia-os/" class="item" id="item-genmedia">
+                <div class="item-content">
+                    <span class="item-title">GenMedia OS</span>
+                    <span class="item-desc">Generative media pipeline — video creation with Veo.</span>
+                </div>
+                <div class="item-meta">
+                    <span class="status status--active">Prototype</span>
+                    <span class="arrow">→</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- ── Flow-Style Loading Animation ── -->
+        <div class="loading-section">
+            <div class="section-label">Video Generation — Loading State</div>
+            <div class="loading-grid" id="loading-grid">
+
+                <!-- Card 1: Generating -->
+                <div class="loading-card" id="card-1" data-video="../assets/landscape_video.mp4" data-label="Aerial landscape — 8s" data-delay="6000">
+                    <div class="amorph-layer">
+                        <div class="blob blob-1"></div>
+                        <div class="blob blob-2"></div>
+                        <div class="blob blob-3"></div>
+                    </div>
+                    <div class="shimmer-layer"></div>
+                    <div class="video-layer"><video muted playsinline loop preload="metadata"></video></div>
+                    <div class="card-status">
+                        <div class="loading-spinner"></div>
+                        <span class="loading-text">Creating your video…</span>
+                    </div>
+                    <div class="card-overlay"><span class="card-overlay-text"></span></div>
+                    <div class="play-icon-overlay"><span class="material-symbols-outlined">play_arrow</span></div>
+                </div>
+
+                <!-- Card 2: Generating -->
+                <div class="loading-card" id="card-2" data-video="../assets/portait_video.mp4" data-label="Portrait scene — 6s" data-delay="10000">
+                    <div class="amorph-layer">
+                        <div class="blob blob-1"></div>
+                        <div class="blob blob-2"></div>
+                        <div class="blob blob-3"></div>
+                    </div>
+                    <div class="shimmer-layer"></div>
+                    <div class="video-layer"><video muted playsinline loop preload="metadata"></video></div>
+                    <div class="card-status">
+                        <div class="loading-spinner"></div>
+                        <span class="loading-text">Creating your video…</span>
+                    </div>
+                    <div class="card-overlay"><span class="card-overlay-text"></span></div>
+                    <div class="play-icon-overlay"><span class="material-symbols-outlined">play_arrow</span></div>
+                </div>
+
+                <!-- Card 3: Already complete (landed with video) -->
+                <div class="loading-card complete" id="card-3">
+                    <div class="video-layer" style="opacity:1;filter:none;transform:none;">
+                        <video class="card-thumb" src="../assets/landscape_video.mp4" muted playsinline loop preload="metadata"></video>
+                    </div>
+                    <div class="card-overlay"><span class="card-overlay-text">Sunset timelapse — 8s</span></div>
+                    <div class="play-icon-overlay"><span class="material-symbols-outlined">play_arrow</span></div>
+                </div>
+
+                <!-- Card 4: Generating (longest delay) -->
+                <div class="loading-card" id="card-4" data-video="../assets/landscape_video.mp4" data-label="Cinematic flyover — 8s" data-delay="16000">
+                    <div class="amorph-layer">
+                        <div class="blob blob-1"></div>
+                        <div class="blob blob-2"></div>
+                        <div class="blob blob-3"></div>
+                    </div>
+                    <div class="shimmer-layer"></div>
+                    <div class="video-layer"><video muted playsinline loop preload="metadata"></video></div>
+                    <div class="card-status">
+                        <div class="loading-spinner"></div>
+                        <span class="loading-text">Creating your video…</span>
+                    </div>
+                    <div class="card-overlay"><span class="card-overlay-text"></span></div>
+                    <div class="play-icon-overlay"><span class="material-symbols-outlined">play_arrow</span></div>
+                </div>
+
+            </div>
         </div>
 
         <a href="../" class="back-link">
-            <span>←</span> Back to Dashboard
+            <span class="material-symbols-outlined">arrow_back</span>
+            Back to Dashboard
         </a>
     </div>
+
+    <script>
+        /* ═══════════════════════════════════════════════════════════
+           Loading → Reveal → Complete lifecycle
+           
+           Motion hierarchy (Sovereign Motion Architect):
+           1. Status text fades OUT first  (400ms exit)
+           2. Shimmer layer fades OUT      (800ms exit)
+           3. Video fades IN + un-blurs    (1400ms blur→sharp reveal)
+           4. Amorphous blobs fade OUT     (1400ms exit — behind video)
+           5. Card enters "complete" state
+           ═══════════════════════════════════════════════════════════ */
+
+        function revealCard(card) {
+            const videoSrc = card.dataset.video;
+            const label = card.dataset.label;
+            const video = card.querySelector('.video-layer video');
+            const overlayText = card.querySelector('.card-overlay-text');
+
+            if (!videoSrc || !video) return;
+
+            // Preload the video
+            video.src = videoSrc;
+            video.load();
+
+            video.addEventListener('canplaythrough', function onReady() {
+                video.removeEventListener('canplaythrough', onReady);
+
+                // Start playback (muted autoplay is allowed)
+                video.play().catch(() => {});
+
+                // ── Phase 1: Trigger the blur→sharp reveal ──
+                card.classList.add('revealing');
+
+                // ── Phase 2: After reveal completes, mark as complete ──
+                setTimeout(() => {
+                    card.classList.remove('revealing');
+                    card.classList.add('complete');
+                    if (overlayText) overlayText.textContent = label;
+                }, 1800);
+            }, { once: true });
+
+            // Fallback: if canplaythrough doesn't fire within 4s
+            setTimeout(() => {
+                if (!card.classList.contains('revealing') && !card.classList.contains('complete')) {
+                    video.play().catch(() => {});
+                    card.classList.add('revealing');
+                    setTimeout(() => {
+                        card.classList.remove('revealing');
+                        card.classList.add('complete');
+                        if (overlayText) overlayText.textContent = label;
+                    }, 1800);
+                }
+            }, 4000);
+        }
+
+        // ── Schedule cards to "complete" with staggered delays ──
+        document.querySelectorAll('.loading-card[data-delay]').forEach(card => {
+            const delay = parseInt(card.dataset.delay, 10);
+            setTimeout(() => revealCard(card), delay);
+        });
+
+        // ── Hover-to-play for complete cards ──
+        document.addEventListener('mouseenter', e => {
+            const card = e.target.closest('.loading-card.complete');
+            if (!card) return;
+            const video = card.querySelector('video');
+            if (video) { video.currentTime = 0; video.play().catch(() => {}); }
+        }, true);
+
+        document.addEventListener('mouseleave', e => {
+            const card = e.target.closest('.loading-card.complete');
+            if (!card) return;
+            const video = card.querySelector('video');
+            if (video) video.pause();
+        }, true);
+    </script>
 </body>
 </html>
