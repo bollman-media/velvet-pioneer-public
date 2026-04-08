@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5000;
 const ROOT = __dirname;
 
 // Gemini API key from environment variable
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBB_UX81p6Cm_Y8MMvTdgySZKdD-R2oItA';
 const VEO_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 // Models tried in order — falls back to next on 429 quota exhaustion
 const VEO_MODELS = [
@@ -587,54 +587,8 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // ========== API: Generic Image Generation (used by DJ Lyria covers) ==========
-  if (req.method === 'POST' && req.url === '/api/generate-image') {
-    try {
-      if (!GEMINI_API_KEY) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'GEMINI_API_KEY not set' }));
-        return;
-      }
-      const body = await parseBody(req);
-      const { prompt } = body;
-      if (!prompt) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'prompt is required' }));
-        return;
-      }
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_API_KEY}`;
-      const reqBody = JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseModalities: ['IMAGE', 'TEXT'] }
-      });
-      const result = await new Promise((resolve) => {
-        const apiReq = https.request(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' } }, apiRes => {
-          let chunks = '';
-          apiRes.on('data', c => chunks += c);
-          apiRes.on('end', () => {
-            try { resolve(JSON.parse(chunks)); } catch (e) { resolve(null); }
-          });
-        });
-        apiReq.on('error', () => resolve(null));
-        apiReq.write(reqBody);
-        apiReq.end();
-      });
-      if (result) {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(result));
-      } else {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Image generation failed' }));
-      }
-    } catch (err) {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: err.message }));
-    }
-    return;
-  }
-
   // ========== API: Generate Album Cover via Gemini ==========
-  if (req.method === 'POST' && req.url === '/api/generate-cover') {
+  if (req.method === 'POST' && req.url === './api/generate-cover') {
     try {
       if (!GEMINI_API_KEY) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -847,285 +801,8 @@ Requirements:
     return;
   }
 
-  // ========== API: Studio — Generate Image (server-side proxy) ==========
-  // All client-side image generation is routed through here so the API key
-  // stays on the server and users never see a key prompt.
-  if (req.method === 'POST' && req.url === '/api/studio-generate') {
-    try {
-      if (!GEMINI_API_KEY) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'GEMINI_API_KEY not set on server' }));
-        return;
-      }
-
-      const body = await parseBody(req);
-      const { contents, generationConfig } = body;
-
-      if (!contents) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'contents is required' }));
-        return;
-      }
-
-      // Try primary model first, fall back to flash-image on 503/429
-      const PRIMARY   = 'gemini-3-pro-image-preview';
-      const FALLBACK  = 'gemini-2.5-flash-image';
-      const BASE      = 'https://generativelanguage.googleapis.com/v1beta/models';
-
-      const reqBody = JSON.stringify({ contents, generationConfig: generationConfig || { responseModalities: ['TEXT', 'IMAGE'] } });
-
-      const tryModel = (model) => new Promise((resolve, reject) => {
-        const url = `${BASE}/${model}:generateContent?key=${GEMINI_API_KEY}`;
-        const apiReq = https.request(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } }, (apiRes) => {
-          let chunks = '';
-          apiRes.on('data', c => chunks += c);
-          apiRes.on('end', () => resolve({ status: apiRes.statusCode, body: chunks }));
-        });
-        apiReq.on('error', reject);
-        apiReq.write(reqBody);
-        apiReq.end();
-      });
-
-      let result = await tryModel(PRIMARY);
-      if (result.status === 503 || result.status === 429) {
-        console.warn(`  [Studio] Primary model ${result.status}, falling back to ${FALLBACK}`);
-        result = await tryModel(FALLBACK);
-      }
-
-      console.log(`  [Studio] Generate → HTTP ${result.status}`);
-      if (result.body) {
-        console.log(`  [Studio] Body preview: ${result.body.substring(0, 300).replace(/\n/g, ' ')}`);
-      }
-      res.writeHead(result.status, { 'Content-Type': 'application/json' });
-      res.end(result.body);
-
-    } catch (err) {
-      console.error('  [Studio] Generate error:', err.message);
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: err.message }));
-    }
-    return;
-  }
-
-  // ========== API: Studio — Analyze / Text-only (server-side proxy) ==========
-  // Uses gemini-2.5-flash which supports responseMimeType: application/json
-  // for structured text-detection and analysis tasks.
-  if (req.method === 'POST' && req.url === '/api/studio-analyze') {
-    try {
-      if (!GEMINI_API_KEY) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'GEMINI_API_KEY not set on server' }));
-        return;
-      }
-
-      const body = await parseBody(req);
-      const { contents, generationConfig } = body;
-
-      if (!contents) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'contents is required' }));
-        return;
-      }
-
-      const MODEL = 'gemini-2.5-flash';
-      const BASE  = 'https://generativelanguage.googleapis.com/v1beta/models';
-      const reqBody = JSON.stringify({ contents, generationConfig: generationConfig || { responseModalities: ['TEXT'] } });
-
-      const result = await new Promise((resolve, reject) => {
-        const url = `${BASE}/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-        const apiReq = https.request(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } }, (apiRes) => {
-          let chunks = '';
-          apiRes.on('data', c => chunks += c);
-          apiRes.on('end', () => resolve({ status: apiRes.statusCode, body: chunks }));
-        });
-        apiReq.on('error', reject);
-        apiReq.write(reqBody);
-        apiReq.end();
-      });
-
-      console.log(`  [Studio] Analyze → HTTP ${result.status}`);
-      if (result.body) {
-        console.log(`  [Studio] Body preview: ${result.body.substring(0, 300).replace(/\n/g, ' ')}`);
-      }
-      res.writeHead(result.status, { 'Content-Type': 'application/json' });
-      res.end(result.body);
-
-    } catch (err) {
-      console.error('  [Studio] Analyze error:', err.message);
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: err.message }));
-    }
-    return;
-  }
-
-  // ========== API: Bollman's Wild Ideas — Generate (Runs Python Script) ==========
-  if (req.method === 'POST' && req.url === '/generate') {
-    try {
-      const { exec } = require('child_process');
-      const scriptPath = '/Users/bollman/.gemini/jetski/scratch/idea-engine/run.py';
-      
-      console.log(`  [Ideas] Running generator script: ${scriptPath}`);
-      
-      exec(`python3 "${scriptPath}"`, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`  [Ideas] Error: ${error.message}`);
-          res.writeHead(500, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: error.message }));
-          return;
-        }
-        if (stderr) {
-          console.warn(`  [Ideas] Stderr: ${stderr}`);
-        }
-        console.log(`  [Ideas] Stdout: ${stdout}`);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, output: stdout }));
-      });
-    } catch (err) {
-      console.error('  [Ideas] Generate error:', err.message);
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: err.message }));
-    }
-    return;
-  }
-
-  // ========== API: AudiBrief — Text to Audio Briefing ==========
-  if (req.method === 'POST' && req.url === '/api/audibrief') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    try {
-      if (!GEMINI_API_KEY) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'GEMINI_API_KEY not set' }));
-        return;
-      }
-      const body = await parseBody(req);
-      const { text, simplify = false, tldrOnly = false } = body;
-      if (!text || typeof text !== 'string' || !text.trim()) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'No text provided.' }));
-        return;
-      }
-      const BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-      const geminiCall = (model, payload) => new Promise((resolve) => {
-        const bodyStr = JSON.stringify(payload);
-        const apiReq = https.request(
-          `${BASE}/${model}:generateContent?key=${GEMINI_API_KEY}`,
-          { method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(bodyStr) } },
-          (apiRes) => {
-            let chunks = '';
-            apiRes.on('data', c => chunks += c);
-            apiRes.on('end', () => resolve({ ok: apiRes.statusCode < 300, status: apiRes.statusCode, data: JSON.parse(chunks) }));
-          }
-        );
-        apiReq.on('error', (e) => resolve({ ok: false, status: 500, data: { error: e.message } }));
-        apiReq.write(bodyStr);
-        apiReq.end();
-      });
-
-      const isFigma = text.startsWith('Figma Design Comments');
-
-      if (tldrOnly) {
-        const r = await geminiCall('gemini-2.5-flash', { contents: [{ parts: [{ text: `Summarize these Figma comments in 3-5 plain-text sentences.\n\n${text.slice(0, 20000)}` }] }], generationConfig: { temperature: 0.4, maxOutputTokens: 512 } });
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ tldr: r.data?.candidates?.[0]?.content?.parts?.[0]?.text || '' }));
-        return;
-      }
-
-      // Step 1: Script
-      console.log(`[AudiBrief] Generating ${isFigma ? 'Figma' : 'general'} script…`);
-      const scriptR = await geminiCall('gemini-2.5-flash', {
-        contents: [{ parts: [{ text: isFigma
-          ? `You are a sharp design lead giving a daily podcast briefing. Cover EVERY Figma comment. 600-900 words, spoken naturally.\n${simplify ? 'Be extra concise.' : ''}\n\nFIGMA COMMENTS:\n---\n${text.slice(0, 20000)}\n---\nWrite ONLY the script.`
-          : `You are a sharp design lead giving a podcast briefing. Write to be spoken aloud. 100-800 words based on content length. Warm, direct, professional.\n${simplify ? 'Be extra concise.' : ''}\n\nTEXT:\n---\n${text.slice(0, 15000)}\n---\nWrite ONLY the script.`
-        }] }],
-        generationConfig: { temperature: 0.6, maxOutputTokens: 3000 }
-      });
-      if (!scriptR.ok) throw new Error(`Script failed: ${scriptR.status}`);
-      const script = scriptR.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      if (!script) throw new Error('No script generated.');
-
-      // Step 2: Takeaways
-      const tkR = await geminiCall('gemini-2.5-flash', {
-        contents: [{ parts: [{ text: `Extract 3-5 key takeaways as short clear sentences from this text. Return ONLY a JSON array of strings.\n\n${text.slice(0, 8000)}` }] }],
-        generationConfig: { temperature: 0.3, maxOutputTokens: 512 }
-      });
-      let takeaways = [];
-      try { takeaways = JSON.parse((tkR.data?.candidates?.[0]?.content?.parts?.[0]?.text || '[]').replace(/```json\n?|```\n?/g, '').trim()); } catch { takeaways = []; }
-
-      // Step 3: TTS
-      console.log('[AudiBrief] Converting to speech…');
-      const ttsR = await geminiCall('gemini-2.5-flash-preview-tts', {
-        contents: [{ parts: [{ text: `Read this in a confident, crisp voice. Sharp design lead. Brisk but clear.\n\n${script}` }] }],
-        generationConfig: {
-          responseModalities: ['AUDIO'],
-          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: isFigma ? 'Orus' : 'Kore' } } }
-        }
-      });
-      if (!ttsR.ok) throw new Error(`TTS failed: ${ttsR.status}`);
-      const audioPart = ttsR.data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-      if (!audioPart) throw new Error('No audio from TTS.');
-
-      console.log('[AudiBrief] ✅ Done');
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ script, takeaways, audio: { data: audioPart.inlineData.data, mimeType: audioPart.inlineData.mimeType || 'audio/L16;rate=24000' } }));
-    } catch (err) {
-      console.error('[AudiBrief] Error:', err.message);
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: err.message }));
-    }
-    return;
-  }
-
-  // ========== API: Studio — Edit Image (server-side proxy) ==========
-  if (req.method === 'POST' && req.url === '/api/studio-edit') {
-
-    try {
-      if (!GEMINI_API_KEY) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'GEMINI_API_KEY not set on server' }));
-        return;
-      }
-
-      const body = await parseBody(req);
-      const { contents, generationConfig } = body;
-
-      if (!contents) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'contents is required' }));
-        return;
-      }
-
-      const MODEL = 'gemini-3-pro-image-preview';
-      const BASE  = 'https://generativelanguage.googleapis.com/v1beta/models';
-      const reqBody = JSON.stringify({ contents, generationConfig: generationConfig || { responseModalities: ['TEXT', 'IMAGE'] } });
-
-      const result = await new Promise((resolve, reject) => {
-        const url = `${BASE}/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-        const apiReq = https.request(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } }, (apiRes) => {
-          let chunks = '';
-          apiRes.on('data', c => chunks += c);
-          apiRes.on('end', () => resolve({ status: apiRes.statusCode, body: chunks }));
-        });
-        apiReq.on('error', reject);
-        apiReq.write(reqBody);
-        apiReq.end();
-      });
-
-      res.writeHead(result.status, { 'Content-Type': 'application/json' });
-      res.end(result.body);
-      console.log(`  [Studio] Edit → HTTP ${result.status}`);
-
-    } catch (err) {
-      console.error('  [Studio] Edit error:', err.message);
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: err.message }));
-    }
-    return;
-  }
-
   // ========== API: Generate Music Track via Lyria ==========
-  if (req.method === 'POST' && req.url === '/api/generate-track') {
+  if (req.method === 'POST' && req.url === './api/generate-track') {
     try {
       if (!GEMINI_API_KEY) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -1154,13 +831,13 @@ Requirements:
       const DURATION_SECONDS = 30;
       const targetBytes = SAMPLE_RATE * CHANNELS * (BIT_DEPTH / 8) * DURATION_SECONDS;
 
-      const MAX_RETRIES = 0; // Client handles retries; server does one clean attempt
+      const MAX_RETRIES = 2;
       let result = null;
 
       for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
         if (attempt > 0) {
           console.log(`  [Lyria] ↻ Retry ${attempt}/${MAX_RETRIES}...`);
-          await new Promise(r => setTimeout(r, 1000));
+          await new Promise(r => setTimeout(r, 1000)); // Wait 1s between retries
         }
 
         const audioChunks = [];
@@ -1205,7 +882,7 @@ Requirements:
             resolve(wavBuffer.toString('base64'));
           }
 
-          const timeout = setTimeout(() => finish('timeout'), 55000);
+          const timeout = setTimeout(() => finish('timeout'), 90000);
 
           try {
             const session = await client.live.music.connect({

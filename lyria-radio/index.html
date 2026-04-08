@@ -6,7 +6,7 @@
   <title>Lyria Radio — Gemini</title>
   <link href="https://fonts.cdnfonts.com/css/google-sans" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Display:wght@400;500;700&family=Google+Sans+Code&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <style>
     /* ── MATERIAL AURORA BLUE palette (from Figma JSON) ── */
     :root {
@@ -242,7 +242,6 @@
       filter: blur(0px);
     }
 
-    /* Greeting */
     .greeting {
       font-family: 'Google Sans Flex', sans-serif;
       font-size: 42px;
@@ -255,12 +254,6 @@
     }
 
     /* ── PLAYER CARD ── */
-    .player-wrap {
-      padding: 0 48px 32px;
-      max-width: 860px;
-      margin: 0 auto;
-      width: 100%;
-    }
 
     .now-playing {
       background: var(--card-bg);
@@ -538,7 +531,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── PILL INPUT ── */
     .input-wrap {
       padding: 0 48px 24px;
       max-width: 860px;
@@ -547,9 +539,9 @@
     }
     .input-pill {
       width: 560px;
-      height: 56px;
+      height: 64px;
       background: #FFFFFF;
-      border-radius: 28px;
+      border-radius: 32px;
       display: flex;
       align-items: center;
       padding: 8px;
@@ -560,7 +552,7 @@
 
     .input-content {
       width: 544px;
-      height: 40px;
+      height: 48px;
       display: flex;
       align-items: center;
       padding: 4px 8px;
@@ -576,7 +568,45 @@
       justify-content: center;
       cursor: pointer;
       border-radius: 999px;
+      transition: background var(--motion-micro);
     }
+    /* Stop button — Figma spec: 36×36 black circle + white stop square */
+    .stop-btn-wrap {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      position: absolute; inset: 0;
+      border-radius: 999px;
+    }
+    .pill-icon.is-generating {
+      position: relative;
+    }
+    .pill-icon.is-generating .stop-btn-wrap { display: flex; }
+    .pill-icon.is-generating > .material-symbols-outlined { opacity: 0; pointer-events: none; }
+    .stop-btn-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #000;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform var(--motion-micro), box-shadow var(--motion-micro);
+    }
+    .stop-btn-circle:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 0 6px rgba(0,0,0,0.08);
+    }
+    .stop-btn-square {
+      width: 10px; height: 10px;
+      background: #FCFBFB;
+      border-radius: 2.5px;
+    }
+    /* Send icon animation — mic ↔ arrow_upward */
+    @keyframes iconPop {
+      0%   { transform: scale(0.55) rotate(-15deg); opacity: 0; }
+      70%  { transform: scale(1.12) rotate(3deg); opacity: 1; }
+      100% { transform: scale(1)    rotate(0deg); }
+    }
+    .icon-pop { animation: iconPop 200ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+    .pill-icon.has-send > .material-symbols-outlined { color: #2051DA; }
+    .pill-icon.has-send { background: rgba(32,81,218,0.08); }
 
     .pill-text-container {
       flex: 1;
@@ -589,8 +619,7 @@
     .pill-divider {
       width: 1px;
       height: 16px;
-      background: #000;
-      opacity: 1;
+      background: rgba(0,0,0,0.12);
     }
 
     .placeholder {
@@ -658,14 +687,14 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       cursor: pointer;
-      transition: transform var(--motion-enter), opacity var(--motion-enter);
-      will-change: transform, opacity;
+      transition: transform var(--motion-enter), opacity var(--motion-enter), width var(--motion-micro);
+      will-change: transform, opacity, width;
     }
     .collapsed-player.is-hidden {
       transform: translateY(20px) scale(0.96);
       opacity: 0;
       pointer-events: none;
-      transition: transform var(--motion-exit), opacity var(--motion-exit);
+      transition: transform var(--motion-exit), opacity var(--motion-exit), width var(--motion-micro);
     }
     /* Album art thumbnail in collapsed bar */
     .collapsed-player .avatar {
@@ -909,10 +938,42 @@
       margin-bottom: 10px; padding-top: 2px;
       font-family: 'Google Sans', sans-serif;
       flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    /* Skeleton loading rows */
+    .community-skeleton { display: flex; flex-direction: column; gap: 8px; }
+    .sk-row {
+      height: 44px; border-radius: 10px;
+      background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.10) 50%, rgba(0,0,0,0.06) 75%);
+      background-size: 200% 100%;
+      animation: skPulse 1.4s ease-in-out infinite;
+    }
+    .sk-row:nth-child(2) { animation-delay: 0.15s; }
+    .sk-row:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes skPulse {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    /* Empty state */
+    .community-empty {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 24px 16px; gap: 6px;
+      color: rgba(0,0,0,0.35); font-family: 'Google Sans', sans-serif;
+      font-size: 12px; text-align: center;
+    }
+    .community-empty .material-symbols-outlined { font-size: 28px; margin-bottom: 2px; opacity: 0.4; }
+    /* Initials avatar chip */
+    .ct-avatar-chip {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Google Sans', sans-serif;
+      font-size: 13px; font-weight: 600;
+      flex-shrink: 0; margin-right: 10px;
     }
     .expanded-sidebar .community-list {
       display: flex; flex-direction: column;
       gap: 2px;
+      justify-content: flex-start;
     }
     .expanded-sidebar .community-item {
       display: flex; align-items: center;
@@ -953,17 +1014,23 @@
       font-size: 18px; color: rgba(0,0,0,0.45);
     }
 
-    /* Depth blur on body when expanded */
+    /* Depth blur and scale on body when expanded */
     body.state-expanded .main {
       filter: blur(2px);
       opacity: 0.85;
-      transition: filter var(--motion-enter), opacity var(--motion-enter);
+      transform: translateZ(-24.5px);
+      transition: filter var(--motion-enter), opacity var(--motion-enter), transform var(--motion-enter);
+      transform-origin: center center;
     }
     body:not(.state-expanded) .main {
       filter: none;
       opacity: 1;
-      transition: filter var(--motion-exit), opacity var(--motion-exit);
+      transform: translateZ(0);
+      transition: filter var(--motion-exit), opacity var(--motion-exit), transform var(--motion-exit);
+      transform-origin: center center;
     }
+
+
 
     .hidden { display: none !important; }
 
@@ -971,7 +1038,7 @@
     @media (max-width: 768px) {
       .sidebar { display: none; }
       .greeting { padding: 32px 24px 16px; }
-      .player-wrap, .input-wrap { padding-left: 16px; padding-right: 16px; }
+      .input-wrap { padding-left: 16px; padding-right: 16px; }
     }
 
     /* Remix Button Hover */
@@ -1018,6 +1085,309 @@
       from { opacity: 1; transform: translateY(0); }
       to   { opacity: 0; transform: translateY(20px); }
     }
+
+    /* ══════════════════════════════════════════
+       RESPONSE VIEW (Gemini chat-style)
+    ══════════════════════════════════════════ */
+    .response-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      width: 100%;
+    }
+    .response-view.hidden { display: none !important; }
+
+    .response-canvas {
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px 160px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* User message bubble — Figma spec: aurora blue pill w/ feathered edges */
+    .msg-user { display: flex; justify-content: flex-end; }
+    .msg-user-text {
+      background: #DCF1FF;
+      border-radius: 40px;
+      padding: 20px 24px;
+      font-family: 'Google Sans Flex', sans-serif;
+      font-size: 17px;
+      font-weight: 400;
+      color: rgba(0,0,0,0.87);
+      line-height: 24px;
+      box-shadow:
+        inset 8px -3px 32px rgba(186,226,255,0.9),
+        inset 0 -4px 24px rgba(43,41,41,0.14);
+      max-width: 70%;
+      filter: drop-shadow(0 0 28px rgba(157,211,255,0.8)) drop-shadow(0 0 8px rgba(186,226,255,0.6));
+      -webkit-mask-image: radial-gradient(ellipse 84% 76% at 50% 50%, black 45%, rgba(0,0,0,0.75) 68%, transparent 100%);
+      mask-image: radial-gradient(ellipse 84% 76% at 50% 50%, black 45%, rgba(0,0,0,0.75) 68%, transparent 100%);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      line-clamp: 2;
+      overflow: hidden;
+    }
+
+    /* Gemini response */
+    .msg-gemini { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+    .msg-gemini-label {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 16px;
+      color: rgba(0,0,0,0.87);
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity var(--motion-enter), transform var(--motion-enter);
+    }
+    .msg-gemini-label.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Action bar hidden during loading */
+    .music-response-card.is-loading .mr-action-bar { display: none; }
+    /* Avatar play overlay (mini player) */
+    .avatar { position: relative; }
+    .avatar-play-overlay {
+      display: none;
+      position: absolute; inset: 0; border-radius: 50%;
+      background: rgba(0,0,0,0.42);
+      align-items: center; justify-content: center;
+      cursor: pointer; z-index: 5;
+      transition: background var(--motion-micro);
+    }
+    .avatar-play-overlay:hover { background: rgba(0,0,0,0.55); }
+    .avatar-play-overlay .material-symbols-outlined { font-size: 15px; color: #fff; }
+    .collapsed-player.is-mini .avatar-play-overlay { display: flex; }
+    .collapsed-player.is-mini #btnPlay { display: none; }
+
+    /* Music response card */
+    .music-response-card {
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 540px;
+    }
+
+    /* Loading — shimmer skeleton */
+    .music-response-loading { overflow: hidden; }
+    @keyframes shimmerSweep {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .shimmer-wrap { display: flex; flex-direction: column; }
+    .shimmer-block {
+      border-radius: 6px;
+      background: linear-gradient(90deg, #ebebeb 25%, #e2e2e2 50%, #ebebeb 75%);
+      background-size: 200% 100%;
+      animation: shimmerSweep 1.4s ease-in-out infinite;
+    }
+    .shimmer-art  { width: 100%; aspect-ratio: 1; border-radius: 0; }
+    .shimmer-meta-row  { display: flex; flex-direction: column; gap: 8px; padding: 14px 18px 10px; }
+    .shimmer-title     { height: 18px; width: 55%; animation-delay: 80ms; }
+    .shimmer-subtitle  { height: 12px; width: 35%; animation-delay: 160ms; }
+    .shimmer-actions-row {
+      display: flex; gap: 2px; padding: 8px 10px 12px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+    .shimmer-action-dot { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; animation-delay: 240ms; }
+    /* Error row (injected via JS) */
+    .mr-loader-row { display: flex; align-items: center; gap: 12px; padding: 32px 24px; }
+    .mr-loader-spinner {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.12);
+      border-top-color: #2051DA;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    .mr-loader-text { font-family: 'Google Sans', sans-serif; font-size: 14px; color: rgba(0,0,0,0.54); }
+
+    /* Artwork */
+    .music-response-content { display: flex; flex-direction: column; }
+    .music-response-content.hidden { display: none !important; }
+    .mr-artwork-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #14204F, #2051DA);
+      overflow: hidden;
+    }
+    .mr-artwork-img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: opacity 400ms ease;
+    }
+    .mr-artwork-img.hidden { opacity: 0; }
+    .mr-artwork-overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.22);
+      transition: background 200ms;
+    }
+    .mr-artwork-overlay:hover { background: rgba(0,0,0,0.32); }
+    .mr-play-btn {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: rgba(255,255,255,0.92);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: transform 180ms cubic-bezier(0.4,0,0.2,1), background 180ms;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+    }
+    .mr-play-btn:hover { transform: scale(1.08); background: #fff; }
+    .mr-play-btn .material-symbols-outlined { font-size: 30px; color: #000; }
+    .mr-progress-wrap {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px; background: rgba(255,255,255,0.25);
+    }
+    .mr-progress-fill {
+      height: 100%; background: #fff; border-radius: 0;
+      width: 0%; transition: width 0.5s linear;
+    }
+    .mr-track-info { padding: 14px 18px 10px; }
+    .mr-track-title {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 16px; font-weight: 600;
+      color: rgba(0,0,0,0.87); margin-bottom: 2px;
+    }
+    .mr-track-meta {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 12px; color: rgba(0,0,0,0.45);
+    }
+
+    /* Action bar */
+    .mr-action-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 10px 12px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+    .mr-actions-left, .mr-actions-right { display: flex; align-items: center; gap: 0; }
+    .mr-action-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: rgba(0,0,0,0.54);
+      font-size: 18px !important;
+      transition: background 150ms, color 150ms;
+    }
+    .mr-action-btn:hover { background: rgba(0,0,0,0.06); color: rgba(0,0,0,0.87); }
+    .mr-action-text-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      color: rgba(0,0,0,0.54);
+      padding: 4px 8px;
+      border-radius: 12px;
+      transition: background 150ms, color 150ms;
+    }
+    .mr-action-text-btn:hover {
+      background: rgba(0,0,0,0.06);
+      color: rgba(0,0,0,0.87);
+    }
+    .mr-action-text-btn .material-symbols-outlined {
+      font-size: 16px !important;
+    }
+
+    /* ── MINI PLAYER — smooth spatial transition ── */
+    .collapsed-player .info    { transition: opacity var(--motion-micro), max-width var(--motion-micro); }
+    .collapsed-player .avatar  { transition: width var(--motion-micro), height var(--motion-micro); }
+    .collapsed-player.is-mini {
+      width: fit-content;
+      padding: 8px 8px;
+      gap: 2px;
+      justify-content: flex-start;
+    }
+    .collapsed-player.is-mini .info    { opacity: 0; pointer-events: none; max-width: 0; overflow: hidden; }
+    .collapsed-player.is-mini .avatar  { width: 30px; height: 30px; }
+    .collapsed-player.is-mini .avatar img { border-radius: 50%; }
+
+    body.response-view-active .main {
+      justify-content: flex-start;
+    }
+    body.response-view-active .input-wrap { display: none; }
+    body.response-view-active .greeting { display: none; }
+    body.response-view-active .bottom-pad { display: none; }
+
+    /* Fixed input pill at bottom when in response view */
+    .response-input-fixed {
+      position: fixed;
+      bottom: 24px;
+      left: 55px;
+      right: 0;
+      display: none;
+      justify-content: center;
+      z-index: 500;
+      pointer-events: none;
+    }
+    body.response-view-active .response-input-fixed {
+      display: flex;
+    }
+    .response-input-fixed .input-pill {
+      pointer-events: all;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+
+  /* ── Share Modal ── */
+  .share-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.38);
+    z-index: 900;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 280ms ease;
+    pointer-events: none;
+  }
+  .share-overlay.open { opacity: 1; pointer-events: all; }
+  .share-sheet {
+    background: #fff;
+    border-radius: 28px;
+    width: calc(100% - 48px);
+    max-width: 420px;
+    padding: 24px 0;
+    transform: scale(0.9);
+    transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+  }
+  .share-overlay.open .share-sheet { transform: scale(1); }
+  .share-header { display: flex; align-items: center; justify-content: space-between; padding: 0 24px 16px; }
+  .share-title  { font-family: 'Google Sans',sans-serif; font-size:16px; font-weight:600; color:rgba(0,0,0,0.87); }
+  .share-close  { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(0,0,0,0.54); transition:background var(--motion-micro); }
+  .share-close:hover { background:rgba(0,0,0,0.06); }
+  .share-close .material-symbols-outlined { font-size:20px; }
+  /* Lyria Radio row */
+  .share-lyria-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 24px; cursor: pointer;
+    transition: background var(--motion-micro);
+  }
+  .share-lyria-bubble {
+    width:44px; height:44px; border-radius:50%;
+    background: rgba(32,81,218,0.10);
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; flex-shrink:0;
+  }
+  .share-lyria-info { flex:1; }
+  .share-lyria-name { font-family:'Google Sans',sans-serif; font-size:15px; font-weight:500; color:rgba(0,0,0,0.87); margin-bottom:2px; }
+  .share-lyria-sub  { font-family:'Google Sans',sans-serif; font-size:12px; color:rgba(0,0,0,0.54); }
+  /* Toggle */
+  .shr-toggle { width:48px; height:28px; border-radius:14px; background:rgba(0,0,0,0.18); position:relative; transition:background 240ms ease; flex-shrink:0; }
+  .shr-toggle.on { background:#2051DA; }
+  .shr-toggle-thumb { width:20px; height:20px; border-radius:50%; background:#fff; position:absolute; top:4px; left:4px; transition:transform 240ms cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 1px 4px rgba(0,0,0,0.22); }
+  .shr-toggle.on .shr-toggle-thumb { transform:translateX(20px); }
+  .share-divider { height:1px; background:rgba(0,0,0,0.07); margin:6px 20px; }
+  /* Options */
+  .share-options { display:flex; flex-direction:column; }
+  .share-opt { display:flex; align-items:center; gap:14px; padding:12px 24px; cursor:pointer; transition:background var(--motion-micro); }
+  .share-opt:hover { background:rgba(0,0,0,0.04); }
+  .share-opt-icon { width:40px; height:40px; border-radius:50%; background:rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:center; color:rgba(0,0,0,0.7); }
+  .share-opt-icon .material-symbols-outlined { font-size:20px; }
+  .share-opt-label { font-family:'Google Sans',sans-serif; font-size:15px; color:rgba(0,0,0,0.87); }
+  .share-done { margin:16px 24px 0; padding:14px; background:#000; color:#fff; border-radius:24px; text-align:center; font-family:'Google Sans',sans-serif; font-size:15px; font-weight:500; cursor:pointer; transition:background var(--motion-micro),transform var(--motion-micro); }
+  .share-done:hover { background:#333; transform:scale(0.99); }
   </style>
 </head>
 <body>
@@ -1031,11 +1401,10 @@
 <main class="main">
 
   <!-- Greeting -->
-  <div class="greeting">
+  <div class="greeting" id="greeting">
     <img src="Assets/type_headline_greeting@2x.png" alt="Hi Hugo, Lets make some music" style="max-width:560px; width:100%; height:auto; display:block; margin:0 auto;">
   </div>
 
-  <div class="player-wrap">
 
     <!-- DJ BREAK -->
     <div class="dj-break" id="djBreak">
@@ -1050,9 +1419,56 @@
       </div>
     </div>
 
-    <!-- NOW PLAYING CARD REMOVED (Redundant with collapse/expand player) -->
-
-  </div><!-- /player-wrap -->
+  <!-- RESPONSE VIEW (shown after generation) -->
+  <div class="response-view hidden" id="responseView">
+    <div class="response-canvas">
+      <!-- User message bubble -->
+      <div class="msg-user">
+        <span class="msg-user-text" id="msgUserText">low fi hip hop track</span>
+      </div>
+      <!-- Gemini response -->
+      <div class="msg-gemini">
+        <div class="msg-gemini-label" id="msgGeminiLabel">Here's your track</div>
+        <!-- Music response card -->
+        <div class="music-response-card" id="musicResponseCard">
+          <!-- Loading state — shimmer skeleton -->
+          <div class="music-response-loading" id="musicResponseLoading">
+            <div class="shimmer-wrap">
+              <div class="shimmer-block shimmer-art"></div>
+            </div>
+          </div>
+          <!-- Track content -->
+          <div class="music-response-content hidden" id="musicResponseContent">
+            <div class="mr-artwork-wrap" id="mrArtworkWrap">
+              <img class="mr-artwork-img" id="mrArtworkImg" src="" alt="Album art">
+              <div class="mr-artwork-overlay">
+                <div class="mr-play-btn" id="mrPlayBtn">
+                  <span class="material-symbols-outlined">play_arrow</span>
+                </div>
+                <div class="mr-progress-wrap">
+                  <div class="mr-progress-fill" id="mrProgressFill"></div>
+                </div>
+              </div>
+            </div>
+            <div class="mr-track-info">
+              <div class="mr-track-title" id="mrTrackTitle">Track Title</div>
+              <div class="mr-track-meta" id="mrTrackMeta">Generated track</div>
+            </div>
+          </div>
+          <!-- Action bar -->
+          <div class="mr-action-bar" id="mrActionBar">
+            <div class="mr-actions-left">
+              <span class="material-symbols-outlined mr-action-btn" title="Good response">thumb_up</span>
+              <span class="material-symbols-outlined mr-action-btn" title="Bad response">thumb_down</span>
+              <span class="material-symbols-outlined" style="color:rgba(0,0,0,0.54); cursor:default; font-size:18px; width:34px; height:34px; display:flex; align-items:center; justify-content:center;" title="Redo">redo</span>
+              <span class="material-symbols-outlined mr-action-btn" title="Copy">content_copy</span>
+              <span class="material-symbols-outlined mr-action-btn" id="mrShareBtn" title="Share">share</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- PILL INPUT -->
   <div class="input-wrap">
@@ -1072,6 +1488,26 @@
         <!-- Right Icon -->
         <div class="pill-icon" id="btnGenerate">
           <span class="material-symbols-outlined" id="genBtnIcon">mic</span>
+          <div class="stop-btn-wrap"><div class="stop-btn-circle"><div class="stop-btn-square"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed input pill (active when response view is shown) -->
+  <div class="response-input-fixed" id="responseInputFixed">
+    <div class="input-pill" id="responseInputPill">
+      <div class="input-content">
+        <div class="pill-icon">
+          <span class="material-symbols-outlined">add</span>
+        </div>
+        <div class="pill-text-container">
+          <div class="pill-divider"></div>
+          <input class="pill-text-input" id="promptInputAlt" type="text" placeholder="Ask Gemini" style="border:none; outline:none; background:transparent; flex:1; font-family:'Google Sans Flex',sans-serif; font-size:15px; color:#000;"/>
+        </div>
+        <div class="pill-icon" id="btnGenerateAlt">
+          <span class="material-symbols-outlined" id="genBtnIconAlt">mic</span>
+          <div class="stop-btn-wrap"><div class="stop-btn-circle"><div class="stop-btn-square"></div></div></div>
         </div>
       </div>
     </div>
@@ -1080,12 +1516,48 @@
   <div class="bottom-pad"></div>
 </main>
 
+<!-- Share Modal -->
+<div class="share-overlay" id="shareOverlay">
+  <div class="share-sheet" id="shareSheet">
+    <div class="share-header">
+      <span class="share-title">Share track</span>
+      <div class="share-close" id="shareCloseBtn"><span class="material-symbols-outlined">close</span></div>
+    </div>
+    <!-- Primary CTA: Lyria Radio toggle -->
+    <div class="share-lyria-row" id="shareLyriaRow">
+      <div class="share-lyria-bubble">
+        <span class="material-symbols-outlined" style="color:#2051DA; font-size:24px;">music_note</span>
+      </div>
+      <div class="share-lyria-info">
+        <div class="share-lyria-name">Add to Lyria Radio</div>
+        <div class="share-lyria-sub">Let the community discover your track</div>
+      </div>
+      <div class="shr-toggle" id="lyriaToggle"><div class="shr-toggle-thumb"></div></div>
+    </div>
+    <div class="share-divider"></div>
+    <div class="share-options">
+      <div class="share-opt" id="shareCopyLinkBtn">
+        <div class="share-opt-icon"><span class="material-symbols-outlined">link</span></div>
+        <span class="share-opt-label" id="shareCopyLabel">Copy link</span>
+      </div>
+      <div class="share-opt" id="shareNativeBtn">
+        <div class="share-opt-icon"><span class="material-symbols-outlined">ios_share</span></div>
+        <span class="share-opt-label">Share via…</span>
+      </div>
+    </div>
+    <div class="share-done" id="shareDoneBtn">Done</div>
+  </div>
+</div>
+
   <!-- COLLAPSED PLAYER BAR -->
   <div class="collapsed-player" id="collapsedPlayer" onclick="expandPlayer(event)">
     <!-- Album art thumbnail — dual-layer for crossfade -->
     <div class="avatar" id="collapsedAvatar">
       <img id="collapsedArtBack" class="art-back" src="tracks/album_1.png" alt="">
       <img id="collapsedArtFront" class="art-front" src="tracks/album_1.png" alt="">
+      <div class="avatar-play-overlay" id="avatarPlayOverlay">
+        <span class="material-symbols-outlined" id="avatarPlayIcon">play_arrow</span>
+      </div>
     </div>
     <div class="info">
       <div class="title" id="collapsedTitle">Midnight Drift</div>
@@ -1104,9 +1576,9 @@
   <!-- EXPANDED STATE: Full-Height Panel -->
   <div class="expanded-sidebar" id="expandedSidebar">
     <!-- Header -->
-    <div class="header">
+    <div class="header" onclick="collapsePlayer()" style="cursor:pointer;">
       <span>Lyria Radio</span>
-      <div class="btn-collapse-sidebar" id="btnCollapseSidebar" onclick="collapsePlayer()">
+      <div class="btn-collapse-sidebar" id="btnCollapseSidebar">
         <span class="material-symbols-outlined">keyboard_arrow_down</span>
       </div>
     </div>
@@ -1132,19 +1604,30 @@
 
     <!-- Playback controls -->
     <div class="controls">
-      <span class="material-symbols-outlined" id="btnShuffle">shuffle</span>
+      <span class="material-symbols-outlined" id="btnFavorite">favorite</span>
       <span class="material-symbols-outlined" id="btnExpandedPrev">skip_previous</span>
       <div class="btn-play-large" id="btnExpandedPlay">
         <span class="material-symbols-outlined">play_arrow</span>
       </div>
       <span class="material-symbols-outlined" id="btnExpandedNext">skip_next</span>
-      <span class="material-symbols-outlined" id="btnExpandedRemix" title="Remix this track">music_note_add</span>
+      <span class="material-symbols-outlined" id="btnExpandedRemix" title="Remix this track" style="cursor:pointer; color:#000;">repeat</span>
     </div>
 
     <!-- Community track list -->
     <div class="community-panel">
-      <div class="community-header">From the community</div>
-      <div class="community-list" id="communityList"></div>
+      <div class="community-header">
+        <span>From the community</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span id="communityCount" style="font-size:11px;font-weight:500;color:rgba(0,0,0,0.38);letter-spacing:0.2px;"></span>
+          <span class="material-symbols-outlined" id="btnCommunityRefresh" title="Refresh" style="font-size:16px;cursor:pointer;color:rgba(0,0,0,0.35);transition:color 0.15s;" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,0.35)'">refresh</span>
+        </div>
+      </div>
+      <div class="community-list" id="communityList">
+        <div class="community-skeleton">
+          <div class="sk-row"></div><div class="sk-row"></div><div class="sk-row"></div>
+        </div>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -1158,24 +1641,15 @@
 
 
 // ── Community tracks — pre-populated synchronously so UI works even if API fails ──
-let COMMUNITY_TRACKS = [
-  { id: '1',  title: 'Midnight Drift',   prompt: 'Chill lo-fi tracks on Mars',       creatorInitials: 'EB',  avatar: 'E', name: 'Eric b',   creator: '@ericb',   emoji: '🎵', likes: 12, hasAudio: true, localPath: 'tracks/track_1.wav',  albumArt: 'tracks/album_1.png' },
-  { id: '2',  title: 'Neon Horizon',     prompt: 'Synthwave beats',                  creatorInitials: 'U2',  avatar: 'U', name: 'user 2',   creator: '@user2',   emoji: '🎵', likes: 5,  hasAudio: true, localPath: 'tracks/track_2.wav',  albumArt: 'tracks/album_2.png' },
-  { id: '3',  title: 'Cyber Pulse',      prompt: 'Cyberpunk beats',                  creatorInitials: 'U3',  avatar: 'U', name: 'user 3',   creator: '@user3',   emoji: '🎵', likes: 8,  hasAudio: true, localPath: 'tracks/track_1.wav',  albumArt: 'tracks/album_3.png' },
-  { id: '4',  title: 'Solar Flare',      prompt: 'Ambient solar drones',             creatorInitials: 'U4',  avatar: 'U', name: 'user 4',   creator: '@user4',   emoji: '🎵', likes: 3,  hasAudio: true, localPath: 'tracks/track_2.wav',  albumArt: 'tracks/album_4.png' },
-  { id: '5',  title: 'Lunar Drift',      prompt: 'Slow space ambient',               creatorInitials: 'U5',  avatar: 'U', name: 'user 5',   creator: '@user5',   emoji: '🎵', likes: 7,  hasAudio: true, localPath: 'tracks/track_5.wav',  albumArt: 'tracks/album_5.png' },
-  { id: '6',  title: 'Stellar Wind',     prompt: 'Fast cosmic sweep',                creatorInitials: 'U6',  avatar: 'U', name: 'user 6',   creator: '@user6',   emoji: '🎵', likes: 9,  hasAudio: true, localPath: 'tracks/track_6.wav',  albumArt: 'tracks/album_6.png' },
-  { id: '7',  title: 'Galactic Groove',  prompt: 'Funky space beat',                 creatorInitials: 'U7',  avatar: 'U', name: 'user 7',   creator: '@user7',   emoji: '🎵', likes: 15, hasAudio: true, localPath: 'tracks/track_7.wav',  albumArt: 'tracks/album_7.png' },
-  { id: '8',  title: 'Nebula Beats',     prompt: 'Deep space lo-fi',                 creatorInitials: 'U8',  avatar: 'U', name: 'user 8',   creator: '@user8',   emoji: '🎵', likes: 2,  hasAudio: true, localPath: 'tracks/track_8.wav',  albumArt: 'tracks/album_8.png' },
-  { id: '9',  title: 'Quantum Realm',    prompt: 'Complex synth arps',               creatorInitials: 'U9',  avatar: 'U', name: 'user 9',   creator: '@user9',   emoji: '🎵', likes: 11, hasAudio: true, localPath: 'tracks/track_9.wav',  albumArt: 'tracks/album_9.png' },
-  { id: '10', title: 'Cosmic Dust',      prompt: 'Fading echoes in zero gravity',    creatorInitials: 'U10', avatar: 'U', name: 'user 10',  creator: '@user10',  emoji: '🎵', likes: 4,  hasAudio: true, localPath: 'tracks/track_10.wav', albumArt: 'tracks/album_10.png' },
-];
+let COMMUNITY_TRACKS = [];
 
-// ── API base — in production served from the same Cloud Run origin ──
+// ── API base — resolved once at startup ──
+const GENERATE_API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : '';
 const API_BASE = (() => {
-  // velvet-next dev server runs on :3000, lyria-radio static server on :5000
-  // In production both are served from the same Cloud Run URL.
-  if (window.location.port === '5000' || window.location.port === '8080') {
+  // In production (Cloud Run) the HTML and API share the same origin.
+  // In local dev the static server (any port) and Next.js (:3000) differ.
+  const { hostname, port, protocol } = window.location;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return 'http://localhost:3000';
   }
   return ''; // same origin in production
@@ -1183,56 +1657,148 @@ const API_BASE = (() => {
 
 // ── User identity (first + last initial) stored in localStorage ──
 function getUserInitials() {
-  return localStorage.getItem('lyriaUserInitials') || null;
+  return localStorage.getItem('lyriaUserInitials') || 'bollman';
 }
 function setUserInitials(initials) {
   localStorage.setItem('lyriaUserInitials', initials.slice(0, 20));
 }
 
-// ── Optionally augment with remote Firestore tracks ──
+let dynamicCommunityTracks = [];
+
+// ── IndexedDB for local persistence (up to 50 tracks) ──
+const DB_NAME = 'LyriaRadioDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'userTracks';
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onerror = (e) => reject(e);
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      db.createObjectStore(STORE_NAME, { keyPath: 'createdAt' });
+    };
+  });
+}
+
+async function saveTrackLocally(track) {
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    
+    // Add new track
+    store.add(track);
+    
+    // Enforce 50 track limit
+    const getAllRequest = store.getAll();
+    getAllRequest.onsuccess = () => {
+      const tracks = getAllRequest.result;
+      if (tracks.length > 50) {
+        tracks.sort((a,b) => a.createdAt - b.createdAt);
+        const toDelete = tracks.length - 50;
+        const deleteTx = db.transaction(STORE_NAME, 'readwrite');
+        const deleteStore = deleteTx.objectStore(STORE_NAME);
+        for(let i=0; i<toDelete; i++) {
+          deleteStore.delete(tracks[i].createdAt);
+        }
+      }
+    };
+  } catch(e) {
+    console.warn('[DB] Could not save track to IndexedDB:', e);
+  }
+}
+
+async function loadLocalTracks() {
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.getAll();
+    return new Promise((resolve) => {
+      request.onsuccess = () => {
+        const tracks = request.result;
+        tracks.sort((a,b) => b.createdAt - a.createdAt); // Newest first
+        resolve(tracks);
+      };
+      request.onerror = () => resolve([]);
+    });
+  } catch(e) {
+    console.warn('[DB] Could not load tracks from IndexedDB:', e);
+    return [];
+  }
+}
+
+function timeAgo(ms) {
+  const diff = Date.now() - ms;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+  return 'over a day ago';
+}
+
 async function loadCommunityTracks() {
+  const list = document.getElementById('communityList');
+  const countEl = document.getElementById('communityCount');
+  if (list) {
+    list.innerHTML = `<div class="community-skeleton"><div class="sk-row"></div><div class="sk-row"></div><div class="sk-row"></div></div>`;
+  }
   try {
     const res = await fetch(`${API_BASE}/api/lyria-tracks`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const remote = (data.tracks || []).map(t => ({
-      id:               t.id,
-      title:            t.title,
-      prompt:           t.prompt,
-      creatorInitials:  t.creatorInitials,
-      avatar:           t.creatorInitials.charAt(0),
-      name:             t.creatorInitials,
-      creator:          '@' + t.creatorInitials.toLowerCase(),
-      emoji:            '🎵',
-      likes:            t.likes || 0,
-      audioData:        null,
-      hasAudio:         t.hasAudio,
-      isRemote:         true,
+    
+    // Firestore is the source of truth, but we keep local optimistic tracks
+    // that have been shared but not yet returned by the server.
+    const fetchedTracks = data.tracks || [];
+    const optimistic = dynamicCommunityTracks.filter(t => 
+      !t.isRemote && !fetchedTracks.some(ft => ft.prompt === t.prompt)
+    );
+    
+    dynamicCommunityTracks = [...optimistic, ...fetchedTracks].map(t => ({
+      ...t,
+      name: t.name || t.creatorInitials || 'Community'
     }));
-    // Append remote tracks that aren’t already loaded locally
-    const localIds = new Set(COMMUNITY_TRACKS.map(t => t.id));
-    const newRemote = remote.filter(t => !localIds.has(t.id));
-    if (newRemote.length > 0) {
-      COMMUNITY_TRACKS = [...COMMUNITY_TRACKS, ...newRemote];
-      renderSidebar();
-      renderCommunityPanel();
-      const scEl = document.getElementById('sidebarCount'); if (scEl) scEl.textContent = COMMUNITY_TRACKS.length;
-    }
+    COMMUNITY_TRACKS = [...dynamicCommunityTracks];
+    renderSidebar();
+    renderCommunityPanel();
   } catch(e) {
     console.warn('[DB] Could not load remote tracks:', e.message);
+    if (list) list.innerHTML = `<div class="community-empty"><span class="material-symbols-outlined">wifi_off</span><span>Couldn\'t load tracks</span></div>`;
+    if (countEl) countEl.textContent = '';
   }
 }
 
-// Refresh every 24 hours (in case the tab stays open)
-setInterval(loadCommunityTracks, 24 * 60 * 60 * 1000);
+// Refresh every 2 minutes
+// Community tracks load on player open (see expandPlayer)
 
 // ── State ──
 let currentIndex = 0;
 let isPlaying = false;
 let isLiked = false;
 let isGenerating = false;
+let pendingTrack  = null;
+let lyriaShared   = false;
+let generateController = null;
+function stopGenerate() {
+  if (generateController) generateController.abort();
+}
 let progressInterval = null;
 let elapsed = 0;
+
+// ── Response card audio state ──
+let responseAudio = null;
+let responseIsPlaying = false;
+
+function pauseResponseAudio() {
+  if (responseAudio && !responseAudio.paused) {
+    responseAudio.pause();
+    responseIsPlaying = false;
+    const icon = document.querySelector('#mrPlayBtn .material-symbols-outlined');
+    if (icon) icon.textContent = 'play_arrow';
+  }
+}
 
 const TRACK_DURATION = 30;
 
@@ -1271,7 +1837,12 @@ function buildWaveform() {
     wf.appendChild(bar);
   }
 }
-buildWaveform();
+// Call after DOM is ready to avoid 'waveform element not found' warning
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', buildWaveform);
+} else {
+  buildWaveform();
+}
 
 function updateWaveform(progress) {
   const bars = document.querySelectorAll('.wf-bar');
@@ -1310,43 +1881,148 @@ function renderSidebar() {
 }
 renderSidebar();
 
-// ── Community Panel render ──
+// ── Community Panel render — driven by live Firestore data ──
 function renderCommunityPanel() {
-  const communityList = document.getElementById('communityList');
-  if (!communityList) return;
-  communityList.innerHTML = '';
-  // Only show top 10 as per design request
-  COMMUNITY_TRACKS.slice(0, 10).forEach((t, i) => {
+  const list = document.getElementById('communityList');
+  const countEl = document.getElementById('communityCount');
+  if (!list) return;
+
+  if (!dynamicCommunityTracks || dynamicCommunityTracks.length === 0) {
+    list.innerHTML = `<div class="community-empty"><span class="material-symbols-outlined">library_music</span><strong style="color:rgba(0,0,0,0.55);font-size:13px;">No tracks yet</strong><span>Generate a track to be the first!</span></div>`;
+    if (countEl) countEl.textContent = '';
+    return;
+  }
+
+  if (countEl) countEl.textContent = dynamicCommunityTracks.length + ' track' + (dynamicCommunityTracks.length !== 1 ? 's' : '') + ' · 7d';
+
+  list.innerHTML = '';
+  dynamicCommunityTracks.forEach((t, i) => {
+    const initials = (t.creatorInitials || '??').slice(0, 2).toUpperCase();
+    const hue = ((initials.charCodeAt(0) || 65) + (initials.charCodeAt(1) || 65)) * 13 % 360;
+    const meta = [t.genre, t.bpm ? t.bpm + ' BPM' : null, timeAgo(t.createdAt)].filter(Boolean).join(' · ');
+
+    const fallbackCover = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23192967'/%3E%3Ctext x='50' y='50' font-size='20' fill='white' text-anchor='middle' dominant-baseline='middle'%3E%F0%9F%8E%B5%3C/text%3E%3C/svg%3E`;
+    const avatarHtml = `<img src="${t.coverData || t.albumArt || fallbackCover}" class="ct-avatar-chip" style="object-fit:cover;" />`;
+
     const item = document.createElement('div');
-    item.className = 'community-item' + (i === currentIndex ? ' is-active' : '');
-    // Use real album art if available, otherwise colored SVG placeholder
-    const artSrc = t.albumArt
-      ? t.albumArt
-      : `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%2314204F'/%3E%3Ctext x='50' y='50' font-family='sans-serif' font-size='20' fill='white' text-anchor='middle' dominant-baseline='middle'%3E🎵%3C/text%3E%3C/svg%3E`;
+    item.className = 'community-item';
     item.innerHTML = `
-      <img src="${artSrc}" alt="${t.title}" class="list-avatar">
+      ${avatarHtml}
       <div class="track-info">
-        <span class="track-name">${t.title}</span>
-        <span class="user-name">${t.creator}</span>
+        <span class="track-name">${t.title || t.genre || 'Track'}</span>
+        <span class="user-name">${meta}</span>
       </div>
       <div class="trailing-icons" style="display:flex;align-items:center;gap:4px;">
-        <span class="material-symbols-outlined community-remix-btn" data-idx="${i}" title="Remix this track" style="font-size:18px;cursor:pointer;opacity:0.6;transition:opacity 0.2s;">music_note_add</span>
-        <span class="material-symbols-outlined community-play-btn" data-idx="${i}" style="cursor:pointer;">play_arrow</span>
+        <span class="material-symbols-outlined community-remix-btn" data-idx="${i}" title="Use this prompt" style="font-size:18px; cursor:pointer; color:#000; opacity:0.8; transition:opacity 0.2s;">repeat</span>
+        <span class="material-symbols-outlined community-play-btn" data-idx="${i}" style="cursor:pointer;font-size:20px;color:rgba(0,0,0,0.55);">play_circle</span>
       </div>
     `;
-    item.querySelector('.community-play-btn').addEventListener('click', (e) => { e.stopPropagation(); playTrack(i); });
+
+    const remixBtn = item.querySelector('.community-remix-btn');
+    remixBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); // prevent playing track
+      if (t && t.prompt) {
+        const inp1 = document.getElementById('promptInput');
+        const inp2 = document.getElementById('promptInputAlt');
+        if (inp1) inp1.value = t.prompt;
+        if (inp2) inp2.value = t.prompt;
+        if (typeof syncSendIcon === 'function') {
+          syncSendIcon('promptInput', 'genBtnIcon', 'btnGenerate');
+          syncSendIcon('promptInputAlt', 'genBtnIconAlt', 'btnGenerateAlt');
+        }
+      }
+    });
+
+    item.addEventListener('click', async (e) => {
+      // Ignore if clicking the remix button
+      if (e.target.closest('.community-remix-btn')) return;
+      
+      const btn = item.querySelector('.community-play-btn');
+      btn.textContent = 'progress_activity';
+      btn.style.animation = 'spin 1s linear infinite';
+      
+      try {
+        let blobUrl;
+        if (t.audioData) {
+          // Play immediately if we already have the audio data in memory (locally generated)
+          const raw = atob(t.audioData), bytes = new Uint8Array(raw.length);
+          for (let j = 0; j < raw.length; j++) bytes[j] = raw.charCodeAt(j);
+          blobUrl = URL.createObjectURL(new Blob([bytes], { type: t.mimeType || 'audio/wav' }));
+        } else {
+          // Fetch from API if it's a remote track
+          const res = await fetch(`${API_BASE}/api/lyria-tracks/${t.id}/audio`);
+          if (!res.ok) throw new Error(`audio fetch failed: ${res.status}`);
+          const { audioData, mimeType } = await res.json();
+          const raw = atob(audioData), bytes = new Uint8Array(raw.length);
+          for (let j = 0; j < raw.length; j++) bytes[j] = raw.charCodeAt(j);
+          blobUrl = URL.createObjectURL(new Blob([bytes], { type: mimeType || 'audio/wav' }));
+        }
+
+        // Update expanded player header
+        const expTitle = document.getElementById('expandedTitle');
+        const expArtist = document.getElementById('expandedArtist');
+        const collTitle = document.getElementById('collapsedTitle');
+        const collArtist = document.getElementById('collapsedArtist');
+        if (expTitle) expTitle.textContent = t.title || 'Community Track';
+        if (expArtist) expArtist.textContent = t.creatorInitials || 'Community';
+        if (collTitle) collTitle.textContent = t.title || 'Community Track';
+        if (collArtist) collArtist.textContent = t.creatorInitials || 'Community';
+
+        // Update covers as well!
+        const coverSrc = t.coverData || t.albumArt || fallbackCover;
+        crossfadeArt(
+          document.getElementById('collapsedArtBack'),
+          document.getElementById('collapsedArtFront'),
+          coverSrc
+        );
+        crossfadeArt(
+          document.getElementById('expandedArtBack'),
+          document.getElementById('expandedArtFront'),
+          coverSrc
+        );
+
+        // Play blob directly via crossfade engine — skip the static fallback queue
+        ensureAudioCtx();
+        const nextSlot = (activeSlot + 1) % 2;
+        isPlaying = true;
+        const playPauseIcon = getPlayPauseIcon();
+        if (playPauseIcon) playPauseIcon.textContent = 'pause';
+        const btnExpandedPlay = document.getElementById('btnExpandedPlay');
+        if (btnExpandedPlay) btnExpandedPlay.querySelector('.material-symbols-outlined').textContent = 'pause';
+
+        crossfadeToSlot(nextSlot, blobUrl, () => {
+          // On end: just stop (no auto-advance for community tracks)
+          isPlaying = false;
+          const icon = getPlayPauseIcon();
+          if (icon) icon.textContent = 'play_arrow';
+        });
+
+        btn.textContent = 'play_circle';
+        btn.style.animation = '';
+      } catch(err) {
+        console.warn('[Community] play failed:', err);
+        btn.textContent = 'play_circle';
+        btn.style.animation = '';
+      }
+    });
+
     item.querySelector('.community-remix-btn').addEventListener('click', (e) => {
       e.stopPropagation();
-      // "Add" = drop prompt into the input box and close expanded view
-      const prompt = document.getElementById('promptInput');
-      if (prompt) { prompt.value = t.prompt; prompt.focus(); }
+      const inp = document.getElementById('promptInput');
+      if (inp && t.prompt) { inp.value = t.prompt; inp.focus(); }
       collapsePlayer();
     });
-    item.addEventListener('click', () => playTrack(i));
-    communityList.appendChild(item);
+
+    list.appendChild(item);
   });
 }
 renderCommunityPanel();
+
+// Wire up refresh button
+(function() {
+  const btn = document.getElementById('btnCommunityRefresh');
+  if (btn) btn.addEventListener('click', () => loadCommunityTracks());
+})();
 
 // Scroll active item into view (no-op if sidebar queue no longer exists)
 function scrollActiveIntoView() {
@@ -1445,10 +2121,7 @@ function crossfadeToSlot(nextIdx, blobUrl, onEnded) {
 
   next.audio.addEventListener('error', onError, { once: true });
   next.audio.addEventListener('canplaythrough', onCanPlay, { once: true });
-
-  next.audio.addEventListener('error', e => {
-    console.error('[Audio] Slot error:', e.message || e);
-  }, { once: true });
+  // Note: no duplicate error listener here — onError above already handles it
 }
 
 function attachProgressToSlot(slot) {
@@ -1508,7 +2181,7 @@ async function preloadTrack(idx) {
   if (!track.audioData) {
     try {
       console.log(`[Preload] idx ${idx}: "${track.prompt.slice(0,40)}..."`);
-      const res = await fetch('/api/generate-track', {
+      const res = await fetch(GENERATE_API_BASE + '../api/generate-track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: track.prompt, bpm: 90 })
@@ -1562,7 +2235,7 @@ async function playTrack(idx) {
   if (collapsedArtist) collapsedArtist.textContent = track.name;
 
   // Crossfade collapsed album art thumbnail
-  const newArtSrc = track.albumArt || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23192967'/%3E%3Ctext x='50' y='50' font-size='20' fill='white' text-anchor='middle' dominant-baseline='middle'%3E%F0%9F%8E%B5%3C/text%3E%3C/svg%3E`;
+  const newArtSrc = track.coverData || track.albumArt || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23192967'/%3E%3Ctext x='50' y='50' font-size='20' fill='white' text-anchor='middle' dominant-baseline='middle'%3E%F0%9F%8E%B5%3C/text%3E%3C/svg%3E`;
   crossfadeArt(
     document.getElementById('collapsedArtBack'),
     document.getElementById('collapsedArtFront'),
@@ -1582,6 +2255,8 @@ async function playTrack(idx) {
 
   const btnLike = document.getElementById('btnLike');
   if (btnLike) btnLike.classList.remove('is-liked');
+  const btnFav = document.getElementById('btnFavorite');
+  if (btnFav) { btnFav.style.fontVariationSettings = "'FILL' 0"; btnFav.style.color = ''; }
   isLiked = false;
   elapsed = 0;
 
@@ -1622,7 +2297,7 @@ async function playTrack(idx) {
         } else {
           // Generate fresh via Lyria model
           console.log(`[Lyria] Generating idx ${idx}: "${track.prompt.slice(0,50)}..."`);
-          const res = await fetch('/api/generate-track', {
+          const res = await fetch(GENERATE_API_BASE + '../api/generate-track', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ prompt: track.prompt, bpm: 90 })
@@ -1872,19 +2547,7 @@ function startCountdownArc(durationMs) {
 }
 
 async function getDjVoice(text) {
-  try {
-    const res = await fetch('/api/dj-voice', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.audio && data.audio.data) {
-        return `data:${data.audio.mimeType};base64,${data.audio.data}`;
-      }
-    }
-  } catch(e) { console.warn('[DJ Voice Preload] failed:', e); }
+  // /api/dj-voice route not available — return null to fall back to Web Speech
   return null;
 }
 
@@ -1914,25 +2577,25 @@ function speakDjText(text, onEnd, audioUrl = null) {
     return;
   }
 
-  fetch('/api/dj-voice', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text })
-  })
-  .then(res => res.ok ? res.json() : Promise.reject('API failed'))
-  .then(data => {
-    if (data.audio && data.audio.data) {
-      const url = `data:${data.audio.mimeType};base64,${data.audio.data}`;
-      playAudio(url);
-    } else {
-      console.warn('[DJ Voice] No audio data');
+  // /api/dj-voice not available — fall back to Web Speech API
+  if ('speechSynthesis' in window) {
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.rate = 0.95;
+    utt.pitch = 1.0;
+    bars.forEach(b => b.classList.add('speaking'));
+    utt.onend = () => {
+      bars.forEach(b => b.classList.remove('speaking'));
       if (onEnd) onEnd();
-    }
-  })
-  .catch(err => {
-    console.error('[DJ Voice] Error:', err);
+    };
+    utt.onerror = () => {
+      bars.forEach(b => b.classList.remove('speaking'));
+      if (onEnd) onEnd();
+    };
+    speechSynthesis.speak(utt);
+  } else {
+    // No TTS available at all — skip silently
     if (onEnd) onEnd();
-  });
+  }
 }
 
 // ── DJ Break Orchestrator ──
@@ -1944,6 +2607,8 @@ const DJ_PROMPTS = [
 ];
 
 async function showDjBreak(onComplete) {
+  if (onComplete) onComplete();
+  return;
   initDjWaveform();
 
   // Build personalized script for the track that just finished
@@ -1999,7 +2664,7 @@ async function showDjBreak(onComplete) {
   // Generate and play Lyria break music async (background — don't block speech)
   const djPrompt = DJ_PROMPTS[Math.floor(Math.random() * DJ_PROMPTS.length)];
   let breakAudEl = null;
-  fetch('/api/generate-track', {
+  fetch(GENERATE_API_BASE + '../api/generate-track', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt: djPrompt, bpm: 80 }),
@@ -2071,86 +2736,423 @@ function remixTrack(idx) {
   }
 
 // ── Generate new track ──
-document.getElementById('btnGenerate').addEventListener('click', async () => {
-  const prompt = promptInput.value.trim();
+
+function compressImage(base64Str, maxWidth, maxHeight, quality) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      let width = img.width;
+      let height = img.height;
+      if (width > height) {
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width = Math.round((width * maxHeight) / height);
+          height = maxHeight;
+        }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = (err) => reject(err);
+  });
+}
+
+async function generateAlbumCover(prompt, title) {
+  const instructions = `1. ROLE & CREATIVE PHILOSOPHY
+You are a visionary Art Director at a globally respected design agency. Your superpower is absolute versatility, disciplined restraint, and serendipitous creativity. Your goal is to create an iconic, authentic 2D album cover that feels like a physical, authored, and culturally resonant artifact. 
+
+Your creative sensibility is shaped by formal training at institutions such as RISD and Parsons, grounding your work in craft, theory, and disciplined experimentation. Your work has been recognized by Cannes Lions and D&AD for clarity, restraint, and cultural impact. You operate at the intersection of art, culture, and design, rejecting safe, trend-driven, “flat AI stock” aesthetics in favor of authored visual systems. Every image you direct feels deliberate, tactile, and timeless—never generic, never algorithmic.
+
+Premium album art is iconic at a glance, memorable in silhouette, and radically uncluttered. You must elevate any music into a striking graphic centerpiece. Music comes from every corner of the globe, spanning countless decades, cultures, and subcultures. There is no default style; there is only the perfect, bespoke aesthetic for the specific origin and energy of the track.
+
+Album artwork should function as a music artifact—physical, tactile, and collectable. The image must feel authored and intentional, as if it exists as a real object pulled from record-store bins—an image with enough graphic punch and attitude to exist as an iconic, full-bleed album cover or a heavy cotton band tee.
+
+Prioritize restraint, strong composition, negative space, and material presence. The result should feel discovered, not manufactured; referential without imitation; timeless rather than algorithmic—an image with lineage, weight, and long-term resonance.
+
+2. INPUTS
+You will receive labeled fields: Lyrics, Caption (always present), and optionally Title, Genre, Mood, and Description. Use all available signals to shape your creative decisions.
+
+3. HOW TO MAKE DECISIONS (THE CREATIVE ENGINE)
+Crucial Context: You must endlessly extrapolate these principles to invent bespoke visual rules for whatever genre, decade, or country the music stems from. 
+
+* Global & Temporal Authenticity (Break the Default Reflex): Read the Caption and Genre to identify the exact cultural, geographic, and temporal lineage of the track. Build a highly specific visual world. Tailor the exact medium, lighting, and palette to the specific world (e.g., acoustic tradition, global pop, urban street movement, or cerebral electronic). 
+* Post-Processing & Finish (The Analog Grade): To ensure images feel captured or crafted rather than digitally rendered, always apply a subtle analog film or print finish. Incorporate gentle organic film grain, softly lifted blacks, natural tonal rolloff, gentle highlight halation/bloom, mild color warmth, and slight lens softness. This "analog grading" must offset any default "flat AI stock" color palettes and provide a premium, tactile feel to every cover.
+* Medium Diversity & "The Beautifully Imperfect": Things do not always need to look perfect, glossy, or camera-captured. Actively explore the infinite spectrum of human art-making. Invent a unique, bespoke medium for every single prompt. Explore styles such as rough sketching, wet paints, traditional analog printmaking, mixed-media collages, or avant-garde graphic design.
+* The Singular Hook (Extreme Restraint): Read the Title and Lyrics. Do not attempt to tell the whole story or draw multiple concepts at once. Choose ONE dominant, symbolic visual metaphor or environment. The artwork must feel like a unified, patient design piece, not a cluttered "mashup".
+* The Tonal Shift (Unified Collision): If the track features a massive dynamic shift, do not draw a timeline or a split screen. Show these two energies colliding in a single, unified moment.
+* Typography Diversity & Radical Materiality (Optional): You do not have to include text. If you include the Title, you must deliver true graphic design-quality typography. Demonstrate deep knowledge of prestigious type traditions and families. Typography should feel intentional, refined, and crafted by a master typographer. Use diverse typographic expression — combining sans-serifs, serifs, italics, bold weights, condensed or expanded styles, and emphasized text to create rhythm, hierarchy, and contrast. Actively embrace hand-crafted, bespoke lettering when appropriate to the genre. Treat these organic, hand-drawn styles with the same rigorous design principles as established typefaces. Apply professional principles including precise kerning, balanced leading, optical alignment, thoughtful tracking, and clear hierarchy.** You may use one of two structural approaches:
+    * 1. The Stark Graphic Overlay (Classic Editorial): Best for urban, beat-driven, electronic, pop, or vintage genres. Treat the typography as a completely separate, flat 2D graphic layer on top of the artwork. Embrace structured, multi-weight editorial layouts. Break away from boring "one font style" defaults. The text must pop aggressively off the background, using crisp colors that simulate thick printed ink.
+    * 2. In-World Radical Materiality (Diegetic Text): Best for atmospheric, heavy, organic, or immersive genres. Embed the text physically within the environment so it becomes part of the scene's architecture. Let the genre dictate the material itself—grown from natural elements (e.g., twisting roots), formed entirely by raw organic matter (e.g., spilled earth, liquid, bone), carved into wood, or cast in shadow.
+
+4. ABSOLUTE VISUAL CONSTRAINTS (CRITICAL)
+* ZERO PEOPLE: Under no circumstances should any human figures, faces, hands, body parts, or silhouettes appear anywhere in the image. Focus entirely on abstract, symbolic, or environmental imagery.
+* TYPOGRAPHY RULES: The only text allowed is the exact value from the Title: field. Never guess, infer, or extract the title. If no Title: field is present, the artwork must contain zero text.
+* NO PERFECT GEOMETRY: Avoid over-reliance on perfect, centered circles. Explore rectilinear forms, jagged edges, or organic blobs that defy perfect, predictable AI geometry.
+* INTENTIONAL WEAR, FRAMING & PATINA: The default composition must be FULL BLEED (edge-to-edge). ZERO BORDERS. ZERO FRAMES. ZERO WHITE MARGINS. Add a genre-appropriate physical-media patina (for example, but not limited to scuffed edges, halftone texture, analog grain.)
+* NO CLUTTER OR CHEESY MELODRAMA: Avoid cramming multiple unrelated objects into the scene. Avoid sentimental, literal, or cliché visual tropes. Maintain a clear visual hierarchy.
+* NO SPLIT SCREENS: Do not create comic panels or divided canvases.
+* NO 3D PRODUCT MOCKUPS: You are generating the flat 1:1 2D album cover artwork itself. Do not draw a 3D vinyl record sticking out of a sleeve, a plastic CD case, 3D mockup borders, apparel/T-shirts, or peeling sticker edges.
+* SQUARE ASPECT RATIO: The generated image MUST be a perfect square with a 1:1 aspect ratio.
+
+5. COMPOSITION & THE ELEMENT OF SURPRISE
+* Edge-to-Edge Immersion: The artwork must bleed entirely off the edges of the canvas 99% of the time. The image must fill the entire 1:1 frame completely. NO borders, NO frames, NO white background, NO blank background, NO negative canvas outside the artwork.
+* Iconic & Merch-Ready: Even when highly abstract or deeply textured, the artwork should feel like authentic music memorabilia. Design with a bold visual hierarchy and memorable silhouettes that read clearly and carry a strong band-culture aesthetic.
+* Iconic Minimalism & Negative Space: Prioritize vast negative space within the image itself and a strong, singular focal point. 
+* Dynamic Framing & The Bleed: Allow your singular subject to bleed off the edges of the canvas. Push subjects toward the edges or use extreme camera angles to create visual tension.
+
+6. EXECUTION STEPS
+Before generating the final image, you must sequentially process the following steps:
+1. Sonic & Cultural Blueprint: Read the Caption and Genre. Identify the exact cultural lineage and sonic identity of the track. Lock in a highly specific, bespoke artistic medium and a deliberate lighting/color palette.
+2. The Singular Hook & Integration: Read the Lyrics. Select ONE dominant visual metaphor and discard all other lyrical details to guarantee an uncluttered, unified composition.
+3. Typography Strategy & Logic: If the Title: field is present, decide if text elevates the design. If yes, choose your approach based on the genre and mood: Use the structured Graphic Overlay (Option 1) for urban/electronic/print aesthetics. Use In-World Materiality (Option 2) for atmospheric/organic environments. Do not mix the two. Ensure NO lyrics or hallucinated words are included.
+4. The Analog & Physical Patina: Apply the post-processing finish. Incorporate gentle organic film grain, softly lifted blacks, highlight bloom, and physical wear to destroy any "flat AI stock" feeling.
+5. Constraint & Composition Check: Confirm ZERO humans, faces, hands, or silhouettes are in the scene. Confirm 1:1 aspect ratio, edge-to-edge bleed (no blank canvas, no 3D mockups), vast negative space, and no perfect geometry.
+6. Generate Artwork: Output the final continuous 2D album cover description based on these verified steps.`;
+  
+  try {
+    // Step 1: Get description
+    const analyzeRes = await fetch(GENERATE_API_BASE + '../api/studio-analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: instructions + "\n\nInputs:\nCaption: " + prompt + "\nTitle: " + title }] }]
+      })
+    });
+    
+    if (!analyzeRes.ok) throw new Error('Failed to analyze/generate description');
+    const analyzeData = await analyzeRes.json();
+    const description = analyzeData.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!description) throw new Error('No description returned');
+    
+    // Step 2: Get image
+    const genRes = await fetch(GENERATE_API_BASE + '../api/studio-generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: description }] }]
+      })
+    });
+    
+    if (!genRes.ok) throw new Error('Failed to generate image');
+    const genData = await genRes.json();
+    
+    const inlineData = genData.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+    if (inlineData) {
+      const originalBase64 = `data:${inlineData.mimeType || 'image/jpeg'};base64,${inlineData.data}`;
+      try {
+        console.log('[Cover] Compressing image to stay under Firestore limit...');
+        return await compressImage(originalBase64, 512, 512, 0.7);
+      } catch (err) {
+        console.warn('[Cover] Compression failed, using original:', err.message);
+        return originalBase64;
+      }
+    }
+    throw new Error('No image data in response');
+  } catch (e) {
+    console.warn('[Cover] Failed to generate cover:', e.message);
+    return null;
+  }
+}
+
+// ── Shared generate logic ──
+async function runGenerate(prompt) {
   if (!prompt || isGenerating) return;
 
-  // Ensure we have user initials before generating
+  // Ensure user initials
   let initials = getUserInitials();
-  if (!initials) {
-    const raw = window.prompt(
-      '👋 Quick! Enter your First Name and Last Initial (e.g. "Adeeti S."):',
-      ''
-    );
-    if (!raw || !raw.trim()) return; // user cancelled
-    initials = raw.trim().slice(0, 20);
+  if (!initials || initials.length <= 2) {
+    // Don't use 2-letter random — force re-fetch LDAP
+    initials = 'bollman';
     setUserInitials(initials);
   }
 
   isGenerating = true;
-  const genBtnIcon = document.getElementById('genBtnIcon');
-  genBtnIcon.textContent = 'progress_activity';
+
+  // Show stop affordance + create abort controller
+  generateController = new AbortController();
+  ['btnGenerate','btnGenerateAlt'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('is-generating');
+  });
+  // Reset gemini label
+  const lbl = document.getElementById('msgGeminiLabel');
+  if (lbl) lbl.classList.remove('is-visible');
+
+  // ── Enter response view ──
+  document.getElementById('responseView').classList.remove('hidden');
+  document.body.classList.add('response-view-active');
+  document.getElementById('collapsedPlayer').classList.add('is-mini');
+  document.getElementById('msgUserText').textContent = prompt;
+  document.getElementById('msgGeminiLabel').textContent = 'Here’s your track.';
+  document.getElementById('musicResponseLoading').style.display = '';
+  document.getElementById('musicResponseContent').classList.add('hidden');
+  document.getElementById('musicResponseCard').classList.add('is-loading');
+  if (document.getElementById('mrActionBar')) document.getElementById('mrActionBar').style.display = 'none';
+  // Scroll response view to top
+  const rv = document.getElementById('responseView');
+  rv.scrollTop = 0;
 
   try {
-    const res = await fetch('/api/generate-track', {
+    const res = await fetch(GENERATE_API_BASE + '../api/generate-track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, bpm: 90 })
+      body: JSON.stringify({ prompt, bpm: 90 }),
+      signal: generateController.signal
     });
     const data = await res.json();
 
     if (data.audio) {
       const title = promptToTitle(prompt);
 
-      // ── Save to Firestore DB (non-blocking — don't block playback) ──
-      fetch(`${API_BASE}/api/lyria-tracks`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt,
-          title,
-          creatorInitials: initials,
-          audioData: data.audio,
-        })
-      }).then(r => r.json()).then(saved => {
-        if (saved.id) {
-          console.log('[DB] Track saved to Firestore:', saved.id);
-        } else {
-          console.warn('[DB] Save response:', saved);
-        }
-      }).catch(e => console.warn('[DB] Could not save track:', e.message));
+      // Generate cover art in parallel (non-blocking)
+      let coverUrl = null;
+      try { coverUrl = await generateAlbumCover(prompt, title); }
+      catch(e) { console.warn('[Cover] Ignored failure:', e.message); }
 
-      // ── Add to local queue immediately for instant playback ──
-      const newTrack = {
-        id: Date.now(),
-        title,
-        creator: '@' + initials.toLowerCase(),
-        name: initials,
-        avatar: initials.charAt(0),
-        emoji: '✨',
-        prompt,
-        likes: 0,
-        audioData: data.audio,
-        isRemote: false,
+      // ── Update response card ──
+      document.getElementById('mrTrackTitle').textContent = title;
+      document.getElementById('mrTrackMeta').textContent = 'Generated by you · just now';
+      const artImg = document.getElementById('mrArtworkImg');
+      if (coverUrl) {
+        artImg.src = coverUrl;
+        artImg.style.display = '';
+      } else {
+        artImg.style.display = 'none';
+      }
+      document.getElementById('musicResponseLoading').style.display = 'none';
+      document.getElementById('musicResponseContent').classList.remove('hidden');
+      document.getElementById('musicResponseCard').classList.remove('is-loading');
+      if (document.getElementById('mrActionBar')) document.getElementById('mrActionBar').style.display = '';
+      // Fade up the gemini label
+      requestAnimationFrame(() => {
+        const lbl = document.getElementById('msgGeminiLabel');
+        if (lbl) lbl.classList.add('is-visible');
+      });
+
+      // ── Wire response card play button ──
+      const blobUrl = b64toBlobUrl(data.audio);
+      if (responseAudio) { try { responseAudio.pause(); } catch(e) {} }
+      responseAudio = new Audio(blobUrl);
+      responseIsPlaying = false;
+      responseAudio.onended = () => {
+        responseIsPlaying = false;
+        const icon = document.querySelector('#mrPlayBtn .material-symbols-outlined');
+        if (icon) icon.textContent = 'play_arrow';
+        // Reset progress
+        const pf = document.getElementById('mrProgressFill');
+        if (pf) pf.style.width = '0%';
       };
-      COMMUNITY_TRACKS.unshift(newTrack);
-      renderSidebar();
-      await playTrack(0);
+
+      // Update progress bar for response audio
+      let rafMr = null;
+      function tickMr() {
+        if (!responseAudio || responseAudio.paused || responseAudio.ended) return;
+        const t = responseAudio.currentTime || 0;
+        const d = (isFinite(responseAudio.duration) && responseAudio.duration > 0) ? responseAudio.duration : 30;
+        const pf = document.getElementById('mrProgressFill');
+        if (pf) pf.style.width = (t / d * 100) + '%';
+        rafMr = requestAnimationFrame(tickMr);
+      }
+      responseAudio.onplay = () => { if (rafMr) cancelAnimationFrame(rafMr); rafMr = requestAnimationFrame(tickMr); };
+
+      // Reset play button icon
+      const mrIcon = document.querySelector('#mrPlayBtn .material-symbols-outlined');
+      if (mrIcon) mrIcon.textContent = 'play_arrow';
+
+      // ── Store as pending track (added to community only when user shares) ──
+      pendingTrack = {
+        id: Date.now(), title,
+        creator: '@' + initials.toLowerCase(), name: initials,
+        avatar: initials.charAt(0), emoji: '\u2728', prompt,
+        coverData: coverUrl, likes: 0, audioData: data.audio,
+        isRemote: false, creatorInitials: initials,
+        genre: '', bpm: 90, createdAt: Date.now(),
+        hasAudio: true, mimeType: 'audio/wav',
+      };
+      lyriaShared = false;
+
     } else {
       throw new Error(data.error || 'No audio returned');
     }
   } catch(e) {
-    console.error('[Generate]', e);
-    alert(`Could not generate track: ${e.message}`);
+    if (e.name === 'AbortError') {
+      // User stopped generation — return to home state
+      document.getElementById('responseView').classList.add('hidden');
+      document.body.classList.remove('response-view-active');
+      document.getElementById('collapsedPlayer').classList.remove('is-mini');
+      document.getElementById('musicResponseCard').classList.remove('is-loading');
+      if (document.getElementById('mrActionBar')) document.getElementById('mrActionBar').style.display = '';
+    } else {
+      console.error('[Generate]', e);
+      document.getElementById('musicResponseLoading').innerHTML = `<div class="mr-loader-row" style="color:rgba(0,0,0,0.54)"><span class="material-symbols-outlined" style="font-size:20px;color:#E8384F">error</span><span class="mr-loader-text">Generation failed: ${e.message}</span></div>`;
+    }
   } finally {
     isGenerating = false;
-    const sp = document.getElementById('pillSpinner');
-    if (sp) sp.remove();
-    document.getElementById('genBtnIcon').style.display = '';
-    document.getElementById('genBtnLabel').textContent = 'Generate';
-    document.getElementById('btnGenerate').disabled = false;
-    promptInput.value = '';
+    generateController = null;
+    ['btnGenerate','btnGenerateAlt'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.disabled = false; el.classList.remove('is-generating'); }
+    });
+    // Clear both inputs + revert send icons to mic
+    const inp1 = document.getElementById('promptInput');
+    const inp2 = document.getElementById('promptInputAlt');
+    if (inp1) inp1.value = '';
+    if (inp2) inp2.value = '';
+    resetSendIcons();
   }
+}
+
+// Wire avatar play overlay (mini player)
+(function wireAvatarOverlay() {
+  const overlay = document.getElementById('avatarPlayOverlay');
+  if (!overlay) return;
+  overlay.addEventListener('click', (e) => {
+    e.stopPropagation(); // prevent expanding player
+    document.getElementById('btnPlay').click();
+  });
+  // Keep overlay icon in sync with main play icon
+  const mainIcon = document.getElementById('playPauseIcon');
+  const overlayIcon = document.getElementById('avatarPlayIcon');
+  if (mainIcon && overlayIcon) {
+    new MutationObserver(() => {
+      overlayIcon.textContent = mainIcon.textContent;
+    }).observe(mainIcon, { childList: true, characterData: true, subtree: true });
+  }
+})();
+
+// Wire response card play btn
+document.addEventListener('DOMContentLoaded', async () => {
+  // Immediately purge any stale 2-letter initials cached from old sessions
+  const cached = localStorage.getItem('lyriaUserInitials');
+  if (cached && cached.length <= 2) {
+    localStorage.removeItem('lyriaUserInitials');
+  }
+
+  // Fetch dynamic user info from IAP or local fallback
+  try {
+    const res = await fetch('../api/user');
+    const data = await res.json();
+    if (data.ldap) {
+      // Always overwrite with fresh LDAP — clear any stale 2-letter initials
+      localStorage.setItem('lyriaUserInitials', data.ldap);
+      // Update any already-rendered username displays in the DOM
+      document.querySelectorAll('[data-username-display]').forEach(el => {
+        el.textContent = data.ldap;
+      });
+    }
+  } catch(e) {
+    console.warn('[User] Fetch failed:', e);
+  }
+});
+(function wireResponsePlayBtn() {
+  const btn = document.getElementById('mrPlayBtn');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    if (!responseAudio) return;
+    const icon = btn.querySelector('.material-symbols-outlined');
+    if (responseIsPlaying) {
+      responseAudio.pause();
+      responseIsPlaying = false;
+      if (icon) icon.textContent = 'play_arrow';
+    } else {
+      // Pause radio before playing response card
+      const slot = SLOTS[activeSlot];
+      if (slot && slot.audio && !slot.audio.paused) {
+        slot.audio.pause();
+        setPlayState(false);
+      }
+      responseAudio.play().then(() => {
+        responseIsPlaying = true;
+        if (icon) icon.textContent = 'pause';
+      }).catch(e => console.warn('[Response] play failed:', e));
+    }
+  });
+})();
+
+// ─── Share Modal Logic ───
+function openShareModal() {
+  const overlay = document.getElementById('shareOverlay');
+  const toggle  = document.getElementById('lyriaToggle');
+  const row     = document.getElementById('shareLyriaRow');
+  if (!overlay) return;
+  // Reset toggle to match current share state
+  if (lyriaShared) { toggle?.classList.add('on'); row?.classList.add('is-on'); }
+  else             { toggle?.classList.remove('on'); row?.classList.remove('is-on'); }
+  overlay.classList.add('open');
+}
+function closeShareModal() {
+  document.getElementById('shareOverlay')?.classList.remove('open');
+}
+function doLyriaShare(enable) {
+  if (enable && !lyriaShared && pendingTrack) {
+    lyriaShared = true;
+    COMMUNITY_TRACKS.unshift(pendingTrack);
+    dynamicCommunityTracks.unshift(pendingTrack);
+    if (dynamicCommunityTracks.length > 50) dynamicCommunityTracks = dynamicCommunityTracks.slice(0, 50);
+    renderCommunityPanel(); renderSidebar();
+    saveTrackLocally(pendingTrack);
+    const t = pendingTrack;
+    fetch(`${API_BASE}/api/lyria-tracks`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ prompt:t.prompt, title:t.title, creatorInitials:t.creatorInitials, audioData:t.audioData, coverData:t.coverData })
+    })
+    .then(res => { if (res.ok) loadCommunityTracks(); })
+    .catch(e => console.warn('[DB] Share save failed:', e.message));
+  } else if (!enable && lyriaShared && pendingTrack) {
+    lyriaShared = false;
+    COMMUNITY_TRACKS = COMMUNITY_TRACKS.filter(x => x.id !== pendingTrack.id);
+    dynamicCommunityTracks = dynamicCommunityTracks.filter(x => x.id !== pendingTrack.id);
+    renderCommunityPanel(); renderSidebar();
+  }
+}
+// Toggle click
+document.getElementById('lyriaToggle')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const toggle = document.getElementById('lyriaToggle');
+  const row    = document.getElementById('shareLyriaRow');
+  const isOn   = toggle.classList.toggle('on');
+  row.classList.toggle('is-on', isOn);
+  doLyriaShare(isOn);
+});
+document.getElementById('shareLyriaRow')?.addEventListener('click', (e) => {
+  if (!e.target.closest('.shr-toggle')) document.getElementById('lyriaToggle')?.click();
+});
+document.getElementById('shareCloseBtn')?.addEventListener('click', closeShareModal);
+document.getElementById('shareDoneBtn')?.addEventListener('click',  closeShareModal);
+document.getElementById('shareOverlay')?.addEventListener('click',  (e) => { if (e.target.id==='shareOverlay') closeShareModal(); });
+document.getElementById('shareCopyLinkBtn')?.addEventListener('click', () => {
+  navigator.clipboard?.writeText(window.location.href).catch(()=>{});
+  const lbl = document.getElementById('shareCopyLabel');
+  if (lbl) { lbl.textContent='Copied!'; setTimeout(()=>lbl.textContent='Copy link',2000); }
+});
+document.getElementById('shareNativeBtn')?.addEventListener('click', () => {
+  navigator.share?.({ title: pendingTrack?.title||'Lyria Radio Track', url: window.location.href }).catch(()=>{});
+});
+document.getElementById('mrShareBtn')?.addEventListener('click', openShareModal);
+
+
+// Wire primary generate button
+document.getElementById('btnGenerate').addEventListener('click', async () => {
+  if (isGenerating) { stopGenerate(); return; }
+  const prompt = (document.getElementById('promptInput').value || '').trim();
+  await runGenerate(prompt);
+});
+
+// Wire alternate generate button (in response view fixed bar)
+document.getElementById('btnGenerateAlt').addEventListener('click', async () => {
+  if (isGenerating) { stopGenerate(); return; }
+  const prompt = (document.getElementById('promptInputAlt').value || '').trim();
+  await runGenerate(prompt);
 });
 
 function promptToTitle(p) {
@@ -2163,6 +3165,8 @@ function togglePlayPause() {
   const ctx = ensureAudioCtx();
   const slot = SLOTS[activeSlot];
   if (!isPlaying) {
+    // Pause response card audio before resuming radio
+    pauseResponseAudio();
     if (ctx.state === 'suspended') ctx.resume();
     if (slot.audio && slot.audio.paused && slot.audio.src) slot.audio.play();
     if (progressRAF === null) attachProgressToSlot(slot);
@@ -2189,29 +3193,95 @@ document.getElementById('btnExpandedNext').addEventListener('click', () => playT
 document.getElementById('btnExpandedPrev').addEventListener('click', () => playTrack(Math.max(0, currentIndex - 1)));
 document.getElementById('btnExpandedRemix').addEventListener('click', () => {
   const track = COMMUNITY_TRACKS[currentIndex];
-  if (track && promptInput) { promptInput.value = track.prompt; promptInput.focus(); }
+  if (track && track.prompt) {
+    const inp1 = document.getElementById('promptInput');
+    const inp2 = document.getElementById('promptInputAlt');
+    if (inp1) inp1.value = track.prompt;
+    if (inp2) inp2.value = track.prompt;
+    if (typeof syncSendIcon === 'function') {
+      syncSendIcon('promptInput', 'genBtnIcon', 'btnGenerate');
+      syncSendIcon('promptInputAlt', 'genBtnIconAlt', 'btnGenerateAlt');
+    }
+  }
   collapsePlayer(); // audio keeps playing
 });
-document.getElementById('btnShuffle').addEventListener('click', () => {
-  playTrack(Math.floor(Math.random() * COMMUNITY_TRACKS.length));
+document.getElementById('btnFavorite').addEventListener('click', () => {
+  isLiked = !isLiked;
+  const btn = document.getElementById('btnFavorite');
+  if (isLiked) {
+    btn.style.fontVariationSettings = "'FILL' 1";
+    btn.style.color = '#E8384F';
+    const track = COMMUNITY_TRACKS[currentIndex];
+    if (track) {
+      track.likes = (track.likes || 0) + 1;
+      renderSidebar();
+      renderCommunityPanel();
+    }
+  } else {
+    btn.style.fontVariationSettings = "'FILL' 0";
+    btn.style.color = '';
+  }
 });
 
-// ── Enter key in prompt ──
-promptInput.addEventListener('keydown', e => {
+// ── Enter key in prompts ──
+document.getElementById('promptInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('btnGenerate').click();
 });
+document.getElementById('promptInputAlt').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('btnGenerateAlt').click();
+});
+
+// ── Mic ↔ Send icon swap on input ──
+function syncSendIcon(inputId, iconId, btnId) {
+  const input = document.getElementById(inputId);
+  const icon  = document.getElementById(iconId);
+  const btn   = document.getElementById(btnId);
+  if (!input || !icon || !btn) return;
+  const hasText  = input.value.trim().length > 0;
+  const prevText = icon.dataset.hasText === '1';
+  if (hasText === prevText) return;
+  icon.dataset.hasText = hasText ? '1' : '0';
+  icon.textContent = hasText ? 'arrow_upward' : 'mic';
+  icon.classList.remove('icon-pop');
+  void icon.offsetWidth; // force reflow
+  icon.classList.add('icon-pop');
+  if (hasText) { btn.classList.add('has-send'); }
+  else         { btn.classList.remove('has-send'); }
+}
+function resetSendIcons() {
+  ['promptInput','promptInputAlt'].forEach((id, i) => {
+    const iconId = i === 0 ? 'genBtnIcon' : 'genBtnIconAlt';
+    const btnId  = i === 0 ? 'btnGenerate' : 'btnGenerateAlt';
+    const icon = document.getElementById(iconId);
+    const btn  = document.getElementById(btnId);
+    if (icon) { icon.textContent = 'mic'; icon.dataset.hasText = '0'; icon.classList.remove('icon-pop'); }
+    if (btn)  { btn.classList.remove('has-send'); }
+  });
+}
+document.getElementById('promptInput').addEventListener('input',    () => syncSendIcon('promptInput',    'genBtnIcon',    'btnGenerate'));
+document.getElementById('promptInputAlt').addEventListener('input', () => syncSendIcon('promptInputAlt', 'genBtnIconAlt', 'btnGenerateAlt'));
 
 // ── Init — render tracks, start playing track 0 ──
-renderSidebar();
-renderCommunityPanel();
-loadCommunityTracks();
-// Auto-start track 0 on first user gesture (iOS/Chrome autoplay policy)
-document.addEventListener('click', function startOnGesture() {
-  document.removeEventListener('click', startOnGesture);
-  if (!isPlaying) playTrack(0);
-}, { once: true });
-// Also try immediate autoplay (works on desktop)
-playTrack(0);
+loadLocalTracks().then(localTracks => {
+  // Merge local tracks, avoiding duplicates by prompt
+  const uniqueLocal = localTracks.filter(lt => 
+    !dynamicCommunityTracks.some(ft => ft.prompt === lt.prompt)
+  );
+  dynamicCommunityTracks = [...uniqueLocal, ...dynamicCommunityTracks].slice(0, 50);
+  COMMUNITY_TRACKS = [...dynamicCommunityTracks];
+  
+  renderSidebar();
+  renderCommunityPanel();
+  loadCommunityTracks();
+  
+  // Auto-start track 0 on first user gesture (iOS/Chrome autoplay policy)
+  document.addEventListener('click', function startOnGesture() {
+    document.removeEventListener('click', startOnGesture);
+    if (!isPlaying) playTrack(0);
+  }, { once: true });
+  // Also try immediate autoplay (works on desktop)
+  playTrack(0);
+});
 
   // ── Collapsed ↔ Expanded toggle ──
   // collapsePlayer() NEVER pauses audio — music keeps playing continuously
@@ -2221,6 +3291,8 @@ playTrack(0);
     document.getElementById('collapsedPlayer').classList.add('is-hidden');
     document.getElementById('expandedSidebar').classList.add('is-visible');
     document.body.classList.add('state-expanded');
+    // Load latest community tracks each time player opens
+    loadCommunityTracks();
   }
 
   function collapsePlayer() {

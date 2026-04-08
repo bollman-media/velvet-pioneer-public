@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script type="importmap">
     { "imports": { 
+        "@google/genai": "https://cdn.jsdelivr.net/npm/@google/genai/+esm",
         "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
     } }
     </script>
@@ -1057,10 +1058,18 @@
         })();
 
         // ══════════════════════════════════════════
-        // API Key Management — handled server-side
+        // API Key Management
         // ══════════════════════════════════════════
-        // API key is stored in server .env — no client key needed
-        function ensureApiKey() { return true; }
+        const DEFAULT_GEMINI_KEY = 'AIzaSyB8FU2vtI3HefFF2et98LLa4HumyssnWss';
+        // Always clear stale cached keys — force fresh default key
+        localStorage.removeItem('gemini_api_key');
+        let GEMINI_KEY = DEFAULT_GEMINI_KEY;
+        function ensureApiKey() {
+            if (GEMINI_KEY) return true;
+            const key = window.prompt('Enter your Gemini API Key to enable generation:');
+            if (key && key.trim()) { GEMINI_KEY = key.trim(); return true; }
+            return false;
+        }
 
         // ══════════════════════════════════════════
         // DOM refs
@@ -1144,12 +1153,12 @@
         const COVER_SI = `You are a visionary Art Director. Create an iconic 2D album cover. CONSTRAINTS: ZERO PEOPLE. FULL BLEED. SQUARE 1:1. No borders. Bold, tactile, premium. Apply organic film grain and analog patina.`;
 
         async function generateCover(promptText, vibe) {
-            const coverPrompt = `Vibe: ${vibe}\nCaption: ${promptText}\n\n${COVER_SI}\n\nGenerate a striking album cover for a vinyl record label. Square, full bleed, no humans, iconic.`;
+            const coverPrompt = `Vibe: ${vibe}\nCaption: ${promptText}\n\nGenerate a striking album cover for a vinyl record label. Square, full bleed, no humans, iconic.`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_KEY}`;
             try {
-                const resp = await fetch('/api/generate-image', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: coverPrompt })
+                const resp = await fetch(url, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: COVER_SI + '\n\n---\n\n' + coverPrompt }] }], generationConfig: { responseModalities: ['IMAGE', 'TEXT'] } })
                 });
                 if (!resp.ok) return null;
                 const json = await resp.json();
@@ -1161,35 +1170,46 @@
         }
 
         // ══════════════════════════════════════════
-        // Lyria Music Generation — via server proxy
+        // Lyria Music Generation
         // ══════════════════════════════════════════
+        let genaiModule = null;
         async function generateTrack(prompt, bpm) {
-            for (let attempt = 0; attempt < 4; attempt++) {
-                if (attempt > 0) {
-                    const wait = attempt * 2000;
-                    console.log(`[Lyria] Retry ${attempt}/3 — waiting ${wait}ms…`);
-                    await new Promise(r => setTimeout(r, wait));
-                }
-                try {
-                    const res = await fetch('/api/generate-track', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt, bpm })
-                    });
-                    if (!res.ok) {
-                        console.warn(`[Lyria] Server error attempt ${attempt + 1}:`, await res.text());
-                        continue;
-                    }
-                    const { audio } = await res.json();
-                    if (!audio) continue;
-                    // Server returns base64 WAV — decode to blob URL for the turntable
-                    const bytes = atob(audio);
-                    const arr = new Uint8Array(bytes.length);
-                    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
-                    return URL.createObjectURL(new Blob([arr], { type: 'audio/wav' }));
-                } catch (e) {
-                    console.warn(`[Lyria] Track gen attempt ${attempt + 1} failed:`, e);
-                }
+            if (!genaiModule) genaiModule = await import('@google/genai');
+            const { GoogleGenAI } = genaiModule;
+            const client = new GoogleGenAI({ apiKey: GEMINI_KEY, apiVersion: 'v1alpha' });
+            const SR = 48000, CH = 2, BD = 16, DUR = 30;
+            const targetBytes = SR * CH * (BD / 8) * DUR;
+
+            for (let attempt = 0; attempt < 3; attempt++) {
+                if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
+                const chunks = []; let total = 0, done = false;
+                const result = await new Promise(async (resolve) => {
+                    const fin = () => { if (done) return; done = true; if (!total) { resolve(null); return; }
+                        const buf = new Uint8Array(total); let off = 0;
+                        for (const c of chunks) { buf.set(c, off); off += c.length; }
+                        const len = Math.min(buf.length, targetBytes);
+                        const wav = new ArrayBuffer(44 + len); const v = new DataView(wav);
+                        const ws = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+                        ws(0,'RIFF'); v.setUint32(4, 36+len, true); ws(8,'WAVE'); ws(12,'fmt ');
+                        v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,CH,true);
+                        v.setUint32(24,SR,true); v.setUint32(28,SR*CH*(BD/8),true); v.setUint16(32,CH*(BD/8),true);
+                        v.setUint16(34,BD,true); ws(36,'data'); v.setUint32(40,len,true);
+                        new Uint8Array(wav, 44).set(buf.subarray(0, len));
+                        resolve(URL.createObjectURL(new Blob([wav], { type: 'audio/wav' })));
+                    };
+                    const to = setTimeout(fin, 90000);
+                    try {
+                        const session = await client.live.music.connect({ model: 'models/lyria-realtime-exp', callbacks: {
+                            onmessage: (msg) => { if (msg.serverContent?.audioChunks) { for (const ck of msg.serverContent.audioChunks) { const raw = atob(ck.data); const arr = new Uint8Array(raw.length); for (let i=0;i<raw.length;i++) arr[i]=raw.charCodeAt(i); chunks.push(arr); total+=arr.length; } if (total>=targetBytes){clearTimeout(to);try{session.stop();}catch(e){}fin();}} },
+                            onerror: () => { clearTimeout(to); fin(); }, onclose: () => { clearTimeout(to); fin(); },
+                        }});
+                        await session.setWeightedPrompts({ weightedPrompts: [{ text: prompt, weight: 1.0 }] });
+                        await session.setMusicGenerationConfig({ musicGenerationConfig: { bpm, temperature: 1.0 } });
+                        await new Promise(r => setTimeout(r, 500));
+                        await session.play();
+                    } catch (e) { clearTimeout(to); resolve(null); }
+                });
+                if (result) return result;
             }
             return null;
         }
@@ -1219,22 +1239,31 @@
 
         btnStart.addEventListener('click', () => generate());
 
-        // Auto-launch: go straight into generating (key is handled server-side)
-        // Small delay to let the disco ball canvas initialize
-        setTimeout(() => generate(), 100);
+        // Auto-launch: if API key is already saved, go straight into generating
+        if (GEMINI_KEY) {
+            // Small delay to let the disco ball canvas initialize
+            setTimeout(() => generate(), 100);
+        } else {
+            // No API key yet — hide loading, show empty state with Start button
+            loading.classList.remove('is-visible');
+            loading.classList.add('is-hidden');
+        }
 
-        // Safety watchdog: if still on loading screen after 3 minutes, show an error
+        // Safety watchdog: if still on loading screen after 60s, show an error
         const loadingWatchdog = setTimeout(() => {
             if (loading.classList.contains('is-visible')) {
                 loadingText.textContent = 'Generation timed out';
                 loadingSub.textContent = 'Tap to retry';
                 loading.style.cursor = 'pointer';
                 loading.onclick = () => { loading.onclick = null; loading.style.cursor = '';
+                    // Clear any saved key so fresh key is tried
+                    localStorage.removeItem('gemini_api_key');
+                    GEMINI_KEY = DEFAULT_GEMINI_KEY;
                     loading.classList.remove('is-visible'); loading.classList.add('is-hidden');
                     emptyState.classList.remove('is-hidden');
                 };
             }
-        }, 180000);
+        }, 60000);
 
         async function generate() {
             if (!ensureApiKey()) return;

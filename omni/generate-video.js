@@ -6,7 +6,12 @@ const { GoogleGenAI } = require('@google/genai');
 const fs = require('fs');
 const path = require('path');
 
-const API_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6LJuyFjpxrD20wyrUYon4Mok4N0iPJXIQSL_rYwbB30ZA';
+const API_KEY = process.env.GEMINI_API_KEY;
+if (!API_KEY) {
+  console.error('❌ GEMINI_API_KEY environment variable is not set. Aborting.');
+  process.exit(1);
+}
+
 const OUTPUT  = path.join(__dirname, 'placeholder.mp4');
 const PROMPT  = 'Cinematic aerial drone shot of a futuristic city at golden hour, smooth slow camera pan, photorealistic, 16:9';
 

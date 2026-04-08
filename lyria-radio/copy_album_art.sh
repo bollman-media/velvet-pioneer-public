@@ -1,0 +1,15 @@
+#!/bin/bash
+BRAIN="/Users/bollman/.gemini/jetski/brain/3dd6b0bc-88e1-4d9e-8e83-e3717aba23ad"
+DEST="/Users/bollman/Documents/Jetski/velvet-pioneer/lyria-radio/tracks"
+cp "$BRAIN/album_midnight_drift_1775442888033.png"  "$DEST/album_1.png"
+cp "$BRAIN/album_neon_horizon_1775443158216.png"    "$DEST/album_2.png"
+cp "$BRAIN/album_cyber_pulse_1775443170441.png"     "$DEST/album_3.png"
+cp "$BRAIN/album_solar_flare_1775443185236.png"     "$DEST/album_4.png"
+cp "$BRAIN/album_lunar_drift_1775443211563.png"     "$DEST/album_5.png"
+cp "$BRAIN/album_stellar_wind_1775443223768.png"    "$DEST/album_6.png"
+cp "$BRAIN/album_galactic_groove_1775443236664.png" "$DEST/album_7.png"
+cp "$BRAIN/album_nebula_beats_1775443247406.png"    "$DEST/album_8.png"
+cp "$BRAIN/album_quantum_realm_1775443262436.png"   "$DEST/album_9.png"
+cp "$BRAIN/album_cosmic_dust_1775443278553.png"     "$DEST/album_10.png"
+echo "✅ Album art copied!"
+ls "$DEST"/album_*.png

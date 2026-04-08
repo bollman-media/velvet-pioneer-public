@@ -1,0 +1,5 @@
+{
+  "cert_config": {
+    "proxy_path": "/usr/bin/true"
+  }
+}

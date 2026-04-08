@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omni Spinner Brainstorming Tool</title>
+  
+  <!-- Critical: Google Symbols -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
+  <!-- Note: Google Sans -->
+  <link href="https://fonts.cdnfonts.com/css/google-sans" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-color: #0d0f12;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.6);
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.5);
+      --font-family: 'Google Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      overflow: hidden;
+    }
+
+    .app-container {
+      display: flex;
+      width: 1200px;
+      height: 900px;
+      background: rgba(23, 27, 33, 0.5);
+      backdrop-filter: blur(20px);
+      border-radius: 32px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    /* ── Mockup Container (Left) ─────────────────────────────── */
+    .mockup-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at center, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+      border-right: 1px solid var(--glass-border);
+      position: relative;
+    }
+
+    /* Phone Mockup (Exact dimensions from JSON: 402x874) */
+    .phone-mockup {
+      width: 402px;
+      height: 874px;
+      background-color: #fdfcfc; /* Exact fill from JSON */
+      border-radius: 62px; /* Exact corner Radius from JSON */
+      overflow: hidden;
+      position: relative;
+      color: #000; /* Default text color for inside mockup */
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), inset 0 0 0 2px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Status Bar (Precise recreation) */
+    .status-bar {
+      width: 402px;
+      height: 62px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 21px 16px 19px 16px;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .status-time {
+      font-weight: 500;
+      font-size: 14px;
+      color: #000;
+    }
+
+    .status-icons {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    /* Island (Notch) */
+    .dynamic-island {
+      width: 126px;
+      height: 38px;
+      background-color: #000;
+      border-radius: 20px;
+      position: absolute;
+      top: 11px;
+      left: 138px;
+      z-index: 10;
+    }
+
+    /* Tool Section ("Loading Omni model ...") */
+    .tool-header {
+      position: absolute;
+      top: 130px;
+      left: 24px;
+      width: 354px;
+      height: 38px;
+    }
+
+    .tool-title {
+      font-size: 32px;
+      font-weight: 400;
+      line-height: 38px;
+      color: #000;
+      font-family: 'Google Sans', sans-serif;
+    }
+
+    /* Banner (Mobile) */
+    .banner-mobile {
+      position: absolute;
+      top: 190px;
+      left: 16px;
+      width: 370px;
+      height: 97px;
+      background: rgba(0, 0, 0, 0.03);
+      border-radius: 24px;
+      padding: 20px 21px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .banner-icon-bg {
+      width: 40px;
+      height: 40px;
+      background: transparent;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #000;
+    }
+
+    #spinnerCanvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    .banner-content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .banner-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: #1f1f1f;
+    }
+
+    .banner-sub {
+      font-size: 13px;
+      color: rgba(0, 0, 0, 0.54);
+    }
+
+    /* Progress Indicator Container */
+    .spinner-container {
+      position: absolute;
+      top: 350px;
+      left: 0;
+      width: 100%;
+      height: 300px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* The Organic Canvas Spinner */
+    .organic-spinner {
+      width: 200px;
+      height: 200px;
+      position: relative;
+    }
+
+    .organic-spinner canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    /* Input (Android) - "Ask Gemini" */
+    .input-android {
+      position: absolute;
+      top: 730px;
+      left: 39px;
+      width: 324px;
+      height: 60px;
+      background: #ffffff;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px 0 12px;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .input-leading {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .add-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #000;
+    }
+
+    .input-text {
+      font-size: 16px;
+      color: rgba(0, 0, 0, 0.54);
+    }
+
+    .input-trailing {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn-circle {
+      width: 40px;
+      height: 40px;
+      background: #000;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+    }
+
+    /* ── Controls Panel (Right) ─────────────────────────────── */
+    .controls-panel {
+      width: 450px;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      padding: 40px;
+      overflow-y: auto;
+    }
+
+    .panel-header {
+      margin-bottom: 32px;
+    }
+
+    .panel-title {
+      font-size: 24px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .panel-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .control-group {
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .control-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .control-value {
+      color: var(--text-primary);
+    }
+
+    /* Custom Slider */
+    .slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+      transition: background 0.3s;
+    }
+
+    .slider:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--accent-glow);
+      transition: transform 0.1s;
+    }
+
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* Toggle Switches */
+    .toggle-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 24px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+      background-color: var(--accent);
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+
+    /* Preset Selectors */
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .preset-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .preset-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .preset-btn.active {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* Scrollbar */
+    .controls-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .controls-panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .controls-panel::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+    .controls-panel::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <!-- Left Side: Mockup -->
+  <div class="mockup-container">
+    <div class="phone-mockup">
+      
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <div class="status-time">9:41</div>
+        <div class="status-icons">
+          <span class="material-symbols-outlined" style="font-size: 18px;">signal_cellular_4_bar</span>
+          <span class="material-symbols-outlined" style="font-size: 18px;">wifi</span>
+          <span class="material-symbols-outlined" style="font-size: 18px;">battery_full</span>
+        </div>
+      </div>
+      
+      <!-- Dynamic Island -->
+      <div class="dynamic-island"></div>
+      
+      <!-- Tool Title -->
+      <div class="tool-header">
+        <div class="tool-title">Loading Omni model ...</div>
+      </div>
+      
+      <!-- Banner -->
+      <div class="banner-mobile">
+        <div class="banner-icon-bg">
+          <canvas id="spinnerCanvas"></canvas>
+        </div>
+        <div class="banner-content">
+          <div class="banner-title">Generating your video</div>
+          <div class="banner-sub">This can take up to 2-3mins</div>
+        </div>
+      </div>
+      
+      <!-- Spinner Area -->
+      <div class="spinner-container">
+        <div class="organic-spinner">
+          <canvas id="bigSpinnerCanvas"></canvas>
+        </div>
+        <div style="color: rgba(0,0,0,0.4); font-size: 14px; font-weight: 500;">AI Brainstorming Mode</div>
+      </div>
+      
+      <!-- Input Area -->
+      <div class="input-android">
+        <div class="input-leading">
+          <div class="add-btn">
+            <span class="material-symbols-outlined">add</span>
+          </div>
+          <div class="input-text">Ask Gemini</div>
+        </div>
+        <div class="input-trailing">
+          <span class="material-symbols-outlined" style="color: rgba(0,0,0,0.54);">keyboard_voice</span>
+          <div class="icon-btn-circle">
+            <span class="material-symbols-outlined" style="font-size: 20px;">arrow_forward</span>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- Right Side: Controls -->
+  <div class="controls-panel">
+    <div class="panel-header">
+      <h1 class="panel-title">Spinner Brainstormer</h1>
+      <p class="panel-sub">Experiment with non-deterministic, organic loading animations.</p>
+    </div>
+    
+    <!-- Presets -->
+    <div class="control-group">
+      <span class="control-label">Animation Presets</span>
+      <div class="presets-grid">
+        <div class="preset-btn active" onclick="loadPreset('nebula')">Glowing Nebula</div>
+        <div class="preset-btn" onclick="loadPreset('fluid')">Quantum Fluid</div>
+        <div class="preset-btn" onclick="loadPreset('ribbon')">Silk Ribbon</div>
+        <div class="preset-btn" onclick="loadPreset('blob')">Organic Cell</div>
+        <div class="preset-btn" onclick="loadPreset('abstract')">Abstract</div>
+        <div class="preset-btn" onclick="loadPreset('matrix')">Digital Matrix</div>
+        <div class="preset-btn" onclick="loadPreset('solar')">Solar Flare</div>
+        <div class="preset-btn" onclick="loadPreset('deepsea')">Deep Sea</div>
+        <div class="preset-btn" onclick="loadPreset('crystal')">Crystal Geometry</div>
+        <div class="preset-btn" style="background: rgba(255,255,255,0.1); border-color: var(--accent);" onclick="randomize()">🎲 Randomize</div>
+      </div>
+    </div>
+    
+    <!-- Render Style -->
+    <div class="control-group">
+      <span class="control-label">Render Style</span>
+      <div class="presets-grid" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="preset-btn active" id="style-fill" onclick="updateRenderMode('fill')">Fill</div>
+        <div class="preset-btn" id="style-outline" onclick="updateRenderMode('outline')">Outline</div>
+      </div>
+    </div>
+    
+    <!-- Base Color -->
+    <div class="control-group">
+      <span class="control-label">Base Color</span>
+      <div style="display: flex; gap: 12px; align-items: center; margin-top: 8px;">
+        <input type="color" id="baseColorPicker" value="#1E88E5" onchange="updateBaseColor(this.value)" style="border: none; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; background: none;">
+        <span id="colorHexVal" style="font-size: 14px; color: var(--text-secondary);">#1E88E5</span>
+      </div>
+    </div>
+    
+    <!-- Base Shape -->
+    <div class="control-group">
+      <span class="control-label">Base Shape</span>
+      <div style="margin-top: 8px;">
+        <select id="baseShape" onchange="updateControl('baseShape', this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-primary); border-radius: 8px; padding: 10px; width: 100%; cursor: pointer;">
+          <option value="circle">Circle (Default)</option>
+          <option value="square">Square</option>
+          <option value="triangle">Triangle</option>
+          <option value="hexagon">Hexagon</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Controls -->
+    <div class="control-group">
+      <div class="control-label">
+        <span>Complexity (Paths)</span>
+        <span class="control-value" id="complexityVal">5</span>
+      </div>
+      <input type="range" class="slider" id="complexity" min="1" max="15" value="5" oninput="updateControl('complexity', this.value)">
+    </div>
+    
+    <div class="control-group">
+      <div class="control-label">
+        <span>Velocity / Speed</span>
+        <span class="control-value" id="speedVal">1.2</span>
+      </div>
+      <input type="range" class="slider" id="speed" min="0.1" max="5" step="0.1" value="1.2" oninput="updateControl('speed', this.value)">
+    </div>
+    
+    <div class="control-group">
+      <div class="control-label">
+        <span>Chaos (Turbulence)</span>
+        <span class="control-value" id="chaosVal">0.8</span>
+      </div>
+      <input type="range" class="slider" id="chaos" min="0" max="3" step="0.1" value="0.8" oninput="updateControl('chaos', this.value)">
+    </div>
+    
+    <div class="control-group">
+      <div class="control-label">
+        <span>Volumetric Blur</span>
+        <span class="control-value" id="blurVal">15px</span>
+      </div>
+      <input type="range" class="slider" id="blur" min="0" max="50" value="15" oninput="updateControl('blur', this.value)">
+    </div>
+    
+    <div class="control-group">
+      <div class="control-label">
+        <span>Core Size</span>
+        <span class="control-value" id="sizeVal">40%</span>
+      </div>
+      <input type="range" class="slider" id="size" min="10" max="80" value="40" oninput="updateControl('size', this.value)">
+    </div>
+
+    <div class="control-group toggle-group">
+      <span class="control-label">Chromatic Aberration</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="chromatic" checked onchange="updateControl('chromatic', this.checked)">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="control-group toggle-group">
+      <span class="control-label">Dynamic Audio Reactive (Simulated)</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="audio" onchange="updateControl('audio', this.checked)">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    
+  </div>
+</div>
+
+<script>
+  // ─── Animation Logic (Organic Canvas) ──────────────────────────────
+  const canvas1 = document.getElementById('spinnerCanvas');
+  const canvas2 = document.getElementById('bigSpinnerCanvas');
+  const ctx1 = canvas1 ? canvas1.getContext('2d') : null;
+  const ctx2 = canvas2 ? canvas2.getContext('2d') : null;
+  
+  // Set canvas resolution
+  function resizeCanvas(c) {
+    if (!c) return;
+    const rect = c.getBoundingClientRect();
+    c.width = rect.width * 2; // High DPI
+    c.height = rect.height * 2;
+  }
+  resizeCanvas(canvas1);
+  resizeCanvas(canvas2);
+  
+  // Simulation State
+  let config = {
+    complexity: 5,
+    speed: 1.2,
+    chaos: 0.8,
+    blur: 15,
+    size: 40,
+    chromatic: true,
+    audio: false,
+    renderMode: 'fill',
+    baseShape: 'circle'
+  };
+  
+  const loaderConfig = {
+    complexity: 5,
+    speed: 1.2,
+    chaos: 0.8,
+    blur: 15,
+    size: 40,
+    chromatic: true,
+    audio: false,
+    renderMode: 'fill',
+    baseShape: 'circle'
+  };
+  
+  let time = 0;
+  let particles = [];
+  
+  // Simple noise simulation for organic feel
+  function noise(x, y, t) {
+    return Math.sin(x * 0.01 + t) * Math.cos(y * 0.01 - t) * Math.sin((x+y)*0.005 + t*0.5);
+  }
+  
+  function initParticles() {
+    particles = [];
+    const count = config.complexity * 20;
+    const refWidth = canvas2 ? canvas2.width : (canvas1 ? canvas1.width : 400);
+    const centerX = refWidth / 2;
+    const centerY = refWidth / 2;
+    const baseRadius = (refWidth / 2) * (config.size / 100);
+    
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      particles.push({
+        x: centerX + Math.cos(angle) * baseRadius,
+        y: centerY + Math.sin(angle) * baseRadius,
+        baseX: centerX + Math.cos(angle) * baseRadius,
+        baseY: centerY + Math.sin(angle) * baseRadius,
+        angle: angle,
+        radius: baseRadius,
+        speed: 0.01 + Math.random() * 0.02,
+        color: `hsl(${(angle * 180 / Math.PI) % 360}, 80%, 60%)`,
+        offset: Math.random() * 100
+      });
+    }
+  }
+  
+  initParticles();
+  
+  let auroraBlues = [
+    '#E1F5FE', // +5
+    '#B3E5FC', // +4
+    '#81D4FA', // +3
+    '#4FC3F7', // +2
+    '#29B6F6', // +1
+    '#1E88E5', // -2
+    '#1565C0', // -3
+    '#0D47A1', // -4
+    '#0A192F', // -5
+    '#020C1B'  // -6
+  ];
+  
+  function drawSpinner(c, ctx) {
+    if (!c || !ctx) return;
+    ctx.clearRect(0, 0, c.width, c.height);
+    
+    const isLoader = (c === canvas1);
+    const cfg = isLoader ? loaderConfig : config;
+    
+    const centerX = c.width / 2;
+    const centerY = c.height / 2;
+    
+    if (cfg.renderMode === 'outline') {
+      c.style.filter = 'none';
+      ctx.globalCompositeOperation = 'source-over';
+    } else {
+      c.style.filter = isLoader ? 'url(#metaball-loader)' : 'url(#metaball)';
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    
+    const baseRadius = (c.width / 2) * (cfg.size / 100);
+    
+    // Draw organic connecting lines
+    for (let j = 0; j < cfg.complexity; j++) {
+      ctx.beginPath();
+      const waveOffset = j * (Math.PI * 2 / cfg.complexity);
+      
+      for (let i = 0; i <= 60; i++) {
+        const stepAngle = (i / 60) * Math.PI * 2;
+        
+        // Base shape coordinates (normalized to radius 1)
+        let xBase = Math.cos(stepAngle);
+        let yBase = Math.sin(stepAngle);
+        
+        if (cfg.baseShape === 'square') {
+          const rSquare = Math.min(1 / Math.abs(Math.cos(stepAngle)), 1 / Math.abs(Math.sin(stepAngle)));
+          xBase = Math.cos(stepAngle) * rSquare;
+          yBase = Math.sin(stepAngle) * rSquare;
+        } else if (cfg.baseShape === 'triangle') {
+          const nTriangle = 3;
+          const rTriangle = Math.cos(Math.PI / nTriangle) / Math.cos((2 * Math.atan(Math.tan((nTriangle * stepAngle) / 2))) / nTriangle);
+          xBase = Math.cos(stepAngle) * rTriangle;
+          yBase = Math.sin(stepAngle) * rTriangle;
+        } else if (cfg.baseShape === 'hexagon') {
+          const nHex = 6;
+          const rHex = Math.cos(Math.PI / nHex) / Math.cos((2 * Math.atan(Math.tan((nHex * stepAngle) / 2))) / nHex);
+          xBase = Math.cos(stepAngle) * rHex;
+          yBase = Math.sin(stepAngle) * rHex;
+        }
+        
+        // Non-deterministic physics using multiple sine waves and noise
+        const n = noise(xBase * 100, yBase * 100, time + waveOffset) * cfg.chaos * (c.width * 0.15);
+        
+        // Simulating audio reactivity
+        const audioReactivity = cfg.audio ? Math.sin(time * 5 + j) * (c.width * 0.05) : 0;
+        
+        const r = baseRadius + n + audioReactivity + Math.sin(time + stepAngle * 3 + j) * (c.width * 0.05);
+        
+        const x = centerX + xBase * r;
+        const y = centerY + yBase * r;
+        
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      
+      ctx.closePath();
+      
+      // Joshua Davis style repetition and layering
+      for (let k = 0; k < 3; k++) {
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.scale(1 - k * 0.15, 1 - k * 0.15);
+        ctx.rotate(time * 0.1 * k);
+        ctx.translate(-centerX, -centerY);
+        
+        ctx.globalAlpha = cfg.renderMode === 'outline' ? (0.7 - k * 0.2) : (0.3 - k * 0.05);
+        
+        // Use colors from the Aurora palette
+        const colorIndex = (j + k) % auroraBlues.length;
+        const color = auroraBlues[colorIndex];
+        
+        if (cfg.renderMode === 'outline') {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = color;
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+    
+    // Draw core glow
+    if (cfg.renderMode !== 'outline') {
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, baseRadius * 0.5, 0, Math.PI * 2);
+      const coreGlow = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, baseRadius * 0.5);
+      coreGlow.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+      coreGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = coreGlow;
+      ctx.fill();
+    }
+  }
+  
+  function draw() {
+    time += 0.01 * config.speed;
+    
+    const feBlur = document.getElementById('feBlur');
+    if (feBlur) feBlur.setAttribute('stdDeviation', config.blur);
+    
+    drawSpinner(canvas1, ctx1);
+    drawSpinner(canvas2, ctx2);
+    
+    requestAnimationFrame(draw);
+  }
+  
+  draw();
+  
+  // ─── UI Controls ──────────────────────────────────────────────────
+  function updateControl(id, val) {
+    if (id === 'renderMode') {
+      config[id] = val;
+      document.getElementById('style-fill').classList.toggle('active', val === 'fill');
+      document.getElementById('style-outline').classList.toggle('active', val === 'outline');
+    } else if (id === 'baseShape') {
+      config[id] = val;
+    } else {
+      config[id] = id === 'chromatic' || id === 'audio' ? val : parseFloat(val);
+      
+      // Update UI value display
+      const valEl = document.getElementById(id + 'Val');
+      if (valEl) {
+        if (id === 'size') valEl.textContent = val + '%';
+        else if (id === 'blur') valEl.textContent = val + 'px';
+        else valEl.textContent = val;
+      }
+      
+      if (id === 'complexity' || id === 'size') {
+        initParticles();
+      }
+    }
+  }
+  
+  function updateRenderMode(mode) {
+    updateControl('renderMode', mode);
+  }
+  
+  function hexToHSL(hex) {
+    let r = parseInt(hex.slice(1, 3), 16) / 255;
+    let g = parseInt(hex.slice(3, 5), 16) / 255;
+    let b = parseInt(hex.slice(5, 7), 16) / 255;
+    let max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      let d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: h * 360, s: s * 100, l: l * 100 };
+  }
+
+  function updateBaseColor(hex) {
+    const valEl = document.getElementById('colorHexVal');
+    if (valEl) valEl.textContent = hex;
+    const hsl = hexToHSL(hex);
+    
+    auroraBlues = [];
+    for (let i = 0; i < 10; i++) {
+      const lightness = 95 - i * 9; 
+      auroraBlues.push(`hsl(${hsl.h}, ${hsl.s}%, ${lightness}%)`);
+    }
+  }
+  
+  function randomize() {
+    const controls = [
+      { id: 'complexity', min: 1, max: 15, step: 1 },
+      { id: 'speed', min: 0.1, max: 5, step: 0.1 },
+      { id: 'chaos', min: 0, max: 3, step: 0.1 },
+      { id: 'blur', min: 0, max: 30, step: 1 },
+      { id: 'size', min: 10, max: 90, step: 1 }
+    ];
+    
+    controls.forEach(c => {
+      const val = Math.random() * (c.max - c.min) + c.min;
+      const roundedVal = Math.round(val / (c.step || 1)) * (c.step || 1);
+      const el = document.getElementById(c.id);
+      if (el) {
+        el.value = roundedVal;
+        updateControl(c.id, roundedVal);
+      }
+    });
+    
+    // Also randomize render mode sometimes
+    const modes = ['fill', 'outline'];
+    const randomMode = modes[Math.floor(Math.random() * modes.length)];
+    updateRenderMode(randomMode);
+    
+    // Randomize base shape
+    const shapes = ['circle', 'square', 'triangle', 'hexagon'];
+    const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+    const shapeEl = document.getElementById('baseShape');
+    if (shapeEl) {
+      shapeEl.value = randomShape;
+      updateControl('baseShape', randomShape);
+    }
+    
+    // Randomize color sometimes
+    const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+    const colorPicker = document.getElementById('baseColorPicker');
+    if (colorPicker) {
+      colorPicker.value = randomColor;
+      updateBaseColor(randomColor);
+    }
+  }
+  
+  function loadPreset(name) {
+    // Remove active class from all buttons
+    document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+    
+    // Add to clicked
+    event.target.classList.add('active');
+    
+    const presets = {
+      nebula: { complexity: 5, speed: 1.2, chaos: 0.8, blur: 15, size: 40, chromatic: true, renderMode: 'fill' },
+      fluid: { complexity: 12, speed: 2.5, chaos: 1.5, blur: 5, size: 50, chromatic: false, renderMode: 'fill' },
+      ribbon: { complexity: 3, speed: 0.8, chaos: 0.3, blur: 2, size: 60, chromatic: true, renderMode: 'fill' },
+      blob: { complexity: 1, speed: 0.5, chaos: 2.0, blur: 25, size: 30, chromatic: false, renderMode: 'fill' },
+      abstract: { complexity: 8, speed: 0.5, chaos: 0.2, blur: 1, size: 70, chromatic: false, renderMode: 'fill' },
+      matrix: { complexity: 15, speed: 3.0, chaos: 0.1, blur: 0, size: 80, chromatic: false, renderMode: 'outline' },
+      solar: { complexity: 6, speed: 4.0, chaos: 2.5, blur: 20, size: 60, chromatic: true, renderMode: 'fill' },
+      deepsea: { complexity: 4, speed: 0.4, chaos: 0.5, blur: 10, size: 50, chromatic: true, renderMode: 'fill' },
+      crystal: { complexity: 20, speed: 0.2, chaos: 0.0, blur: 0, size: 90, chromatic: false, renderMode: 'outline' }
+    };
+    
+    const p = presets[name];
+    for (let key in p) {
+      config[key] = p[key];
+      const el = document.getElementById(key);
+      if (el) {
+        if (el.type === 'checkbox') el.checked = p[key];
+        else el.value = p[key];
+        
+        // Trigger UI update
+        updateControl(key, p[key]);
+      }
+    }
+  }
+</script>
+
+<!-- SVG Filter for Amorphous Metaballs -->
+<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="metaball">
+      <feGaussianBlur id="feBlur" in="SourceGraphic" stdDeviation="15" result="blur" />
+      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="metaball" />
+      <feComposite in="SourceGraphic" in2="metaball" operator="atop"/>
+    </filter>
+    <filter id="metaball-loader">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
+      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="metaball" />
+      <feComposite in="SourceGraphic" in2="metaball" operator="atop"/>
+    </filter>
+  </defs>
+</svg>
+
+</body>
+</html>
