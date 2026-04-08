@@ -413,6 +413,20 @@
                 </button>
             </div>
             
+            <!-- Image Selector -->
+            <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; background: var(--surface-1); padding: 16px; border-radius: 12px; border: 1px solid var(--line);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Select Image</span>
+                </div>
+                <select id="image-selector" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid var(--line); border-radius: 8px; font-family: inherit; font-size: 0.85rem;">
+                    <option value="../omni/landscape.png">Landscape (Default)</option>
+                    <option value="../omni/portrait.png">Portrait</option>
+                    <option value="../assets/lead_guitar.png">Guitar</option>
+                    <option value="../assets/turntable_background.jpeg">Turntable</option>
+                    <option value="../assets/pink_floyd_bg.jpeg">Abstract Art</option>
+                </select>
+            </div>
+
             <!-- Blur Radius Slider -->
             <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; background: var(--surface-1); padding: 16px; border-radius: 12px; border: 1px solid var(--line);">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -451,8 +465,13 @@
         const blurValue = document.getElementById('blur-value');
         const morphSlider = document.getElementById('morph-slider');
         const morphValue = document.getElementById('morph-value');
+        const imageSelector = document.getElementById('image-selector');
 
         let isProcessing = false;
+
+        imageSelector.addEventListener('change', (e) => {
+            targetMedia.src = e.target.value;
+        });
 
         speedSlider.addEventListener('input', (e) => {
             speedValue.textContent = parseFloat(e.target.value).toFixed(1) + 's';
