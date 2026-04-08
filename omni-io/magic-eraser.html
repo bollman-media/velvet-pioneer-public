@@ -401,15 +401,26 @@
         </div>
 
         <!-- ── External Controls ── -->
-        <div class="controls">
-            <button class="btn" id="btn-reset">
-                <span class="material-symbols-outlined">replay</span>
-                Reset
-            </button>
-            <button class="btn btn-primary" id="btn-trigger">
-                <span class="material-symbols-outlined">celebration</span>
-                Simulate Edit
-            </button>
+        <div class="controls" style="flex-direction: column; gap: 16px;">
+            <div style="display: flex; gap: 16px; width: 100%;">
+                <button class="btn" id="btn-reset" style="flex: 1;">
+                    <span class="material-symbols-outlined">replay</span>
+                    Reset
+                </button>
+                <button class="btn btn-primary" id="btn-trigger" style="flex: 2;">
+                    <span class="material-symbols-outlined">celebration</span>
+                    Simulate Edit
+                </button>
+            </div>
+            
+            <!-- Speed Slider -->
+            <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; background: var(--surface-1); padding: 16px; border-radius: 12px; border: 1px solid var(--line);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Processing Duration</span>
+                    <span id="speed-value" style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">3.0s</span>
+                </div>
+                <input type="range" id="speed-slider" min="0.5" max="10" step="0.5" value="3" style="width: 100%; accent-color: var(--accent); background: rgba(255,255,255,0.05); border-radius: 4px; height: 6px;">
+            </div>
         </div>
 
         <a href="./index.html" class="back-link">
@@ -425,12 +436,20 @@
         const btnTrigger = document.getElementById('btn-trigger');
         const btnReset = document.getElementById('btn-reset');
         const targetMedia = document.getElementById('target-media');
+        const speedSlider = document.getElementById('speed-slider');
+        const speedValue = document.getElementById('speed-value');
 
         let isProcessing = false;
+
+        speedSlider.addEventListener('input', (e) => {
+            speedValue.textContent = parseFloat(e.target.value).toFixed(1) + 's';
+        });
 
         function runFlow() {
             if (isProcessing) return;
             isProcessing = true;
+
+            const duration = parseFloat(speedSlider.value) * 1000;
 
             // ── Step 1: Trigger Edit (Blur image + show progress) ──
             workspace.classList.add('is-editing');
@@ -440,11 +459,8 @@
             eraserTool.style.background = 'var(--accent)';
             eraserTool.style.color = '#000';
 
-            // ── Step 2: Processing (Hold for 3 seconds) ──
+            // ── Step 2: Processing (Hold for slider duration) ──
             setTimeout(() => {
-                // Swap image during blur to simulate the edit (optional, just desaturating slightly here)
-                // targetMedia.style.filter = 'grayscale(0.3)';
-                
                 // ── Step 3: Reveal (Fade out loading, un-blur image) ──
                 workspace.classList.remove('is-editing');
                 workspace.classList.add('is-revealing');
@@ -459,7 +475,7 @@
                     isProcessing = false;
                 }, 1400); // Matches --motion-reveal
                 
-            }, 3000); // 3s processing hold
+            }, duration); 
         }
 
         function reset() {
