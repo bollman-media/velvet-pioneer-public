@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magic Eraser — Loading State Prototype</title>
+    <title>Video Loader — Loading State Prototype</title>
     <meta name="description" content="Image editing loading state with amorphous blur transition.">
     <link href="https://fonts.cdnfonts.com/css/google-sans" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
@@ -353,7 +353,7 @@
     <div class="container">
         <div class="header">
             <span class="eyebrow">Motion Prototype</span>
-            <h1 class="title">Magic Eraser</h1>
+            <h1 class="title">Video Loader</h1>
         </div>
 
         <!-- ── Image Workspace ── -->
@@ -427,6 +427,15 @@
                 </select>
             </div>
 
+            <!-- Speed Slider -->
+            <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; background: var(--surface-1); padding: 16px; border-radius: 12px; border: 1px solid var(--line);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Processing Duration</span>
+                    <span id="speed-value" style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">3.0s</span>
+                </div>
+                <input type="range" id="speed-slider" min="0.5" max="10" step="0.5" value="3" style="width: 100%; accent-color: var(--accent); background: rgba(255,255,255,0.05); border-radius: 4px; height: 6px;">
+            </div>
+
             <!-- Blur Radius Slider -->
             <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; background: var(--surface-1); padding: 16px; border-radius: 12px; border: 1px solid var(--line);">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -480,6 +489,18 @@
         blurSlider.addEventListener('input', (e) => {
             blurValue.textContent = e.target.value + 'px';
             document.documentElement.style.setProperty('--blur-radius', e.target.value + 'px');
+            
+            // Live feedback: apply blur while sliding even if not editing
+            if (!workspace.classList.contains('is-editing')) {
+                targetMedia.style.filter = `blur(${e.target.value}px) saturate(1.2)`;
+            }
+        });
+
+        // Reset live feedback on change end
+        blurSlider.addEventListener('change', () => {
+            if (!workspace.classList.contains('is-editing')) {
+                targetMedia.style.filter = '';
+            }
         });
 
         morphSlider.addEventListener('input', (e) => {
