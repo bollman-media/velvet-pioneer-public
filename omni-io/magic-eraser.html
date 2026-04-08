@@ -453,6 +453,85 @@
                 </div>
                 <input type="range" id="morph-slider" min="1" max="15" step="0.5" value="6" style="width: 100%; accent-color: var(--accent); background: rgba(255,255,255,0.05); border-radius: 4px; height: 6px;">
             </div>
+        <!-- ── Code Snippet for Engineers ── -->
+        <div style="margin-top: 32px; background: var(--surface-1); border: 1px solid var(--line); border-radius: 12px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Engineer's Export (CSS & HTML)</span>
+                <button class="circle-btn" style="width: 32px; height: 32px;" onclick="copyCode()" aria-label="Copy Code">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span>
+                </button>
+            </div>
+            
+            <pre style="background: #000; padding: 16px; border-radius: 8px; overflow-x: auto; font-family: 'Google Sans Mono', monospace; font-size: 0.75rem; color: #ededed; line-height: 1.5;"><code id="code-block">/* ── 1. CSS Variables & Animation ── */
+:root {
+  --blur-radius: 20px;
+  --morph-speed: 6s;
+}
+
+.image-layer {
+  transition: filter 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Editing State */
+.is-editing .image-layer {
+  filter: blur(var(--blur-radius)) saturate(1.2);
+  transform: scale(1.05);
+}
+
+/* Amorphous Loading Blobs */
+.loading-layer {
+  position: absolute;
+  inset: -20%;
+  filter: blur(50px);
+  opacity: 0;
+  transition: opacity 600ms ease;
+  mix-blend-mode: screen;
+}
+
+.is-editing .loading-layer {
+  opacity: 1;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(20px);
+}
+
+.blob-1 {
+  width: 50%; height: 50%;
+  top: 20%; left: 10%;
+  background: radial-gradient(circle, rgba(138, 180, 248, 0.8), transparent 70%);
+  animation: float1 var(--morph-speed) ease-in-out infinite alternate;
+}
+
+.blob-2 {
+  width: 45%; height: 45%;
+  bottom: 10%; right: 10%;
+  background: radial-gradient(circle, rgba(197, 138, 249, 0.7), transparent 70%);
+  animation: float2 calc(var(--morph-speed) * 1.16) ease-in-out infinite alternate;
+}
+
+@keyframes float1 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(10%, -5%) scale(1.1); }
+}
+
+@keyframes float2 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-8%, 8%) scale(1.05); }
+}
+
+/* ── 2. HTML Structure ── */
+&lt;div class="workspace"&gt;
+  &lt;div class="image-layer"&gt;
+    &lt;img src="image.jpg"&gt;
+  &lt;/div&gt;
+  &lt;div class="loading-layer"&gt;
+    &lt;div class="blob blob-1"&gt;&lt;/div&gt;
+    &lt;div class="blob blob-2"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
         </div>
 
         <a href="./index.html" class="back-link">
@@ -477,6 +556,15 @@
         const imageSelector = document.getElementById('image-selector');
 
         let isProcessing = false;
+
+        function copyCode() {
+            const code = document.getElementById('code-block').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
 
         imageSelector.addEventListener('change', (e) => {
             targetMedia.src = e.target.value;
