@@ -133,14 +133,14 @@
             width: 50%; height: 50%;
             top: 20%; left: 10%;
             background: radial-gradient(circle, rgba(138, 180, 248, 0.8), transparent 70%);
-            animation: float1 var(--morph-speed, 6s) ease-in-out infinite alternate;
+            animation: float1 6s ease-in-out infinite alternate;
         }
 
         .blob-2 {
             width: 45%; height: 45%;
             bottom: 10%; right: 10%;
             background: radial-gradient(circle, rgba(197, 138, 249, 0.7), transparent 70%);
-            animation: float2 calc(var(--morph-speed, 6s) * 1.16) ease-in-out infinite alternate;
+            animation: float2 7s ease-in-out infinite alternate;
         }
 
         /* ── Shimmer Sweep ───────────────────────────────────── */
@@ -239,7 +239,7 @@
 
         /* 1. EDITING STATE: Image blurs, loading appears */
         .workspace.is-editing .image-layer {
-            filter: blur(var(--blur-radius, 20px)) saturate(1.2);
+            filter: blur(20px) saturate(1.2);
             transform: scale(1.05);
         }
 
@@ -413,22 +413,13 @@
                 </button>
             </div>
             
-            <!-- Blur Radius Slider -->
+            <!-- Speed Slider -->
             <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; background: var(--surface-1); padding: 16px; border-radius: 12px; border: 1px solid var(--line);">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Blur Radius</span>
-                    <span id="blur-value" style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">20px</span>
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Processing Duration</span>
+                    <span id="speed-value" style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">3.0s</span>
                 </div>
-                <input type="range" id="blur-slider" min="0" max="50" step="5" value="20" style="width: 100%; accent-color: var(--accent); background: rgba(255,255,255,0.05); border-radius: 4px; height: 6px;">
-            </div>
-
-            <!-- Morph Speed Slider -->
-            <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; background: var(--surface-1); padding: 16px; border-radius: 12px; border: 1px solid var(--line);">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Morph Speed</span>
-                    <span id="morph-value" style="font-size: 0.75rem; font-weight: 600; color: var(--accent);">6.0s</span>
-                </div>
-                <input type="range" id="morph-slider" min="1" max="15" step="0.5" value="6" style="width: 100%; accent-color: var(--accent); background: rgba(255,255,255,0.05); border-radius: 4px; height: 6px;">
+                <input type="range" id="speed-slider" min="0.5" max="10" step="0.5" value="3" style="width: 100%; accent-color: var(--accent); background: rgba(255,255,255,0.05); border-radius: 4px; height: 6px;">
             </div>
         </div>
 
@@ -447,25 +438,11 @@
         const targetMedia = document.getElementById('target-media');
         const speedSlider = document.getElementById('speed-slider');
         const speedValue = document.getElementById('speed-value');
-        const blurSlider = document.getElementById('blur-slider');
-        const blurValue = document.getElementById('blur-value');
-        const morphSlider = document.getElementById('morph-slider');
-        const morphValue = document.getElementById('morph-value');
 
         let isProcessing = false;
 
         speedSlider.addEventListener('input', (e) => {
             speedValue.textContent = parseFloat(e.target.value).toFixed(1) + 's';
-        });
-
-        blurSlider.addEventListener('input', (e) => {
-            blurValue.textContent = e.target.value + 'px';
-            document.documentElement.style.setProperty('--blur-radius', e.target.value + 'px');
-        });
-
-        morphSlider.addEventListener('input', (e) => {
-            morphValue.textContent = parseFloat(e.target.value).toFixed(1) + 's';
-            document.documentElement.style.setProperty('--morph-speed', e.target.value + 's');
         });
 
         function runFlow() {
