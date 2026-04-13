@@ -128,7 +128,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ========== API: Save Upvote State ==========
-  if (req.method === 'POST' && req.url === './api/save-upvotes') {
+  if (req.method === 'POST' && req.url === '/api/save-upvotes') {
     try {
       const body = await parseBody(req);
       const { date, pitchIndex, liked } = body;
@@ -164,7 +164,7 @@ const server = http.createServer(async (req, res) => {
   // ========== API: Extract Keyframes from Video ==========
   // Reads the saved MP4, uploads to Gemini Files API, asks Gemini to generate
   // 8 representative still images (one per second of the 8-second video).
-  if (req.method === 'POST' && req.url === './api/extract-keyframes') {
+  if (req.method === 'POST' && req.url === '/api/extract-keyframes') {
     try {
       if (!GEMINI_API_KEY) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -341,7 +341,7 @@ const server = http.createServer(async (req, res) => {
 
   // ========== API: Generate Shot Variations ==========
 
-  if (req.method === 'POST' && req.url === './api/generate-shot-variations') {
+  if (req.method === 'POST' && req.url === '/api/generate-shot-variations') {
     try {
       if (!GEMINI_API_KEY) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -437,7 +437,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ========== API: Generate Video ==========
-  if (req.method === 'POST' && req.url === './api/generate-video') {
+  if (req.method === 'POST' && req.url === '/api/generate-video') {
     try {
       if (!GEMINI_API_KEY) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -588,7 +588,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ========== API: Generate Album Cover via Gemini ==========
-  if (req.method === 'POST' && req.url === './api/generate-cover') {
+  if (req.method === 'POST' && req.url === '/api/generate-cover') {
     try {
       if (!GEMINI_API_KEY) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -695,7 +695,7 @@ Generate a striking 2D album cover following the art direction system. The cover
   }
 
   // ========== API: Luminous — Generate fashion image ==========
-  if (req.method === 'POST' && req.url === './api/luminous-generate') {
+  if (req.method === 'POST' && req.url === '/api/luminous-generate') {
     try {
       if (!GEMINI_API_KEY) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -802,7 +802,7 @@ Requirements:
   }
 
   // ========== API: Generate Music Track via Lyria ==========
-  if (req.method === 'POST' && req.url === './api/generate-track') {
+  if (req.method === 'POST' && req.url === '/api/generate-track') {
     try {
       if (!GEMINI_API_KEY) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -948,14 +948,14 @@ Requirements:
   }
 
   // ========== API: Check API Key ==========
-  if (req.method === 'GET' && req.url === './api/veo-status') {
+  if (req.method === 'GET' && req.url === '/api/veo-status') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ hasKey: !!GEMINI_API_KEY }));
     return;
   }
 
   // ========== API: Get Latest Video ==========
-  if (req.method === 'GET' && req.url === './api/latest-video') {
+  if (req.method === 'GET' && req.url === '/api/latest-video') {
     const videosDir = path.join(ROOT, 'videos');
     try {
       const files = fs.readdirSync(videosDir)
@@ -982,7 +982,7 @@ Requirements:
     return;
   }
   // ========== API: Google Drive Video Proxy (via Drive API v3) ==========
-  if (req.method === 'GET' && req.url.startsWith('./api/drive-video?')) {
+  if (req.method === 'GET' && req.url.startsWith('/api/drive-video?')) {
     const urlParams = new URL(req.url, 'http://localhost').searchParams;
     const fileId = urlParams.get('id');
     const resourceKey = urlParams.get('rk') || '';
