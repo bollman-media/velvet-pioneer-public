@@ -1054,15 +1054,19 @@ Requirements:
   // Decode percent-encoded characters (spaces, apostrophes, etc.)
   urlPath = decodeURIComponent(urlPath);
 
-  // Directory paths: append index.html (e.g. /studio/ → /studio/index.html)
-  if (urlPath.endsWith('/')) urlPath += 'index.html';
-
-  // Directory paths without trailing slash: redirect to add it (e.g. /studio → /studio/)
-  const tentativePath = path.join(ROOT, urlPath);
-  if (!path.extname(tentativePath) && fs.existsSync(tentativePath) && fs.statSync(tentativePath).isDirectory()) {
-    res.writeHead(301, { 'Location': urlPath + '/' });
-    res.end();
-    return;
+  // Check if a Next.js exported .html file exists for this route path
+  const cleanRoute = urlPath.replace(/\/$/, '');
+  if (cleanRoute !== '' && cleanRoute !== '/index.html' && fs.existsSync(path.join(ROOT, cleanRoute + '.html'))) {
+    urlPath = cleanRoute + '.html';
+  } else if (urlPath.endsWith('/')) {
+    urlPath += 'index.html';
+  } else {
+    const tentativePath = path.join(ROOT, urlPath);
+    if (!path.extname(tentativePath) && fs.existsSync(tentativePath) && fs.statSync(tentativePath).isDirectory()) {
+      res.writeHead(301, { 'Location': urlPath + '/' });
+      res.end();
+      return;
+    }
   }
 
   const filePath = path.join(ROOT, urlPath);

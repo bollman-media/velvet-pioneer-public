@@ -1,0 +1,7 @@
+.git/
+node_modules/
+.DS_Store
+velvet-legacy/
+bollmans-wild-ideas/audio/
+bollmans-wild-ideas/images/
+videos/

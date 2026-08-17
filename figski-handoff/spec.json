@@ -1,0 +1,3799 @@
+{
+  "id": "4044:13953",
+  "name": "—",
+  "type": "FRAME",
+  "width": 402,
+  "height": 874,
+  "borderRadius": 62,
+  "borderRadiusToken": null,
+  "constraints": {
+    "horizontal": "LEFT",
+    "vertical": "CENTER"
+  },
+  "children": [
+    {
+      "id": "4044:13954",
+      "name": "dc - background",
+      "type": "FRAME",
+      "width": 402,
+      "height": 874,
+      "constraints": {
+        "horizontal": "LEFT_RIGHT",
+        "vertical": "TOP_BOTTOM"
+      },
+      "children": [
+        {
+          "id": "4044:13955",
+          "name": "surface",
+          "type": "RECTANGLE",
+          "width": 402,
+          "height": 874,
+          "fills": [
+            {
+              "type": "SOLID",
+              "color": "rgba(253, 252, 252, 1)",
+              "token": "var(--surface)"
+            }
+          ],
+          "constraints": {
+            "horizontal": "LEFT_RIGHT",
+            "vertical": "TOP_BOTTOM"
+          }
+        },
+        {
+          "id": "4044:13956",
+          "name": "scrim",
+          "type": "RECTANGLE",
+          "width": 402,
+          "height": 874,
+          "constraints": {
+            "horizontal": "LEFT_RIGHT",
+            "vertical": "TOP_BOTTOM"
+          }
+        }
+      ]
+    },
+    {
+      "id": "4044:13957",
+      "name": "Background",
+      "type": "INSTANCE",
+      "width": 402,
+      "height": 874,
+      "fills": [
+        {
+          "type": "SOLID",
+          "color": "rgba(253, 252, 252, 1)",
+          "token": "var(--surface)"
+        }
+      ],
+      "componentId": "348:31101",
+      "variantProperties": {
+        "Mode": "Light"
+      },
+      "constraints": {
+        "horizontal": "LEFT",
+        "vertical": "TOP"
+      },
+      "children": [
+        {
+          "id": "I4044:13957;2510:7933",
+          "name": "gradient",
+          "type": "RECTANGLE",
+          "width": 330,
+          "height": 570,
+          "fills": [
+            {
+              "type": "GRADIENT_RADIAL"
+            }
+          ],
+          "borderRadius": 170.00001525878906,
+          "borderRadiusToken": null,
+          "effects": [
+            {
+              "type": "LAYER_BLUR",
+              "color": null,
+              "radius": 120,
+              "css": "filter: blur(120px)"
+            }
+          ],
+          "constraints": {
+            "horizontal": "CENTER",
+            "vertical": "BOTTOM"
+          }
+        }
+      ]
+    },
+    {
+      "id": "4044:14976",
+      "name": "Frame 2147228371 nc_916:5",
+      "type": "FRAME",
+      "width": 402,
+      "height": 606,
+      "layout": {
+        "direction": "column",
+        "padding": {},
+        "mainAxisAlign": "flex-start",
+        "crossAxisAlign": "flex-start",
+        "sizing": {
+          "primary": "FIXED",
+          "counter": "FIXED"
+        }
+      },
+      "constraints": {
+        "horizontal": "LEFT",
+        "vertical": "TOP"
+      },
+      "children": [
+        {
+          "id": "4044:14977",
+          "name": "Frame 5 nc_916:5",
+          "type": "FRAME",
+          "width": 402,
+          "height": 150,
+          "layout": {
+            "direction": "row",
+            "gap": 8,
+            "padding": {
+              "right": 8,
+              "bottom": 8,
+              "left": 8
+            },
+            "mainAxisAlign": "flex-end",
+            "crossAxisAlign": "flex-end",
+            "sizing": {
+              "primary": "FIXED"
+            }
+          },
+          "constraints": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "children": [
+            {
+              "id": "4044:20336",
+              "name": "Group 2147231154",
+              "type": "GROUP",
+              "width": 386,
+              "height": 142,
+              "borderRadius": 40,
+              "borderRadiusToken": null,
+              "constraints": {
+                "horizontal": "LEFT",
+                "vertical": "TOP"
+              },
+              "children": [
+                {
+                  "id": "4044:14978",
+                  "name": "Disco cards",
+                  "type": "INSTANCE",
+                  "width": 189,
+                  "height": 142,
+                  "fills": [
+                    {
+                      "type": "IMAGE",
+                      "imageRef": "46411bb3f554a6842ab56ea2b47e2f8f2f3f57b5"
+                    },
+                    {
+                      "type": "GRADIENT_LINEAR",
+                      "cssGradient": "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.23999999463558197) 100%)"
+                    },
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(230, 234, 237, 1)",
+                      "token": null
+                    }
+                  ],
+                  "layout": {
+                    "direction": "column",
+                    "gap": 10,
+                    "padding": {},
+                    "mainAxisAlign": "space-between",
+                    "crossAxisAlign": "flex-start",
+                    "sizing": {
+                      "primary": "FIXED",
+                      "counter": "FIXED"
+                    }
+                  },
+                  "borderRadius": 40,
+                  "borderRadiusToken": null,
+                  "componentId": "5:7239",
+                  "variantProperties": {
+                    "Style": "Image",
+                    "Visual": "Five",
+                    "Aspect ratio": "4:3"
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:14978;513:43933",
+                      "name": "Icon nc_I916:",
+                      "type": "FRAME",
+                      "width": 64,
+                      "height": 64,
+                      "opacity": 0,
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10,
+                        "padding": {
+                          "top": 20,
+                          "right": 20,
+                          "bottom": 20,
+                          "left": 20
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "center",
+                        "sizing": {}
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:14978;513:43934",
+                          "name": "Tools",
+                          "type": "INSTANCE",
+                          "width": 24,
+                          "height": 24,
+                          "componentId": "5:7182",
+                          "variantProperties": {
+                            "Tool": "Canvas"
+                          },
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:14978;513:43934;227:18275",
+                              "name": "icon nc_I916:",
+                              "type": "TEXT",
+                              "width": 24,
+                              "height": 24,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(255, 255, 255, 1)",
+                                  "token": "var(--white)"
+                                }
+                              ],
+                              "typography": {
+                                "fontFamily": "Google Symbols",
+                                "fontFamilyToken": "var(--font-icons)",
+                                "fontWeight": 400,
+                                "fontSize": 24,
+                                "lineHeight": 24,
+                                "letterSpacing": 0,
+                                "textAlign": "center"
+                              },
+                              "isIcon": true,
+                              "styleRefs": {
+                                "text": "5:6997"
+                              },
+                              "text": "note_stack_add",
+                              "constraints": {
+                                "horizontal": "SCALE",
+                                "vertical": "SCALE"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "I4044:14978;513:43935",
+                      "name": "Prompt nc_I916:",
+                      "type": "FRAME",
+                      "width": 380,
+                      "height": 66,
+                      "fills": [
+                        {
+                          "type": "GRADIENT_LINEAR",
+                          "cssGradient": "linear-gradient(180deg, rgba(71, 71, 71, 0) 0%, rgba(71, 71, 71, 0.4399999976158142) 65%)"
+                        }
+                      ],
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10.000014305114746,
+                        "padding": {
+                          "top": 16,
+                          "right": 16,
+                          "bottom": 16,
+                          "left": 16
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "flex-end",
+                        "sizing": {
+                          "primary": "FIXED"
+                        }
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:14978;513:43936",
+                          "name": "Text nc_I916:",
+                          "type": "TEXT",
+                          "width": 157,
+                          "height": 20,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(255, 255, 255, 1)",
+                              "token": "var(--white)"
+                            }
+                          ],
+                          "typography": {
+                            "fontFamily": "Google Sans Flex",
+                            "fontFamilyToken": "var(--font-display)",
+                            "fontWeight": 400,
+                            "fontSize": 15,
+                            "lineHeight": 20,
+                            "letterSpacing": 0,
+                            "textAlign": "left"
+                          },
+                          "styleRefs": {
+                            "text": "3219:123396"
+                          },
+                          "text": "Monochrome",
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "4044:14979",
+                  "name": "Disco cards",
+                  "type": "INSTANCE",
+                  "width": 189,
+                  "height": 142,
+                  "fills": [
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(230, 234, 237, 1)",
+                      "token": null
+                    }
+                  ],
+                  "layout": {
+                    "direction": "column",
+                    "gap": 10,
+                    "padding": {},
+                    "mainAxisAlign": "space-between",
+                    "crossAxisAlign": "flex-start",
+                    "sizing": {
+                      "primary": "FIXED",
+                      "counter": "FIXED"
+                    }
+                  },
+                  "borderRadius": 40,
+                  "borderRadiusToken": null,
+                  "componentId": "5:7229",
+                  "variantProperties": {
+                    "Style": "Image",
+                    "Visual": "Three",
+                    "Aspect ratio": "4:3"
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:14979;513:43909",
+                      "name": "Icon nc_I916:",
+                      "type": "FRAME",
+                      "width": 64,
+                      "height": 64,
+                      "opacity": 0,
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10,
+                        "padding": {
+                          "top": 20,
+                          "right": 20,
+                          "bottom": 20,
+                          "left": 20
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "center",
+                        "sizing": {}
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:14979;513:43910",
+                          "name": "Tools",
+                          "type": "INSTANCE",
+                          "width": 24,
+                          "height": 24,
+                          "componentId": "5:7178",
+                          "variantProperties": {
+                            "Tool": "Imagen"
+                          },
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:14979;513:43910;227:18267",
+                              "name": "icon nc_I916:",
+                              "type": "TEXT",
+                              "width": 24,
+                              "height": 24,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(255, 255, 255, 1)",
+                                  "token": "var(--white)"
+                                }
+                              ],
+                              "typography": {
+                                "fontFamily": "Google Symbols",
+                                "fontFamilyToken": "var(--font-icons)",
+                                "fontWeight": 400,
+                                "fontSize": 24,
+                                "lineHeight": 24,
+                                "letterSpacing": 0,
+                                "textAlign": "center"
+                              },
+                              "isIcon": true,
+                              "styleRefs": {
+                                "text": "5:6997"
+                              },
+                              "text": "photo_prints",
+                              "constraints": {
+                                "horizontal": "SCALE",
+                                "vertical": "SCALE"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "I4044:14979;513:43911",
+                      "name": "Prompt nc_I916:",
+                      "type": "FRAME",
+                      "width": 380,
+                      "height": 66,
+                      "fills": [
+                        {
+                          "type": "GRADIENT_LINEAR",
+                          "cssGradient": "linear-gradient(180deg, rgba(71, 71, 71, 0) 0%, rgba(71, 71, 71, 0.4399999976158142) 65%)"
+                        }
+                      ],
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10.000014305114746,
+                        "padding": {
+                          "top": 16,
+                          "right": 16,
+                          "bottom": 16,
+                          "left": 16
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "flex-end",
+                        "sizing": {
+                          "primary": "FIXED"
+                        }
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:14979;513:43912",
+                          "name": "Text nc_I916:",
+                          "type": "TEXT",
+                          "width": 157,
+                          "height": 20,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(255, 255, 255, 1)",
+                              "token": "var(--white)"
+                            }
+                          ],
+                          "typography": {
+                            "fontFamily": "Google Sans Flex",
+                            "fontFamilyToken": "var(--font-display)",
+                            "fontWeight": 400,
+                            "fontSize": 15,
+                            "lineHeight": 20,
+                            "letterSpacing": 0,
+                            "textAlign": "left"
+                          },
+                          "styleRefs": {
+                            "text": "3219:123396"
+                          },
+                          "text": "Color blocking",
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "4044:20538",
+          "name": "Frame 5 nc_916:5",
+          "type": "FRAME",
+          "width": 402,
+          "height": 150,
+          "layout": {
+            "direction": "row",
+            "gap": 8,
+            "padding": {
+              "right": 8,
+              "bottom": 8,
+              "left": 8
+            },
+            "mainAxisAlign": "flex-end",
+            "crossAxisAlign": "flex-end",
+            "sizing": {
+              "primary": "FIXED"
+            }
+          },
+          "constraints": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "children": [
+            {
+              "id": "4044:20539",
+              "name": "Group 2147231154",
+              "type": "GROUP",
+              "width": 386,
+              "height": 142,
+              "borderRadius": 40,
+              "borderRadiusToken": null,
+              "constraints": {
+                "horizontal": "LEFT",
+                "vertical": "TOP"
+              },
+              "children": [
+                {
+                  "id": "4044:20540",
+                  "name": "Disco cards",
+                  "type": "INSTANCE",
+                  "width": 189,
+                  "height": 142,
+                  "fills": [
+                    {
+                      "type": "IMAGE",
+                      "imageRef": "46411bb3f554a6842ab56ea2b47e2f8f2f3f57b5"
+                    },
+                    {
+                      "type": "GRADIENT_LINEAR",
+                      "cssGradient": "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.23999999463558197) 100%)"
+                    },
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(230, 234, 237, 1)",
+                      "token": null
+                    }
+                  ],
+                  "layout": {
+                    "direction": "column",
+                    "gap": 10,
+                    "padding": {},
+                    "mainAxisAlign": "space-between",
+                    "crossAxisAlign": "flex-start",
+                    "sizing": {
+                      "primary": "FIXED",
+                      "counter": "FIXED"
+                    }
+                  },
+                  "borderRadius": 40,
+                  "borderRadiusToken": null,
+                  "componentId": "5:7239",
+                  "variantProperties": {
+                    "Style": "Image",
+                    "Visual": "Five",
+                    "Aspect ratio": "4:3"
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20540;513:43933",
+                      "name": "Icon nc_I916:",
+                      "type": "FRAME",
+                      "width": 64,
+                      "height": 64,
+                      "opacity": 0,
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10,
+                        "padding": {
+                          "top": 20,
+                          "right": 20,
+                          "bottom": 20,
+                          "left": 20
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "center",
+                        "sizing": {}
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20540;513:43934",
+                          "name": "Tools",
+                          "type": "INSTANCE",
+                          "width": 24,
+                          "height": 24,
+                          "componentId": "5:7182",
+                          "variantProperties": {
+                            "Tool": "Canvas"
+                          },
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:20540;513:43934;227:18275",
+                              "name": "icon nc_I916:",
+                              "type": "TEXT",
+                              "width": 24,
+                              "height": 24,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(255, 255, 255, 1)",
+                                  "token": "var(--white)"
+                                }
+                              ],
+                              "typography": {
+                                "fontFamily": "Google Symbols",
+                                "fontFamilyToken": "var(--font-icons)",
+                                "fontWeight": 400,
+                                "fontSize": 24,
+                                "lineHeight": 24,
+                                "letterSpacing": 0,
+                                "textAlign": "center"
+                              },
+                              "isIcon": true,
+                              "styleRefs": {
+                                "text": "5:6997"
+                              },
+                              "text": "note_stack_add",
+                              "constraints": {
+                                "horizontal": "SCALE",
+                                "vertical": "SCALE"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "I4044:20540;513:43935",
+                      "name": "Prompt nc_I916:",
+                      "type": "FRAME",
+                      "width": 380,
+                      "height": 66,
+                      "fills": [
+                        {
+                          "type": "GRADIENT_LINEAR",
+                          "cssGradient": "linear-gradient(180deg, rgba(71, 71, 71, 0) 0%, rgba(71, 71, 71, 0.4399999976158142) 65%)"
+                        }
+                      ],
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10.000014305114746,
+                        "padding": {
+                          "top": 16,
+                          "right": 16,
+                          "bottom": 16,
+                          "left": 16
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "flex-end",
+                        "sizing": {
+                          "primary": "FIXED"
+                        }
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20540;513:43936",
+                          "name": "Text nc_I916:",
+                          "type": "TEXT",
+                          "width": 157,
+                          "height": 20,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(255, 255, 255, 1)",
+                              "token": "var(--white)"
+                            }
+                          ],
+                          "typography": {
+                            "fontFamily": "Google Sans Flex",
+                            "fontFamilyToken": "var(--font-display)",
+                            "fontWeight": 400,
+                            "fontSize": 15,
+                            "lineHeight": 20,
+                            "letterSpacing": 0,
+                            "textAlign": "left"
+                          },
+                          "styleRefs": {
+                            "text": "3219:123396"
+                          },
+                          "text": "Monochrome",
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "4044:20541",
+                  "name": "Disco cards",
+                  "type": "INSTANCE",
+                  "width": 189,
+                  "height": 142,
+                  "fills": [
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(230, 234, 237, 1)",
+                      "token": null
+                    }
+                  ],
+                  "layout": {
+                    "direction": "column",
+                    "gap": 10,
+                    "padding": {},
+                    "mainAxisAlign": "space-between",
+                    "crossAxisAlign": "flex-start",
+                    "sizing": {
+                      "primary": "FIXED",
+                      "counter": "FIXED"
+                    }
+                  },
+                  "borderRadius": 40,
+                  "borderRadiusToken": null,
+                  "componentId": "5:7229",
+                  "variantProperties": {
+                    "Style": "Image",
+                    "Visual": "Three",
+                    "Aspect ratio": "4:3"
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20541;513:43909",
+                      "name": "Icon nc_I916:",
+                      "type": "FRAME",
+                      "width": 64,
+                      "height": 64,
+                      "opacity": 0,
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10,
+                        "padding": {
+                          "top": 20,
+                          "right": 20,
+                          "bottom": 20,
+                          "left": 20
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "center",
+                        "sizing": {}
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20541;513:43910",
+                          "name": "Tools",
+                          "type": "INSTANCE",
+                          "width": 24,
+                          "height": 24,
+                          "componentId": "5:7178",
+                          "variantProperties": {
+                            "Tool": "Imagen"
+                          },
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:20541;513:43910;227:18267",
+                              "name": "icon nc_I916:",
+                              "type": "TEXT",
+                              "width": 24,
+                              "height": 24,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(255, 255, 255, 1)",
+                                  "token": "var(--white)"
+                                }
+                              ],
+                              "typography": {
+                                "fontFamily": "Google Symbols",
+                                "fontFamilyToken": "var(--font-icons)",
+                                "fontWeight": 400,
+                                "fontSize": 24,
+                                "lineHeight": 24,
+                                "letterSpacing": 0,
+                                "textAlign": "center"
+                              },
+                              "isIcon": true,
+                              "styleRefs": {
+                                "text": "5:6997"
+                              },
+                              "text": "photo_prints",
+                              "constraints": {
+                                "horizontal": "SCALE",
+                                "vertical": "SCALE"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "I4044:20541;513:43911",
+                      "name": "Prompt nc_I916:",
+                      "type": "FRAME",
+                      "width": 380,
+                      "height": 66,
+                      "fills": [
+                        {
+                          "type": "GRADIENT_LINEAR",
+                          "cssGradient": "linear-gradient(180deg, rgba(71, 71, 71, 0) 0%, rgba(71, 71, 71, 0.4399999976158142) 65%)"
+                        }
+                      ],
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10.000014305114746,
+                        "padding": {
+                          "top": 16,
+                          "right": 16,
+                          "bottom": 16,
+                          "left": 16
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "flex-end",
+                        "sizing": {
+                          "primary": "FIXED"
+                        }
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20541;513:43912",
+                          "name": "Text nc_I916:",
+                          "type": "TEXT",
+                          "width": 157,
+                          "height": 20,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(255, 255, 255, 1)",
+                              "token": "var(--white)"
+                            }
+                          ],
+                          "typography": {
+                            "fontFamily": "Google Sans Flex",
+                            "fontFamilyToken": "var(--font-display)",
+                            "fontWeight": 400,
+                            "fontSize": 15,
+                            "lineHeight": 20,
+                            "letterSpacing": 0,
+                            "textAlign": "left"
+                          },
+                          "styleRefs": {
+                            "text": "3219:123396"
+                          },
+                          "text": "Color blocking",
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "4044:20551",
+          "name": "Frame 5 nc_916:5",
+          "type": "FRAME",
+          "width": 402,
+          "height": 150,
+          "layout": {
+            "direction": "row",
+            "gap": 8,
+            "padding": {
+              "right": 8,
+              "bottom": 8,
+              "left": 8
+            },
+            "mainAxisAlign": "flex-end",
+            "crossAxisAlign": "flex-end",
+            "sizing": {
+              "primary": "FIXED"
+            }
+          },
+          "constraints": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "children": [
+            {
+              "id": "4044:20552",
+              "name": "Group 2147231154",
+              "type": "GROUP",
+              "width": 386,
+              "height": 142,
+              "borderRadius": 40,
+              "borderRadiusToken": null,
+              "constraints": {
+                "horizontal": "LEFT",
+                "vertical": "TOP"
+              },
+              "children": [
+                {
+                  "id": "4044:20553",
+                  "name": "Disco cards",
+                  "type": "INSTANCE",
+                  "width": 189,
+                  "height": 142,
+                  "fills": [
+                    {
+                      "type": "IMAGE",
+                      "imageRef": "46411bb3f554a6842ab56ea2b47e2f8f2f3f57b5"
+                    },
+                    {
+                      "type": "GRADIENT_LINEAR",
+                      "cssGradient": "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.23999999463558197) 100%)"
+                    },
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(230, 234, 237, 1)",
+                      "token": null
+                    }
+                  ],
+                  "layout": {
+                    "direction": "column",
+                    "gap": 10,
+                    "padding": {},
+                    "mainAxisAlign": "space-between",
+                    "crossAxisAlign": "flex-start",
+                    "sizing": {
+                      "primary": "FIXED",
+                      "counter": "FIXED"
+                    }
+                  },
+                  "borderRadius": 40,
+                  "borderRadiusToken": null,
+                  "componentId": "5:7239",
+                  "variantProperties": {
+                    "Style": "Image",
+                    "Visual": "Five",
+                    "Aspect ratio": "4:3"
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20553;513:43933",
+                      "name": "Icon nc_I916:",
+                      "type": "FRAME",
+                      "width": 64,
+                      "height": 64,
+                      "opacity": 0,
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10,
+                        "padding": {
+                          "top": 20,
+                          "right": 20,
+                          "bottom": 20,
+                          "left": 20
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "center",
+                        "sizing": {}
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20553;513:43934",
+                          "name": "Tools",
+                          "type": "INSTANCE",
+                          "width": 24,
+                          "height": 24,
+                          "componentId": "5:7182",
+                          "variantProperties": {
+                            "Tool": "Canvas"
+                          },
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:20553;513:43934;227:18275",
+                              "name": "icon nc_I916:",
+                              "type": "TEXT",
+                              "width": 24,
+                              "height": 24,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(255, 255, 255, 1)",
+                                  "token": "var(--white)"
+                                }
+                              ],
+                              "typography": {
+                                "fontFamily": "Google Symbols",
+                                "fontFamilyToken": "var(--font-icons)",
+                                "fontWeight": 400,
+                                "fontSize": 24,
+                                "lineHeight": 24,
+                                "letterSpacing": 0,
+                                "textAlign": "center"
+                              },
+                              "isIcon": true,
+                              "styleRefs": {
+                                "text": "5:6997"
+                              },
+                              "text": "note_stack_add",
+                              "constraints": {
+                                "horizontal": "SCALE",
+                                "vertical": "SCALE"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "I4044:20553;513:43935",
+                      "name": "Prompt nc_I916:",
+                      "type": "FRAME",
+                      "width": 380,
+                      "height": 66,
+                      "fills": [
+                        {
+                          "type": "GRADIENT_LINEAR",
+                          "cssGradient": "linear-gradient(180deg, rgba(71, 71, 71, 0) 0%, rgba(71, 71, 71, 0.4399999976158142) 65%)"
+                        }
+                      ],
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10.000014305114746,
+                        "padding": {
+                          "top": 16,
+                          "right": 16,
+                          "bottom": 16,
+                          "left": 16
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "flex-end",
+                        "sizing": {
+                          "primary": "FIXED"
+                        }
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20553;513:43936",
+                          "name": "Text nc_I916:",
+                          "type": "TEXT",
+                          "width": 157,
+                          "height": 20,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(255, 255, 255, 1)",
+                              "token": "var(--white)"
+                            }
+                          ],
+                          "typography": {
+                            "fontFamily": "Google Sans Flex",
+                            "fontFamilyToken": "var(--font-display)",
+                            "fontWeight": 400,
+                            "fontSize": 15,
+                            "lineHeight": 20,
+                            "letterSpacing": 0,
+                            "textAlign": "left"
+                          },
+                          "styleRefs": {
+                            "text": "3219:123396"
+                          },
+                          "text": "Monochrome",
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "4044:20554",
+                  "name": "Disco cards",
+                  "type": "INSTANCE",
+                  "width": 189,
+                  "height": 142,
+                  "fills": [
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(230, 234, 237, 1)",
+                      "token": null
+                    }
+                  ],
+                  "layout": {
+                    "direction": "column",
+                    "gap": 10,
+                    "padding": {},
+                    "mainAxisAlign": "space-between",
+                    "crossAxisAlign": "flex-start",
+                    "sizing": {
+                      "primary": "FIXED",
+                      "counter": "FIXED"
+                    }
+                  },
+                  "borderRadius": 40,
+                  "borderRadiusToken": null,
+                  "componentId": "5:7229",
+                  "variantProperties": {
+                    "Style": "Image",
+                    "Visual": "Three",
+                    "Aspect ratio": "4:3"
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20554;513:43909",
+                      "name": "Icon nc_I916:",
+                      "type": "FRAME",
+                      "width": 64,
+                      "height": 64,
+                      "opacity": 0,
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10,
+                        "padding": {
+                          "top": 20,
+                          "right": 20,
+                          "bottom": 20,
+                          "left": 20
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "center",
+                        "sizing": {}
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20554;513:43910",
+                          "name": "Tools",
+                          "type": "INSTANCE",
+                          "width": 24,
+                          "height": 24,
+                          "componentId": "5:7178",
+                          "variantProperties": {
+                            "Tool": "Imagen"
+                          },
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:20554;513:43910;227:18267",
+                              "name": "icon nc_I916:",
+                              "type": "TEXT",
+                              "width": 24,
+                              "height": 24,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(255, 255, 255, 1)",
+                                  "token": "var(--white)"
+                                }
+                              ],
+                              "typography": {
+                                "fontFamily": "Google Symbols",
+                                "fontFamilyToken": "var(--font-icons)",
+                                "fontWeight": 400,
+                                "fontSize": 24,
+                                "lineHeight": 24,
+                                "letterSpacing": 0,
+                                "textAlign": "center"
+                              },
+                              "isIcon": true,
+                              "styleRefs": {
+                                "text": "5:6997"
+                              },
+                              "text": "photo_prints",
+                              "constraints": {
+                                "horizontal": "SCALE",
+                                "vertical": "SCALE"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "I4044:20554;513:43911",
+                      "name": "Prompt nc_I916:",
+                      "type": "FRAME",
+                      "width": 380,
+                      "height": 66,
+                      "fills": [
+                        {
+                          "type": "GRADIENT_LINEAR",
+                          "cssGradient": "linear-gradient(180deg, rgba(71, 71, 71, 0) 0%, rgba(71, 71, 71, 0.4399999976158142) 65%)"
+                        }
+                      ],
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10.000014305114746,
+                        "padding": {
+                          "top": 16,
+                          "right": 16,
+                          "bottom": 16,
+                          "left": 16
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "flex-end",
+                        "sizing": {
+                          "primary": "FIXED"
+                        }
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20554;513:43912",
+                          "name": "Text nc_I916:",
+                          "type": "TEXT",
+                          "width": 157,
+                          "height": 20,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(255, 255, 255, 1)",
+                              "token": "var(--white)"
+                            }
+                          ],
+                          "typography": {
+                            "fontFamily": "Google Sans Flex",
+                            "fontFamilyToken": "var(--font-display)",
+                            "fontWeight": 400,
+                            "fontSize": 15,
+                            "lineHeight": 20,
+                            "letterSpacing": 0,
+                            "textAlign": "left"
+                          },
+                          "styleRefs": {
+                            "text": "3219:123396"
+                          },
+                          "text": "Color blocking",
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "4044:20564",
+          "name": "Frame 5 nc_916:5",
+          "type": "FRAME",
+          "width": 402,
+          "height": 150,
+          "layout": {
+            "direction": "row",
+            "gap": 8,
+            "padding": {
+              "right": 8,
+              "bottom": 8,
+              "left": 8
+            },
+            "mainAxisAlign": "flex-end",
+            "crossAxisAlign": "flex-end",
+            "sizing": {
+              "primary": "FIXED"
+            }
+          },
+          "constraints": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "children": [
+            {
+              "id": "4044:20565",
+              "name": "Group 2147231154",
+              "type": "GROUP",
+              "width": 386,
+              "height": 142,
+              "borderRadius": 40,
+              "borderRadiusToken": null,
+              "constraints": {
+                "horizontal": "LEFT",
+                "vertical": "TOP"
+              },
+              "children": [
+                {
+                  "id": "4044:20566",
+                  "name": "Disco cards",
+                  "type": "INSTANCE",
+                  "width": 189,
+                  "height": 142,
+                  "fills": [
+                    {
+                      "type": "IMAGE",
+                      "imageRef": "46411bb3f554a6842ab56ea2b47e2f8f2f3f57b5"
+                    },
+                    {
+                      "type": "GRADIENT_LINEAR",
+                      "cssGradient": "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.23999999463558197) 100%)"
+                    },
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(230, 234, 237, 1)",
+                      "token": null
+                    }
+                  ],
+                  "layout": {
+                    "direction": "column",
+                    "gap": 10,
+                    "padding": {},
+                    "mainAxisAlign": "space-between",
+                    "crossAxisAlign": "flex-start",
+                    "sizing": {
+                      "primary": "FIXED",
+                      "counter": "FIXED"
+                    }
+                  },
+                  "borderRadius": 40,
+                  "borderRadiusToken": null,
+                  "componentId": "5:7239",
+                  "variantProperties": {
+                    "Style": "Image",
+                    "Visual": "Five",
+                    "Aspect ratio": "4:3"
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20566;513:43933",
+                      "name": "Icon nc_I916:",
+                      "type": "FRAME",
+                      "width": 64,
+                      "height": 64,
+                      "opacity": 0,
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10,
+                        "padding": {
+                          "top": 20,
+                          "right": 20,
+                          "bottom": 20,
+                          "left": 20
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "center",
+                        "sizing": {}
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20566;513:43934",
+                          "name": "Tools",
+                          "type": "INSTANCE",
+                          "width": 24,
+                          "height": 24,
+                          "componentId": "5:7182",
+                          "variantProperties": {
+                            "Tool": "Canvas"
+                          },
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:20566;513:43934;227:18275",
+                              "name": "icon nc_I916:",
+                              "type": "TEXT",
+                              "width": 24,
+                              "height": 24,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(255, 255, 255, 1)",
+                                  "token": "var(--white)"
+                                }
+                              ],
+                              "typography": {
+                                "fontFamily": "Google Symbols",
+                                "fontFamilyToken": "var(--font-icons)",
+                                "fontWeight": 400,
+                                "fontSize": 24,
+                                "lineHeight": 24,
+                                "letterSpacing": 0,
+                                "textAlign": "center"
+                              },
+                              "isIcon": true,
+                              "styleRefs": {
+                                "text": "5:6997"
+                              },
+                              "text": "note_stack_add",
+                              "constraints": {
+                                "horizontal": "SCALE",
+                                "vertical": "SCALE"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "I4044:20566;513:43935",
+                      "name": "Prompt nc_I916:",
+                      "type": "FRAME",
+                      "width": 380,
+                      "height": 66,
+                      "fills": [
+                        {
+                          "type": "GRADIENT_LINEAR",
+                          "cssGradient": "linear-gradient(180deg, rgba(71, 71, 71, 0) 0%, rgba(71, 71, 71, 0.4399999976158142) 65%)"
+                        }
+                      ],
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10.000014305114746,
+                        "padding": {
+                          "top": 16,
+                          "right": 16,
+                          "bottom": 16,
+                          "left": 16
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "flex-end",
+                        "sizing": {
+                          "primary": "FIXED"
+                        }
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20566;513:43936",
+                          "name": "Text nc_I916:",
+                          "type": "TEXT",
+                          "width": 157,
+                          "height": 20,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(255, 255, 255, 1)",
+                              "token": "var(--white)"
+                            }
+                          ],
+                          "typography": {
+                            "fontFamily": "Google Sans Flex",
+                            "fontFamilyToken": "var(--font-display)",
+                            "fontWeight": 400,
+                            "fontSize": 15,
+                            "lineHeight": 20,
+                            "letterSpacing": 0,
+                            "textAlign": "left"
+                          },
+                          "styleRefs": {
+                            "text": "3219:123396"
+                          },
+                          "text": "Monochrome",
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "4044:20567",
+                  "name": "Disco cards",
+                  "type": "INSTANCE",
+                  "width": 189,
+                  "height": 142,
+                  "fills": [
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(230, 234, 237, 1)",
+                      "token": null
+                    }
+                  ],
+                  "layout": {
+                    "direction": "column",
+                    "gap": 10,
+                    "padding": {},
+                    "mainAxisAlign": "space-between",
+                    "crossAxisAlign": "flex-start",
+                    "sizing": {
+                      "primary": "FIXED",
+                      "counter": "FIXED"
+                    }
+                  },
+                  "borderRadius": 40,
+                  "borderRadiusToken": null,
+                  "componentId": "5:7229",
+                  "variantProperties": {
+                    "Style": "Image",
+                    "Visual": "Three",
+                    "Aspect ratio": "4:3"
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20567;513:43909",
+                      "name": "Icon nc_I916:",
+                      "type": "FRAME",
+                      "width": 64,
+                      "height": 64,
+                      "opacity": 0,
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10,
+                        "padding": {
+                          "top": 20,
+                          "right": 20,
+                          "bottom": 20,
+                          "left": 20
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "center",
+                        "sizing": {}
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20567;513:43910",
+                          "name": "Tools",
+                          "type": "INSTANCE",
+                          "width": 24,
+                          "height": 24,
+                          "componentId": "5:7178",
+                          "variantProperties": {
+                            "Tool": "Imagen"
+                          },
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:20567;513:43910;227:18267",
+                              "name": "icon nc_I916:",
+                              "type": "TEXT",
+                              "width": 24,
+                              "height": 24,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(255, 255, 255, 1)",
+                                  "token": "var(--white)"
+                                }
+                              ],
+                              "typography": {
+                                "fontFamily": "Google Symbols",
+                                "fontFamilyToken": "var(--font-icons)",
+                                "fontWeight": 400,
+                                "fontSize": 24,
+                                "lineHeight": 24,
+                                "letterSpacing": 0,
+                                "textAlign": "center"
+                              },
+                              "isIcon": true,
+                              "styleRefs": {
+                                "text": "5:6997"
+                              },
+                              "text": "photo_prints",
+                              "constraints": {
+                                "horizontal": "SCALE",
+                                "vertical": "SCALE"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "I4044:20567;513:43911",
+                      "name": "Prompt nc_I916:",
+                      "type": "FRAME",
+                      "width": 380,
+                      "height": 66,
+                      "fills": [
+                        {
+                          "type": "GRADIENT_LINEAR",
+                          "cssGradient": "linear-gradient(180deg, rgba(71, 71, 71, 0) 0%, rgba(71, 71, 71, 0.4399999976158142) 65%)"
+                        }
+                      ],
+                      "layout": {
+                        "direction": "row",
+                        "gap": 10.000014305114746,
+                        "padding": {
+                          "top": 16,
+                          "right": 16,
+                          "bottom": 16,
+                          "left": 16
+                        },
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "flex-end",
+                        "sizing": {
+                          "primary": "FIXED"
+                        }
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20567;513:43912",
+                          "name": "Text nc_I916:",
+                          "type": "TEXT",
+                          "width": 157,
+                          "height": 20,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(255, 255, 255, 1)",
+                              "token": "var(--white)"
+                            }
+                          ],
+                          "typography": {
+                            "fontFamily": "Google Sans Flex",
+                            "fontFamilyToken": "var(--font-display)",
+                            "fontWeight": 400,
+                            "fontSize": 15,
+                            "lineHeight": 20,
+                            "letterSpacing": 0,
+                            "textAlign": "left"
+                          },
+                          "styleRefs": {
+                            "text": "3219:123396"
+                          },
+                          "text": "Color blocking",
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "4044:20687",
+          "name": "Input area iOS",
+          "type": "INSTANCE",
+          "width": 402,
+          "height": 200,
+          "x": 0,
+          "y": 488,
+          "isAbsolute": true,
+          "layout": {
+            "direction": "column",
+            "gap": 10,
+            "padding": {
+              "top": 80,
+              "bottom": 40
+            },
+            "mainAxisAlign": "center",
+            "crossAxisAlign": "center",
+            "sizing": {
+              "counter": "FIXED"
+            }
+          },
+          "componentId": "4044:17959",
+          "variantProperties": {
+            "Scrim#1331:0": false,
+            "State": "Bottom of scroll"
+          },
+          "constraints": {
+            "horizontal": "CENTER",
+            "vertical": "BOTTOM"
+          },
+          "children": [
+            {
+              "id": "I4044:20687;22396:8450",
+              "name": ".Input Scrim",
+              "type": "INSTANCE",
+              "width": 402,
+              "height": 120,
+              "x": 0,
+              "y": 80,
+              "isAbsolute": true,
+              "fills": [
+                {
+                  "type": "GRADIENT_LINEAR",
+                  "cssGradient": "linear-gradient(180deg, rgba(253, 252, 252, 0) 0%, rgba(157, 210, 255, 1) 98%)"
+                }
+              ],
+              "effects": [
+                {
+                  "type": "BACKGROUND_BLUR",
+                  "color": null,
+                  "radius": 5,
+                  "css": "backdrop-filter: blur(5px)"
+                }
+              ],
+              "componentId": "3361:131742",
+              "variantProperties": {
+                "Mode": "Light"
+              },
+              "constraints": {
+                "horizontal": "LEFT",
+                "vertical": "TOP"
+              }
+            },
+            {
+              "id": "I4044:20687;22396:8451",
+              "name": "Input",
+              "type": "INSTANCE",
+              "width": 314,
+              "height": 80,
+              "layout": {
+                "direction": "row",
+                "padding": {
+                  "top": 16,
+                  "right": 16,
+                  "bottom": 16,
+                  "left": 16
+                },
+                "mainAxisAlign": "flex-start",
+                "crossAxisAlign": "center",
+                "sizing": {}
+              },
+              "componentId": "4044:17746",
+              "variantProperties": {
+                "Progressive disclosure#20633:0": true,
+                "Cursor#16025:0": false,
+                "State": "Idle",
+                "Attachments": "False",
+                "Mic On": "False"
+              },
+              "constraints": {
+                "horizontal": "LEFT",
+                "vertical": "TOP"
+              },
+              "children": [
+                {
+                  "id": "I4044:20687;22396:8451;24536:16804",
+                  "name": "Native Liquid Glass Shadow",
+                  "type": "FRAME",
+                  "width": 314,
+                  "height": 80,
+                  "x": 0,
+                  "y": 0,
+                  "isAbsolute": true,
+                  "fills": [
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(255, 255, 255, 0.00009999999747378752)",
+                      "token": null
+                    }
+                  ],
+                  "borderRadius": 200,
+                  "borderRadiusToken": "var(--radius-pill)",
+                  "effects": [
+                    {
+                      "type": "DROP_SHADOW",
+                      "color": "rgba(0, 0, 0, 0.10000000149011612)",
+                      "offset": {
+                        "x": 0,
+                        "y": 16
+                      },
+                      "radius": 40,
+                      "css": "box-shadow: 0px 16px 40px 0px rgba(0, 0, 0, 0.10000000149011612)"
+                    }
+                  ],
+                  "constraints": {
+                    "horizontal": "SCALE",
+                    "vertical": "SCALE"
+                  }
+                },
+                {
+                  "id": "I4044:20687;22396:8451;16744:14509",
+                  "name": "Glass",
+                  "type": "INSTANCE",
+                  "width": 314,
+                  "height": 80,
+                  "x": 0,
+                  "y": 0,
+                  "isAbsolute": true,
+                  "componentId": "3361:127196",
+                  "variantProperties": {
+                    "Variant": "MD Glass (Default)"
+                  },
+                  "constraints": {
+                    "horizontal": "SCALE",
+                    "vertical": "SCALE"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20687;22396:8451;16744:14509;16652:5807",
+                      "name": "MD Glass",
+                      "type": "INSTANCE",
+                      "width": 314,
+                      "height": 80,
+                      "componentId": "2324:46019",
+                      "constraints": {
+                        "horizontal": "SCALE",
+                        "vertical": "SCALE"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20687;22396:8451;16744:14509;16652:5807;3420:12655",
+                          "name": "Blur",
+                          "type": "FRAME",
+                          "width": 366,
+                          "height": 132,
+                          "opacity": 0.6700000166893005,
+                          "borderRadius": 999,
+                          "borderRadiusToken": "var(--radius-full)",
+                          "constraints": {
+                            "horizontal": "LEFT_RIGHT",
+                            "vertical": "TOP_BOTTOM"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:20687;22396:8451;16744:14509;16652:5807;3420:12656",
+                              "name": "Mask",
+                              "type": "FRAME",
+                              "width": 466,
+                              "height": 232,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(255, 255, 255, 1)",
+                                  "token": "var(--white)"
+                                }
+                              ],
+                              "constraints": {
+                                "horizontal": "LEFT_RIGHT",
+                                "vertical": "TOP_BOTTOM"
+                              },
+                              "children": [
+                                {
+                                  "id": "I4044:20687;22396:8451;16744:14509;16652:5807;3420:12657",
+                                  "name": "Shape",
+                                  "type": "RECTANGLE",
+                                  "width": 314,
+                                  "height": 80,
+                                  "fills": [
+                                    {
+                                      "type": "SOLID",
+                                      "color": "rgba(0, 0, 0, 1)",
+                                      "token": "var(--black)"
+                                    }
+                                  ],
+                                  "borderRadius": 200,
+                                  "borderRadiusToken": "var(--radius-pill)",
+                                  "constraints": {
+                                    "horizontal": "LEFT_RIGHT",
+                                    "vertical": "TOP_BOTTOM"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "I4044:20687;22396:8451;16744:14509;16652:5807;3420:12658",
+                              "name": "Blur",
+                              "type": "FRAME",
+                              "width": 314,
+                              "height": 80,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(0, 0, 0, 0.03999999910593033)",
+                                  "token": null
+                                }
+                              ],
+                              "borderRadius": 200,
+                              "borderRadiusToken": "var(--radius-pill)",
+                              "effects": [
+                                {
+                                  "type": "BACKGROUND_BLUR",
+                                  "color": null,
+                                  "radius": 40,
+                                  "css": "backdrop-filter: blur(40px)"
+                                },
+                                {
+                                  "type": "LAYER_BLUR",
+                                  "color": null,
+                                  "radius": 20,
+                                  "css": "filter: blur(20px)"
+                                }
+                              ],
+                              "constraints": {
+                                "horizontal": "LEFT_RIGHT",
+                                "vertical": "TOP_BOTTOM"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "id": "I4044:20687;22396:8451;16744:14509;16652:5807;3420:12659",
+                          "name": "Scrim",
+                          "type": "FRAME",
+                          "width": 314,
+                          "height": 80,
+                          "opacity": 0.8500000238418579,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(255, 255, 255, 1)",
+                              "token": "var(--white)"
+                            }
+                          ],
+                          "borderRadius": 999,
+                          "borderRadiusToken": "var(--radius-full)",
+                          "constraints": {
+                            "horizontal": "LEFT_RIGHT",
+                            "vertical": "TOP_BOTTOM"
+                          }
+                        },
+                        {
+                          "id": "I4044:20687;22396:8451;16744:14509;16652:5807;3420:12660",
+                          "name": "Tint",
+                          "type": "FRAME",
+                          "width": 314,
+                          "height": 80,
+                          "opacity": 0.699999988079071,
+                          "blendMode": "color",
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(255, 255, 255, 1)",
+                              "token": "var(--white)"
+                            }
+                          ],
+                          "borderRadius": 999,
+                          "borderRadiusToken": "var(--radius-full)",
+                          "constraints": {
+                            "horizontal": "LEFT_RIGHT",
+                            "vertical": "TOP_BOTTOM"
+                          }
+                        },
+                        {
+                          "id": "I4044:20687;22396:8451;16744:14509;16652:5807;3420:12661",
+                          "name": "Glass",
+                          "type": "FRAME",
+                          "width": 314,
+                          "height": 80,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(0, 0, 0, 0.004000000189989805)",
+                              "token": null
+                            }
+                          ],
+                          "styleRefs": {
+                            "effect": "371:22827"
+                          },
+                          "borderRadius": 999,
+                          "borderRadiusToken": "var(--radius-full)",
+                          "effects": [
+                            {
+                              "type": "GLASS",
+                              "color": null,
+                              "css": ""
+                            }
+                          ],
+                          "constraints": {
+                            "horizontal": "LEFT_RIGHT",
+                            "vertical": "TOP_BOTTOM"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "I4044:20687;22396:8451;10295:14328",
+                  "name": "Leading",
+                  "type": "FRAME",
+                  "width": 186,
+                  "height": 48,
+                  "layout": {
+                    "direction": "row",
+                    "gap": 8,
+                    "padding": {},
+                    "mainAxisAlign": "flex-start",
+                    "crossAxisAlign": "center",
+                    "sizing": {
+                      "primary": "FIXED"
+                    }
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20687;22396:8451;20652:11929",
+                      "name": "Button",
+                      "type": "INSTANCE",
+                      "width": 48,
+                      "height": 48,
+                      "componentId": "4044:16961",
+                      "variantProperties": {
+                        "Type": "Plus",
+                        "State": "Default",
+                        "Mode": "Light"
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20687;22396:8451;20652:11929;22208:21458",
+                          "name": "state",
+                          "type": "ELLIPSE",
+                          "width": 40,
+                          "height": 40,
+                          "constraints": {
+                            "horizontal": "CENTER",
+                            "vertical": "CENTER"
+                          }
+                        },
+                        {
+                          "id": "I4044:20687;22396:8451;20652:11929;20633:11498",
+                          "name": "Icons",
+                          "type": "INSTANCE",
+                          "width": 28,
+                          "height": 28,
+                          "componentId": "4044:16260",
+                          "variantProperties": {
+                            "Symbols#15347:799": "185:7121",
+                            "Library": "Luminous",
+                            "Type": "plus",
+                            "Size": "28"
+                          },
+                          "constraints": {
+                            "horizontal": "CENTER",
+                            "vertical": "CENTER"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:20687;22396:8451;20652:11929;20633:11498;18311:48498",
+                              "name": "Union",
+                              "type": "BOOLEAN_OPERATION",
+                              "width": 21,
+                              "height": 21,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(0, 0, 0, 1)",
+                                  "token": "var(--black)"
+                                }
+                              ],
+                              "constraints": {
+                                "horizontal": "LEFT",
+                                "vertical": "TOP"
+                              },
+                              "children": [
+                                {
+                                  "id": "I4044:20687;22396:8451;20652:11929;20633:11498;18311:48499",
+                                  "name": "Group 2147230839",
+                                  "type": "GROUP",
+                                  "width": 21,
+                                  "height": 21,
+                                  "constraints": {
+                                    "horizontal": "CENTER",
+                                    "vertical": "CENTER"
+                                  },
+                                  "children": [
+                                    {
+                                      "id": "I4044:20687;22396:8451;20652:11929;20633:11498;18311:48500",
+                                      "name": "Item.01 (Stroke)",
+                                      "type": "VECTOR",
+                                      "width": 21,
+                                      "height": 2,
+                                      "fills": [
+                                        {
+                                          "type": "SOLID",
+                                          "color": "rgba(0, 0, 0, 1)",
+                                          "token": "var(--black)"
+                                        }
+                                      ],
+                                      "constraints": {
+                                        "horizontal": "CENTER",
+                                        "vertical": "CENTER"
+                                      }
+                                    },
+                                    {
+                                      "id": "I4044:20687;22396:8451;20652:11929;20633:11498;18311:48501",
+                                      "name": "Item.02 (Stroke)",
+                                      "type": "VECTOR",
+                                      "width": 2,
+                                      "height": 21,
+                                      "fills": [
+                                        {
+                                          "type": "SOLID",
+                                          "color": "rgba(0, 0, 0, 1)",
+                                          "token": "var(--black)"
+                                        }
+                                      ],
+                                      "constraints": {
+                                        "horizontal": "CENTER",
+                                        "vertical": "CENTER"
+                                      }
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "I4044:20687;22396:8451;1704:3785",
+                      "name": "Input content",
+                      "type": "FRAME",
+                      "width": 130,
+                      "height": 24,
+                      "layout": {
+                        "direction": "row",
+                        "gap": 8,
+                        "padding": {},
+                        "mainAxisAlign": "flex-start",
+                        "crossAxisAlign": "center",
+                        "sizing": {
+                          "primary": "FIXED"
+                        }
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20687;22396:8451;218:342",
+                          "name": "Ask Gemini",
+                          "type": "TEXT",
+                          "width": 102,
+                          "height": 24,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(0, 0, 0, 0.5400000214576721)",
+                              "token": null
+                            }
+                          ],
+                          "typography": {
+                            "fontFamily": "Google Sans Flex",
+                            "fontFamilyToken": "var(--font-display)",
+                            "fontWeight": 375,
+                            "fontSize": 20,
+                            "lineHeight": 24,
+                            "letterSpacing": 0,
+                            "textAlign": "left"
+                          },
+                          "styleRefs": {
+                            "text": "1672:31368"
+                          },
+                          "text": "Ask Gemini",
+                          "constraints": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "I4044:20687;22396:8451;20652:12698",
+                  "name": "Trailing",
+                  "type": "FRAME",
+                  "width": 96,
+                  "height": 48,
+                  "layout": {
+                    "direction": "row",
+                    "padding": {},
+                    "mainAxisAlign": "center",
+                    "crossAxisAlign": "center",
+                    "sizing": {
+                      "counter": "FIXED"
+                    }
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20687;22396:8451;20652:12699",
+                      "name": ".Input mobile buttons",
+                      "type": "INSTANCE",
+                      "width": 48,
+                      "height": 48,
+                      "componentId": "4044:16970",
+                      "variantProperties": {
+                        "Type": "Mic off",
+                        "State": "Default",
+                        "Mode": "Light"
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20687;22396:8451;20652:12699;22208:19973",
+                          "name": "state",
+                          "type": "ELLIPSE",
+                          "width": 40,
+                          "height": 40,
+                          "constraints": {
+                            "horizontal": "CENTER",
+                            "vertical": "CENTER"
+                          }
+                        },
+                        {
+                          "id": "I4044:20687;22396:8451;20652:12699;20633:11502",
+                          "name": "Icons",
+                          "type": "INSTANCE",
+                          "width": 28,
+                          "height": 28,
+                          "componentId": "4044:15076",
+                          "variantProperties": {
+                            "Symbols#15347:799": "185:7121",
+                            "Library": "Luminous",
+                            "Type": "mic",
+                            "Size": "28"
+                          },
+                          "constraints": {
+                            "horizontal": "CENTER",
+                            "vertical": "CENTER"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:20687;22396:8451;20652:12699;20633:11502;18233:32921",
+                              "name": "Vector",
+                              "type": "VECTOR",
+                              "width": 16,
+                              "height": 20,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(0, 0, 0, 1)",
+                                  "token": "var(--black)"
+                                }
+                              ],
+                              "constraints": {
+                                "horizontal": "CENTER",
+                                "vertical": "CENTER"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "I4044:20687;22396:8451;20652:12700",
+                      "name": "Button",
+                      "type": "INSTANCE",
+                      "width": 48,
+                      "height": 48,
+                      "componentId": "4044:16988",
+                      "variantProperties": {
+                        "Type": "Live",
+                        "State": "Default",
+                        "Mode": "Light"
+                      },
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20687;22396:8451;20652:12700;21429:34374",
+                          "name": "state",
+                          "type": "ELLIPSE",
+                          "width": 40,
+                          "height": 40,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(220, 241, 255, 1)",
+                              "token": null
+                            }
+                          ],
+                          "constraints": {
+                            "horizontal": "CENTER",
+                            "vertical": "CENTER"
+                          }
+                        },
+                        {
+                          "id": "I4044:20687;22396:8451;20652:12700;20633:11512",
+                          "name": "Icons",
+                          "type": "INSTANCE",
+                          "width": 28,
+                          "height": 28,
+                          "componentId": "4044:15125",
+                          "variantProperties": {
+                            "Symbols#15347:799": "185:7121",
+                            "Library": "Luminous",
+                            "Type": "live",
+                            "Size": "28"
+                          },
+                          "constraints": {
+                            "horizontal": "CENTER",
+                            "vertical": "CENTER"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:20687;22396:8451;20652:12700;20633:11512;18233:35402",
+                              "name": "Vector",
+                              "type": "VECTOR",
+                              "width": 16,
+                              "height": 21,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(0, 0, 0, 1)",
+                                  "token": "var(--black)"
+                                }
+                              ],
+                              "constraints": {
+                                "horizontal": "CENTER",
+                                "vertical": "CENTER"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4044:13958",
+      "name": "Group 2147231150",
+      "type": "GROUP",
+      "width": 402,
+      "height": 260,
+      "borderRadius": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "constraints": {
+        "horizontal": "LEFT",
+        "vertical": "TOP"
+      },
+      "children": [
+        {
+          "id": "4044:13959",
+          "name": "Rectangle 1739336615",
+          "type": "RECTANGLE",
+          "width": 402,
+          "height": 260,
+          "borderRadius": [
+            20,
+            20,
+            0,
+            0
+          ],
+          "constraints": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          }
+        }
+      ]
+    },
+    {
+      "id": "4044:13960",
+      "name": "Group 2147231151",
+      "type": "GROUP",
+      "width": 402,
+      "height": 184,
+      "constraints": {
+        "horizontal": "CENTER",
+        "vertical": "TOP"
+      },
+      "children": [
+        {
+          "id": "4044:13962",
+          "name": "sysUI",
+          "type": "FRAME",
+          "width": 402,
+          "height": 68,
+          "constraints": {
+            "horizontal": "LEFT_RIGHT",
+            "vertical": "TOP_BOTTOM"
+          },
+          "children": [
+            {
+              "id": "4044:13963",
+              "name": "island",
+              "type": "RECTANGLE",
+              "width": 126,
+              "height": 62,
+              "fills": [
+                {
+                  "type": "IMAGE",
+                  "imageRef": "67603624385848a90c5545284ca559f6f43b6a8e"
+                }
+              ],
+              "constraints": {
+                "horizontal": "CENTER",
+                "vertical": "TOP"
+              }
+            },
+            {
+              "id": "4044:13965",
+              "name": "Status bar",
+              "type": "INSTANCE",
+              "width": 402,
+              "height": 62,
+              "layout": {
+                "direction": "row",
+                "gap": 154,
+                "padding": {
+                  "top": 21,
+                  "right": 16,
+                  "bottom": 19,
+                  "left": 16
+                },
+                "mainAxisAlign": "center",
+                "crossAxisAlign": "center",
+                "sizing": {
+                  "primary": "FIXED"
+                }
+              },
+              "componentId": "5:323",
+              "variantProperties": {
+                "Time#5466:2": "9:41",
+                "Size": "iPhone 16 Pro and 16 Max"
+              },
+              "constraints": {
+                "horizontal": "LEFT_RIGHT",
+                "vertical": "TOP"
+              },
+              "children": [
+                {
+                  "id": "I4044:13965;5465:16808",
+                  "name": "Time",
+                  "type": "FRAME",
+                  "width": 108,
+                  "height": 22,
+                  "layout": {
+                    "direction": "row",
+                    "gap": 10,
+                    "padding": {
+                      "top": 2
+                    },
+                    "mainAxisAlign": "center",
+                    "crossAxisAlign": "center",
+                    "sizing": {
+                      "primary": "FIXED",
+                      "counter": "FIXED"
+                    }
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:13965;5465:16809",
+                      "name": "Time",
+                      "type": "TEXT",
+                      "width": 37,
+                      "height": 22,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(0, 0, 0, 1)",
+                          "token": "var(--black)"
+                        }
+                      ],
+                      "typography": {
+                        "fontFamily": "SF Pro",
+                        "fontFamilyToken": null,
+                        "fontWeight": 590,
+                        "fontSize": 17,
+                        "lineHeight": 22,
+                        "letterSpacing": 0,
+                        "textAlign": "center"
+                      },
+                      "text": "9:41",
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "I4044:13965;5465:16811",
+                  "name": "Levels",
+                  "type": "FRAME",
+                  "width": 108,
+                  "height": 22,
+                  "layout": {
+                    "direction": "row",
+                    "gap": 7,
+                    "padding": {
+                      "top": 1
+                    },
+                    "mainAxisAlign": "center",
+                    "crossAxisAlign": "center",
+                    "sizing": {
+                      "primary": "FIXED",
+                      "counter": "FIXED"
+                    }
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:13965;5465:16812",
+                      "name": "Cellular Connection",
+                      "type": "VECTOR",
+                      "width": 19,
+                      "height": 12,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(0, 0, 0, 1)",
+                          "token": "var(--black)"
+                        }
+                      ],
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      }
+                    },
+                    {
+                      "id": "I4044:13965;5465:16813",
+                      "name": "Wifi",
+                      "type": "VECTOR",
+                      "width": 17,
+                      "height": 12,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(0, 0, 0, 1)",
+                          "token": "var(--black)"
+                        }
+                      ],
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      }
+                    },
+                    {
+                      "id": "I4044:13965;5465:16814",
+                      "name": "Battery",
+                      "type": "GROUP",
+                      "width": 27,
+                      "height": 13,
+                      "fills": [],
+                      "borderRadius": [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "constraints": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:13965;5465:16815",
+                          "name": "Border",
+                          "type": "RECTANGLE",
+                          "width": 25,
+                          "height": 13,
+                          "opacity": 0.3499999940395355,
+                          "borderRadius": 4.300000190734863,
+                          "borderRadiusToken": null,
+                          "border": {
+                            "color": "rgba(0, 0, 0, 1)",
+                            "weight": 1,
+                            "align": "INSIDE"
+                          },
+                          "constraints": {
+                            "horizontal": "CENTER",
+                            "vertical": "SCALE"
+                          }
+                        },
+                        {
+                          "id": "I4044:13965;5465:16816",
+                          "name": "Cap",
+                          "type": "VECTOR",
+                          "width": 1,
+                          "height": 4,
+                          "opacity": 0.4000000059604645,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(0, 0, 0, 1)",
+                              "token": "var(--black)"
+                            }
+                          ],
+                          "constraints": {
+                            "horizontal": "CENTER",
+                            "vertical": "SCALE"
+                          }
+                        },
+                        {
+                          "id": "I4044:13965;5465:16817",
+                          "name": "Capacity",
+                          "type": "RECTANGLE",
+                          "width": 21,
+                          "height": 9,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(0, 0, 0, 1)",
+                              "token": "var(--black)"
+                            }
+                          ],
+                          "borderRadius": 2.5,
+                          "borderRadiusToken": null,
+                          "constraints": {
+                            "horizontal": "CENTER",
+                            "vertical": "SCALE"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "4044:13966",
+          "name": "Text nc_917:9",
+          "type": "FRAME",
+          "width": 402,
+          "height": 68,
+          "layout": {
+            "direction": "row",
+            "gap": 10,
+            "padding": {
+              "top": 16,
+              "right": 16,
+              "bottom": 24,
+              "left": 16
+            },
+            "mainAxisAlign": "center",
+            "crossAxisAlign": "center",
+            "sizing": {
+              "primary": "FIXED"
+            }
+          },
+          "constraints": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "children": [
+            {
+              "id": "4044:13967",
+              "name": "Text nc_6656:",
+              "type": "TEXT",
+              "width": 370,
+              "height": 28,
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "color": "rgba(31, 31, 31, 1)",
+                  "token": "var(--text-primary)"
+                }
+              ],
+              "typography": {
+                "fontFamily": "Google Sans Flex",
+                "fontFamilyToken": "var(--font-display)",
+                "fontWeight": 380,
+                "fontSize": 24,
+                "lineHeight": 28,
+                "letterSpacing": 0,
+                "textAlign": "left"
+              },
+              "styleRefs": {
+                "text": "3409:137582"
+              },
+              "text": "Pick a style for your image",
+              "constraints": {
+                "horizontal": "LEFT",
+                "vertical": "TOP"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4053:1264",
+      "name": "Toolbar iOS",
+      "type": "FRAME",
+      "width": 402,
+      "height": 54,
+      "layout": {
+        "direction": "row",
+        "gap": 282,
+        "padding": {
+          "right": 16,
+          "bottom": 10,
+          "left": 16
+        },
+        "mainAxisAlign": "space-between",
+        "crossAxisAlign": "center",
+        "sizing": {
+          "primary": "FIXED"
+        }
+      },
+      "constraints": {
+        "horizontal": "LEFT_RIGHT",
+        "vertical": "TOP"
+      }
+    },
+    {
+      "id": "4044:20577",
+      "name": "Toolbar iOS",
+      "type": "INSTANCE",
+      "width": 402,
+      "height": 54,
+      "layout": {
+        "direction": "row",
+        "gap": 282,
+        "padding": {
+          "right": 16,
+          "bottom": 10,
+          "left": 16
+        },
+        "mainAxisAlign": "space-between",
+        "crossAxisAlign": "center",
+        "sizing": {
+          "primary": "FIXED"
+        }
+      },
+      "componentId": "4044:16845",
+      "variantProperties": {
+        "Show skrim (over content)#218:0": true,
+        "Location": "Home",
+        "Mode": "Light",
+        "Live": "False",
+        "Live Captions": "False"
+      },
+      "constraints": {
+        "horizontal": "LEFT_RIGHT",
+        "vertical": "TOP"
+      },
+      "children": [
+        {
+          "id": "I4044:20577;10780:871",
+          "name": "Skrim",
+          "type": "FRAME",
+          "width": 402,
+          "height": 116,
+          "x": 0,
+          "y": -62,
+          "isAbsolute": true,
+          "constraints": {
+            "horizontal": "SCALE",
+            "vertical": "BOTTOM"
+          },
+          "children": [
+            {
+              "id": "I4044:20577;10780:872",
+              "name": "Scroll Edge Effect - Soft",
+              "type": "INSTANCE",
+              "width": 402,
+              "height": 116,
+              "effects": [
+                {
+                  "type": "BACKGROUND_BLUR",
+                  "color": null,
+                  "radius": 2,
+                  "css": "backdrop-filter: blur(2px)"
+                }
+              ],
+              "componentId": "5:30",
+              "variantProperties": {
+                "Edge": "Top"
+              },
+              "constraints": {
+                "horizontal": "SCALE",
+                "vertical": "SCALE"
+              },
+              "children": [
+                {
+                  "id": "I4044:20577;10780:872;5661:28843",
+                  "name": "Mask",
+                  "type": "FRAME",
+                  "width": 402,
+                  "height": 116,
+                  "fills": [
+                    {
+                      "type": "GRADIENT_LINEAR",
+                      "cssGradient": "linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%)"
+                    }
+                  ],
+                  "constraints": {
+                    "horizontal": "LEFT_RIGHT",
+                    "vertical": "TOP_BOTTOM"
+                  }
+                },
+                {
+                  "id": "I4044:20577;10780:872;5661:28853",
+                  "name": "Blur",
+                  "type": "RECTANGLE",
+                  "width": 402,
+                  "height": 116,
+                  "opacity": 0.8999999761581421,
+                  "fills": [
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(255, 255, 255, 1)",
+                      "token": "var(--white)"
+                    }
+                  ],
+                  "effects": [
+                    {
+                      "type": "BACKGROUND_BLUR",
+                      "color": null,
+                      "radius": 60,
+                      "css": "backdrop-filter: blur(60px)"
+                    }
+                  ],
+                  "constraints": {
+                    "horizontal": "LEFT_RIGHT",
+                    "vertical": "TOP_BOTTOM"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "I4044:20577;10780:873",
+          "name": "LG Icon Button",
+          "type": "FRAME",
+          "width": 44,
+          "height": 44,
+          "fills": [
+            {
+              "type": "SOLID",
+              "color": "rgba(255, 255, 255, 1)",
+              "token": "var(--white)"
+            }
+          ],
+          "layout": {
+            "direction": "row",
+            "gap": 12,
+            "padding": {
+              "right": 2,
+              "left": 2
+            },
+            "mainAxisAlign": "center",
+            "crossAxisAlign": "center",
+            "sizing": {
+              "primary": "FIXED",
+              "counter": "FIXED"
+            }
+          },
+          "borderRadius": 296,
+          "borderRadiusToken": null,
+          "constraints": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "children": [
+            {
+              "id": "I4044:20577;16744:41945",
+              "name": "Glass",
+              "type": "INSTANCE",
+              "width": 44,
+              "height": 44,
+              "x": 0,
+              "y": 0,
+              "isAbsolute": true,
+              "componentId": "3361:127196",
+              "variantProperties": {
+                "Variant": "MD Glass (Default)"
+              },
+              "constraints": {
+                "horizontal": "SCALE",
+                "vertical": "SCALE"
+              },
+              "children": [
+                {
+                  "id": "I4044:20577;16744:41945;16652:5807",
+                  "name": "MD Glass",
+                  "type": "INSTANCE",
+                  "width": 44,
+                  "height": 44,
+                  "componentId": "2324:46019",
+                  "constraints": {
+                    "horizontal": "SCALE",
+                    "vertical": "SCALE"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20577;16744:41945;16652:5807;3420:12655",
+                      "name": "Blur",
+                      "type": "FRAME",
+                      "width": 96,
+                      "height": 96,
+                      "opacity": 0.6700000166893005,
+                      "borderRadius": 40,
+                      "borderRadiusToken": null,
+                      "constraints": {
+                        "horizontal": "LEFT_RIGHT",
+                        "vertical": "TOP_BOTTOM"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20577;16744:41945;16652:5807;3420:12656",
+                          "name": "Mask",
+                          "type": "FRAME",
+                          "width": 196,
+                          "height": 196,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(255, 255, 255, 1)",
+                              "token": "var(--white)"
+                            }
+                          ],
+                          "constraints": {
+                            "horizontal": "LEFT_RIGHT",
+                            "vertical": "TOP_BOTTOM"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:20577;16744:41945;16652:5807;3420:12657",
+                              "name": "Shape",
+                              "type": "RECTANGLE",
+                              "width": 44,
+                              "height": 44,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(0, 0, 0, 1)",
+                                  "token": "var(--black)"
+                                }
+                              ],
+                              "borderRadius": 200,
+                              "borderRadiusToken": "var(--radius-pill)",
+                              "constraints": {
+                                "horizontal": "LEFT_RIGHT",
+                                "vertical": "TOP_BOTTOM"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "id": "I4044:20577;16744:41945;16652:5807;3420:12658",
+                          "name": "Blur",
+                          "type": "FRAME",
+                          "width": 44,
+                          "height": 44,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(0, 0, 0, 0.03999999910593033)",
+                              "token": null
+                            }
+                          ],
+                          "borderRadius": 200,
+                          "borderRadiusToken": "var(--radius-pill)",
+                          "effects": [
+                            {
+                              "type": "BACKGROUND_BLUR",
+                              "color": null,
+                              "radius": 40,
+                              "css": "backdrop-filter: blur(40px)"
+                            },
+                            {
+                              "type": "LAYER_BLUR",
+                              "color": null,
+                              "radius": 20,
+                              "css": "filter: blur(20px)"
+                            }
+                          ],
+                          "constraints": {
+                            "horizontal": "LEFT_RIGHT",
+                            "vertical": "TOP_BOTTOM"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "I4044:20577;16744:41945;16652:5807;3420:12659",
+                      "name": "Scrim",
+                      "type": "FRAME",
+                      "width": 44,
+                      "height": 44,
+                      "opacity": 0.8500000238418579,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(255, 255, 255, 1)",
+                          "token": "var(--white)"
+                        }
+                      ],
+                      "borderRadius": 40,
+                      "borderRadiusToken": null,
+                      "constraints": {
+                        "horizontal": "LEFT_RIGHT",
+                        "vertical": "TOP_BOTTOM"
+                      }
+                    },
+                    {
+                      "id": "I4044:20577;16744:41945;16652:5807;3420:12660",
+                      "name": "Tint",
+                      "type": "FRAME",
+                      "width": 44,
+                      "height": 44,
+                      "opacity": 0.699999988079071,
+                      "blendMode": "color",
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(255, 255, 255, 1)",
+                          "token": "var(--white)"
+                        }
+                      ],
+                      "borderRadius": 40,
+                      "borderRadiusToken": null,
+                      "constraints": {
+                        "horizontal": "LEFT_RIGHT",
+                        "vertical": "TOP_BOTTOM"
+                      }
+                    },
+                    {
+                      "id": "I4044:20577;16744:41945;16652:5807;3420:12661",
+                      "name": "Glass",
+                      "type": "FRAME",
+                      "width": 44,
+                      "height": 44,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(0, 0, 0, 0.004000000189989805)",
+                          "token": null
+                        }
+                      ],
+                      "styleRefs": {
+                        "effect": "371:22827"
+                      },
+                      "borderRadius": 40,
+                      "borderRadiusToken": null,
+                      "effects": [
+                        {
+                          "type": "GLASS",
+                          "color": null,
+                          "css": ""
+                        }
+                      ],
+                      "constraints": {
+                        "horizontal": "LEFT_RIGHT",
+                        "vertical": "TOP_BOTTOM"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "I4044:20577;11505:875",
+              "name": "Icons",
+              "type": "INSTANCE",
+              "width": 32,
+              "height": 32,
+              "componentId": "4044:15537",
+              "variantProperties": {
+                "Symbols#15347:799": "185:7121",
+                "Library": "Luminous",
+                "Type": "menu",
+                "Size": "32"
+              },
+              "constraints": {
+                "horizontal": "LEFT",
+                "vertical": "TOP"
+              },
+              "children": [
+                {
+                  "id": "I4044:20577;11505:875;18311:40763",
+                  "name": "Union",
+                  "type": "BOOLEAN_OPERATION",
+                  "width": 20,
+                  "height": 10,
+                  "fills": [
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(0, 0, 0, 1)",
+                      "token": "var(--black)"
+                    }
+                  ],
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20577;11505:875;10526:13450",
+                      "name": "Item.01 (Stroke)",
+                      "type": "VECTOR",
+                      "width": 20,
+                      "height": 2,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(0, 0, 0, 1)",
+                          "token": "var(--black)"
+                        }
+                      ],
+                      "constraints": {
+                        "horizontal": "CENTER",
+                        "vertical": "CENTER"
+                      }
+                    },
+                    {
+                      "id": "I4044:20577;11505:875;10526:13451",
+                      "name": "Item.02 (Stroke)",
+                      "type": "VECTOR",
+                      "width": 20,
+                      "height": 2,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(0, 0, 0, 1)",
+                          "token": "var(--black)"
+                        }
+                      ],
+                      "constraints": {
+                        "horizontal": "CENTER",
+                        "vertical": "CENTER"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "I4044:20577;10780:878",
+          "name": "LG Icon Button",
+          "type": "FRAME",
+          "width": 44,
+          "height": 44,
+          "fills": [
+            {
+              "type": "SOLID",
+              "color": "rgba(255, 255, 255, 1)",
+              "token": "var(--white)"
+            }
+          ],
+          "layout": {
+            "direction": "row",
+            "gap": 12,
+            "padding": {
+              "right": 2,
+              "left": 2
+            },
+            "mainAxisAlign": "center",
+            "crossAxisAlign": "center",
+            "sizing": {
+              "primary": "FIXED",
+              "counter": "FIXED"
+            }
+          },
+          "borderRadius": 296,
+          "borderRadiusToken": null,
+          "constraints": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "children": [
+            {
+              "id": "I4044:20577;16744:42104",
+              "name": "Glass",
+              "type": "INSTANCE",
+              "width": 44,
+              "height": 44,
+              "x": 0,
+              "y": 0,
+              "isAbsolute": true,
+              "componentId": "3361:127196",
+              "variantProperties": {
+                "Variant": "MD Glass (Default)"
+              },
+              "constraints": {
+                "horizontal": "LEFT",
+                "vertical": "TOP"
+              },
+              "children": [
+                {
+                  "id": "I4044:20577;16744:42104;16652:5807",
+                  "name": "MD Glass",
+                  "type": "INSTANCE",
+                  "width": 44,
+                  "height": 44,
+                  "componentId": "2324:46019",
+                  "constraints": {
+                    "horizontal": "SCALE",
+                    "vertical": "SCALE"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20577;16744:42104;16652:5807;3420:12655",
+                      "name": "Blur",
+                      "type": "FRAME",
+                      "width": 96,
+                      "height": 96,
+                      "opacity": 0.6700000166893005,
+                      "borderRadius": 40,
+                      "borderRadiusToken": null,
+                      "constraints": {
+                        "horizontal": "LEFT_RIGHT",
+                        "vertical": "TOP_BOTTOM"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20577;16744:42104;16652:5807;3420:12656",
+                          "name": "Mask",
+                          "type": "FRAME",
+                          "width": 196,
+                          "height": 196,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(255, 255, 255, 1)",
+                              "token": "var(--white)"
+                            }
+                          ],
+                          "constraints": {
+                            "horizontal": "LEFT_RIGHT",
+                            "vertical": "TOP_BOTTOM"
+                          },
+                          "children": [
+                            {
+                              "id": "I4044:20577;16744:42104;16652:5807;3420:12657",
+                              "name": "Shape",
+                              "type": "RECTANGLE",
+                              "width": 44,
+                              "height": 44,
+                              "fills": [
+                                {
+                                  "type": "SOLID",
+                                  "color": "rgba(0, 0, 0, 1)",
+                                  "token": "var(--black)"
+                                }
+                              ],
+                              "borderRadius": 200,
+                              "borderRadiusToken": "var(--radius-pill)",
+                              "constraints": {
+                                "horizontal": "LEFT_RIGHT",
+                                "vertical": "TOP_BOTTOM"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "id": "I4044:20577;16744:42104;16652:5807;3420:12658",
+                          "name": "Blur",
+                          "type": "FRAME",
+                          "width": 44,
+                          "height": 44,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(0, 0, 0, 0.03999999910593033)",
+                              "token": null
+                            }
+                          ],
+                          "borderRadius": 200,
+                          "borderRadiusToken": "var(--radius-pill)",
+                          "effects": [
+                            {
+                              "type": "BACKGROUND_BLUR",
+                              "color": null,
+                              "radius": 40,
+                              "css": "backdrop-filter: blur(40px)"
+                            },
+                            {
+                              "type": "LAYER_BLUR",
+                              "color": null,
+                              "radius": 20,
+                              "css": "filter: blur(20px)"
+                            }
+                          ],
+                          "constraints": {
+                            "horizontal": "LEFT_RIGHT",
+                            "vertical": "TOP_BOTTOM"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "I4044:20577;16744:42104;16652:5807;3420:12659",
+                      "name": "Scrim",
+                      "type": "FRAME",
+                      "width": 44,
+                      "height": 44,
+                      "opacity": 0.8500000238418579,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(255, 255, 255, 1)",
+                          "token": "var(--white)"
+                        }
+                      ],
+                      "borderRadius": 40,
+                      "borderRadiusToken": null,
+                      "constraints": {
+                        "horizontal": "LEFT_RIGHT",
+                        "vertical": "TOP_BOTTOM"
+                      }
+                    },
+                    {
+                      "id": "I4044:20577;16744:42104;16652:5807;3420:12660",
+                      "name": "Tint",
+                      "type": "FRAME",
+                      "width": 44,
+                      "height": 44,
+                      "opacity": 0.699999988079071,
+                      "blendMode": "color",
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(255, 255, 255, 1)",
+                          "token": "var(--white)"
+                        }
+                      ],
+                      "borderRadius": 40,
+                      "borderRadiusToken": null,
+                      "constraints": {
+                        "horizontal": "LEFT_RIGHT",
+                        "vertical": "TOP_BOTTOM"
+                      }
+                    },
+                    {
+                      "id": "I4044:20577;16744:42104;16652:5807;3420:12661",
+                      "name": "Glass",
+                      "type": "FRAME",
+                      "width": 44,
+                      "height": 44,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(0, 0, 0, 0.004000000189989805)",
+                          "token": null
+                        }
+                      ],
+                      "styleRefs": {
+                        "effect": "371:22827"
+                      },
+                      "borderRadius": 40,
+                      "borderRadiusToken": null,
+                      "effects": [
+                        {
+                          "type": "GLASS",
+                          "color": null,
+                          "css": ""
+                        }
+                      ],
+                      "constraints": {
+                        "horizontal": "LEFT_RIGHT",
+                        "vertical": "TOP_BOTTOM"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "I4044:20577;11505:1028",
+              "name": "Icons",
+              "type": "INSTANCE",
+              "width": 32,
+              "height": 32,
+              "componentId": "4044:15496",
+              "variantProperties": {
+                "Symbols#15347:799": "185:7121",
+                "Library": "Luminous",
+                "Type": "temp chat",
+                "Size": "32"
+              },
+              "constraints": {
+                "horizontal": "LEFT",
+                "vertical": "TOP"
+              },
+              "children": [
+                {
+                  "id": "I4044:20577;11505:1028;18311:40271",
+                  "name": "Union",
+                  "type": "BOOLEAN_OPERATION",
+                  "width": 27,
+                  "height": 23,
+                  "fills": [
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(0, 0, 0, 1)",
+                      "token": "var(--black)"
+                    }
+                  ],
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20577;11505:1028;18311:40234",
+                      "name": "Item.01 (Stroke)",
+                      "type": "VECTOR",
+                      "width": 25,
+                      "height": 21,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(0, 0, 0, 1)",
+                          "token": "var(--black)"
+                        }
+                      ],
+                      "constraints": {
+                        "horizontal": "CENTER",
+                        "vertical": "CENTER"
+                      }
+                    },
+                    {
+                      "id": "I4044:20577;11505:1028;18311:40235",
+                      "name": "Item.02 (Stroke)",
+                      "type": "VECTOR",
+                      "width": 15,
+                      "height": 15,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(0, 0, 0, 1)",
+                          "token": "var(--black)"
+                        }
+                      ],
+                      "constraints": {
+                        "horizontal": "CENTER",
+                        "vertical": "CENTER"
+                      }
+                    },
+                    {
+                      "id": "I4044:20577;11505:1028;18311:40236",
+                      "name": "Ellipse 23784",
+                      "type": "ELLIPSE",
+                      "width": 3,
+                      "height": 3,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "color": "rgba(0, 0, 0, 1)",
+                          "token": "var(--black)"
+                        }
+                      ],
+                      "constraints": {
+                        "horizontal": "CENTER",
+                        "vertical": "CENTER"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "I4044:20577;10780:884",
+          "name": "Model Picker",
+          "type": "INSTANCE",
+          "width": 129,
+          "height": 44,
+          "x": 64,
+          "y": 0,
+          "isAbsolute": true,
+          "layout": {
+            "direction": "row",
+            "gap": 4,
+            "padding": {
+              "top": 14,
+              "right": 4,
+              "bottom": 14,
+              "left": 8
+            },
+            "mainAxisAlign": "center",
+            "crossAxisAlign": "center",
+            "sizing": {
+              "counter": "FIXED"
+            }
+          },
+          "borderRadius": 999,
+          "borderRadiusToken": "var(--radius-full)",
+          "effects": [
+            {
+              "type": "BACKGROUND_BLUR",
+              "color": null,
+              "radius": 28,
+              "css": "backdrop-filter: blur(28px)"
+            }
+          ],
+          "componentId": "4044:15043",
+          "variantProperties": {
+            "Type": "Name + Model"
+          },
+          "constraints": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "children": [
+            {
+              "id": "I4044:20577;10780:884;4514:2015",
+              "name": "label-text",
+              "type": "TEXT",
+              "width": 54,
+              "height": 24,
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "color": "rgba(0, 0, 0, 1)",
+                  "token": "var(--black)"
+                }
+              ],
+              "typography": {
+                "fontFamily": "Google Sans Flex",
+                "fontFamilyToken": "var(--font-display)",
+                "fontWeight": 400,
+                "fontSize": 17,
+                "lineHeight": 24,
+                "letterSpacing": 0,
+                "textAlign": "center"
+              },
+              "styleRefs": {
+                "text": "3180:108641"
+              },
+              "text": "Gemini",
+              "constraints": {
+                "horizontal": "LEFT",
+                "vertical": "TOP"
+              }
+            },
+            {
+              "id": "I4044:20577;10780:884;4514:2018",
+              "name": "Trailing",
+              "type": "FRAME",
+              "width": 59,
+              "height": 24,
+              "layout": {
+                "direction": "row",
+                "padding": {},
+                "mainAxisAlign": "flex-start",
+                "crossAxisAlign": "center",
+                "sizing": {}
+              },
+              "constraints": {
+                "horizontal": "LEFT",
+                "vertical": "TOP"
+              },
+              "children": [
+                {
+                  "id": "I4044:20577;10780:884;4514:2017",
+                  "name": "label-text",
+                  "type": "TEXT",
+                  "width": 39,
+                  "height": 24,
+                  "fills": [
+                    {
+                      "type": "SOLID",
+                      "color": "rgba(0, 0, 0, 0.5400000214576721)",
+                      "token": null
+                    }
+                  ],
+                  "typography": {
+                    "fontFamily": "Google Sans Flex",
+                    "fontFamilyToken": "var(--font-display)",
+                    "fontWeight": 400,
+                    "fontSize": 17,
+                    "lineHeight": 24,
+                    "letterSpacing": 0,
+                    "textAlign": "center"
+                  },
+                  "styleRefs": {
+                    "text": "3180:108641"
+                  },
+                  "text": "Flash",
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  }
+                },
+                {
+                  "id": "I4044:20577;10780:884;17880:8260",
+                  "name": "Icons",
+                  "type": "INSTANCE",
+                  "width": 20,
+                  "height": 20,
+                  "componentId": "3219:113264",
+                  "variantProperties": {
+                    "Symbols#15347:799": "3605:15368",
+                    "Library": "Google",
+                    "Type": "Symbols",
+                    "Size": "20"
+                  },
+                  "constraints": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP"
+                  },
+                  "children": [
+                    {
+                      "id": "I4044:20577;10780:884;17880:8260;15347:22956",
+                      "name": "keyboard_arrow_down",
+                      "type": "INSTANCE",
+                      "width": 20,
+                      "height": 20,
+                      "fills": [],
+                      "componentId": "3605:15368",
+                      "constraints": {
+                        "horizontal": "CENTER",
+                        "vertical": "CENTER"
+                      },
+                      "children": [
+                        {
+                          "id": "I4044:20577;10780:884;17880:8260;15347:22956;45109:1524",
+                          "name": "icon",
+                          "type": "TEXT",
+                          "width": 20,
+                          "height": 20,
+                          "fills": [
+                            {
+                              "type": "SOLID",
+                              "color": "rgba(0, 0, 0, 0.5400000214576721)",
+                              "token": null
+                            }
+                          ],
+                          "typography": {
+                            "fontFamily": "Google Symbols",
+                            "fontFamilyToken": "var(--font-icons)",
+                            "fontWeight": 330,
+                            "fontSize": 20,
+                            "lineHeight": 50,
+                            "letterSpacing": 0,
+                            "textAlign": "center"
+                          },
+                          "isIcon": true,
+                          "text": "keyboard_arrow_down",
+                          "constraints": {
+                            "horizontal": "SCALE",
+                            "vertical": "SCALE"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

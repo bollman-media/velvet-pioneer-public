@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Suno.com — Product Audit 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080810;
+      --surface: #0f0f1a;
+      --surface2: #161626;
+      --border: rgba(255,255,255,0.07);
+      --purple: #8b5cf6;
+      --purple-light: #a78bfa;
+      --teal: #2dd4bf;
+      --gold: #fbbf24;
+      --text: #f0f0f8;
+      --muted: #888aaa;
+      --accent-glow: rgba(139,92,246,0.25);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(8,8,16,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-size: 15px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--purple-light);
+    }
+    .nav-tag {
+      font-size: 11px; color: var(--muted); letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      font-size: 13px; color: var(--muted); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 120px 24px 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero-orb {
+      position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.35;
+      animation: drift 8s ease-in-out infinite alternate;
+    }
+    .hero-orb-1 { width: 500px; height: 500px; background: var(--purple); top: -100px; left: 50%; transform: translateX(-50%); }
+    .hero-orb-2 { width: 300px; height: 300px; background: var(--teal); bottom: 0; right: 5%; animation-delay: -3s; opacity: 0.2; }
+    @keyframes drift { from { transform: translateX(-50%) translateY(0); } to { transform: translateX(-50%) translateY(30px); } }
+
+    .hero-inner { position: relative; max-width: 760px; }
+    .hero-kicker {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--purple-light);
+      background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.25);
+      padding: 6px 16px; border-radius: 100px; margin-bottom: 28px;
+    }
+    .hero-title {
+      font-size: clamp(48px, 8vw, 88px); font-weight: 900; line-height: 1.0;
+      letter-spacing: -0.03em; margin-bottom: 24px;
+    }
+    .hero-title span { color: var(--purple-light); }
+    .hero-desc {
+      font-size: 18px; color: var(--muted); max-width: 540px; margin: 0 auto 40px;
+    }
+    .hero-meta {
+      display: flex; gap: 32px; justify-content: center; flex-wrap: wrap;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat-value { font-size: 28px; font-weight: 800; color: var(--text); }
+    .hero-stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ─── SECTION ─── */
+    section { padding: 100px 24px; max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--purple-light); margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px); font-weight: 800;
+      letter-spacing: -0.02em; margin-bottom: 16px;
+    }
+    .section-desc { font-size: 17px; color: var(--muted); max-width: 600px; margin-bottom: 56px; }
+
+    /* ─── FEATURE BLOCKS ─── */
+    .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-bottom: 2px; }
+    .feature-grid + .feature-grid { margin-top: 0; }
+    .feature-card {
+      background: var(--surface);
+      padding: 48px;
+      border-radius: 0;
+      transition: background 0.3s;
+    }
+    .feature-card:hover { background: var(--surface2); }
+    .feature-card:first-child { border-radius: 20px 0 0 0; }
+    .feature-card:last-child { border-radius: 0 20px 0 0; }
+
+    .feature-number {
+      font-size: 11px; font-weight: 700; color: var(--purple);
+      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px;
+    }
+    .feature-title { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+    .feature-desc { font-size: 15px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+    .feature-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 100px;
+      background: rgba(139,92,246,0.12); color: var(--purple-light);
+      border: 1px solid rgba(139,92,246,0.2);
+    }
+    .tag.teal { background: rgba(45,212,191,0.1); color: var(--teal); border-color: rgba(45,212,191,0.2); }
+    .tag.gold { background: rgba(251,191,36,0.1); color: var(--gold); border-color: rgba(251,191,36,0.2); }
+
+    /* ─── SCREENSHOT SECTION ─── */
+    .screenshot-section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
+    .screenshot-group { margin-bottom: 80px; }
+    .screenshot-group-header { margin-bottom: 32px; }
+    .screenshot-group-label {
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--purple-light); font-weight: 600; margin-bottom: 8px;
+    }
+    .screenshot-group-title { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+    .screenshot-group-desc { font-size: 15px; color: var(--muted); max-width: 560px; }
+
+    .screenshot-frame {
+      border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s;
+    }
+    .screenshot-frame:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 48px 100px rgba(0,0,0,0.6), 0 0 60px var(--accent-glow);
+    }
+    .screenshot-frame img { width: 100%; display: block; }
+
+    .screenshot-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .screenshot-caption {
+      margin-top: 16px; font-size: 13px; color: var(--muted);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .caption-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); flex-shrink: 0; }
+
+    /* ─── PLANS ─── */
+    .plans-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .plan-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 36px 32px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .plan-card:hover { transform: translateY(-4px); box-shadow: 0 24px 60px rgba(0,0,0,0.4); }
+    .plan-card.highlighted {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 1px var(--purple), 0 24px 60px rgba(139,92,246,0.2);
+    }
+    .plan-name { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+    .plan-card.highlighted .plan-name { color: var(--purple-light); }
+    .plan-price { font-size: 38px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .plan-period { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .plan-features li { font-size: 14px; color: var(--muted); display: flex; gap: 10px; align-items: flex-start; }
+    .plan-features li::before { content: '✓'; color: var(--purple-light); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .plan-card.highlighted .plan-features li { color: rgba(255,255,255,0.8); }
+
+    /* ─── VERDICT ─── */
+    .verdict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 48px; }
+    .verdict-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px;
+    }
+    .verdict-card.pro { border-color: rgba(45,212,191,0.25); }
+    .verdict-card.con { border-color: rgba(248,113,113,0.25); }
+    .verdict-header {
+      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+    }
+    .verdict-card.pro .verdict-header { color: var(--teal); }
+    .verdict-card.con .verdict-header { color: #f87171; }
+    .verdict-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .verdict-list li { font-size: 14px; color: var(--muted); padding-left: 20px; position: relative; }
+    .verdict-list li::before { position: absolute; left: 0; font-weight: 700; }
+    .verdict-card.pro .verdict-list li::before { content: '+'; color: var(--teal); }
+    .verdict-card.con .verdict-list li::before { content: '−'; color: #f87171; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border); padding: 48px;
+      display: flex; justify-content: space-between; align-items: center;
+      max-width: 1100px; margin: 0 auto;
+    }
+    .footer-text { font-size: 13px; color: var(--muted); }
+    .footer-link { font-size: 13px; color: var(--purple-light); text-decoration: none; }
+    .footer-link:hover { text-decoration: underline; }
+
+    /* ─── DIVIDER ─── */
+    .divider { max-width: 1100px; margin: 0 auto; height: 1px; background: var(--border); }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .screenshot-two-col { grid-template-columns: 1fr; }
+      .plans-grid { grid-template-columns: 1fr; }
+      .verdict-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 12px; padding: 32px 20px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div>
+    <div class="nav-logo">Suno Audit</div>
+    <div class="nav-tag">Product Analysis · April 2026</div>
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#screenshots">Screens</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#verdict">Verdict</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-inner">
+    <div class="hero-kicker">Comprehensive Product Audit</div>
+    <h1 class="hero-title">Suno<span>.com</span></h1>
+    <p class="hero-desc">
+      A deep-dive into the world's leading AI music generation platform — features, UX patterns, business model, and competitive positioning.
+    </p>
+    <div class="hero-meta">
+      <div class="hero-stat">
+        <div class="hero-stat-value">v5.5</div>
+        <div class="hero-stat-label">Latest Model</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">$2.45B</div>
+        <div class="hero-stat-label">Valuation (Nov '25)</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">$250M</div>
+        <div class="hero-stat-label">Series C</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">WMG</div>
+        <div class="hero-stat-label">Key Partnership</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Core Capabilities</div>
+  <h2 class="section-title">What Suno Can Do</h2>
+  <p class="section-desc">Suno has evolved from a simple text-to-music tool into a full creative stack for audio. Here are the platform's most significant capabilities.</p>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-number">01 — Core</div>
+      <div class="feature-title">Text-to-Music Generation</div>
+      <p class="feature-desc">The flagship — describe any song in plain language and Suno generates full tracks with vocals, instrumentation, and production in seconds. Supports simple prompts or the "Custom" mode for advanced control over lyrics, style tags, and structure.</p>
+      <div class="feature-tags">
+        <span class="tag">All plans</span>
+        <span class="tag">v5.5 model</span>
+        <span class="tag">10 songs/day free</span>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-number">02 — New in v5.5</div>
+      <div class="feature-title">Voices — Your Voice in Songs</div>
+      <p class="feature-desc">The most-requested feature: capture your own voice and have it sing in any song you generate. Includes a verification system (biometric match of singing voice to a spoken phrase) to prevent misuse. Your voices are private — only you can use them.</p>
+      <div class="feature-tags">
+        <span class="tag">Pro &amp; Premier</span>
+        <span class="tag">Biometric lock</span>
+        <span class="tag teal">v5.5</span>
+      </div>
+    </div>
+  </div>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-number">03 — New in v5.5</div>
+      <div class="feature-title">Custom Models — Your AI, Your Sound</div>
+      <p class="feature-desc">Upload your own original music catalog and fine-tune v5.5 on your unique style. Creates a personalized model that generates music sounding distinctly like you. Pro users get up to 3 custom models, making this a powerful tool for professional artists building an identifiable sonic brand.</p>
+      <div class="feature-tags">
+        <span class="tag">Pro &amp; Premier</span>
+        <span class="tag">Up to 3 models</span>
+        <span class="tag teal">Fine-tuning</span>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-number">04 — New in v5.5</div>
+      <div class="feature-title">My Taste — Personalized AI Curation</div>
+      <p class="feature-desc">Suno learns your genre preferences, moods, and musical habits over time and shapes its recommendations accordingly. The more you create and engage, the more the platform adapts. Available for all users — the free-tier "hook" for personalization.</p>
+      <div class="feature-tags">
+        <span class="tag">All plans</span>
+        <span class="tag">Always-on learning</span>
+      </div>
+    </div>
+  </div>
+  <div class="feature-grid" style="margin-top:2px;">
+    <div class="feature-card" style="border-radius:0 0 0 20px;">
+      <div class="feature-number">05 — Premier Only</div>
+      <div class="feature-title">Suno Studio — Generative DAW</div>
+      <p class="feature-desc">The world's first "generative audio workstation" — a professional multi-track timeline editor with AI generation at its core. Generate unlimited stem variations (vocals, drums, synths), control BPM, edit pitch, export MIDI, and bring stems into any existing DAW. Studio 1.2 added Warp Markers, Remove FX, Alternates, and time signature support.</p>
+      <div class="feature-tags">
+        <span class="tag gold">Premier only</span>
+        <span class="tag">MIDI export</span>
+        <span class="tag">12 stems</span>
+      </div>
+    </div>
+    <div class="feature-card" style="border-radius:0 0 20px 0;">
+      <div class="feature-number">06 — Pro+</div>
+      <div class="feature-title">Stems Splitting &amp; Advanced Editing</div>
+      <p class="feature-desc">Split any generated song into up to 12 individual vocal and instrument tracks. Add new vocals or instrumentals to existing songs without regenerating the whole track. Extend songs, remix sections, or inpaint specific segments. Upload up to 30 minutes of reference audio to guide style.</p>
+      <div class="feature-tags">
+        <span class="tag">12 stems</span>
+        <span class="tag">Extend / Remix</span>
+        <span class="tag">Upload reference</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SCREENSHOTS -->
+<div class="screenshot-section" id="screenshots">
+
+  <div class="screenshot-group">
+    <div class="screenshot-group-header">
+      <div class="screenshot-group-label">01 — Home UI</div>
+      <h3 class="screenshot-group-title">The Creation Interface</h3>
+      <p class="screenshot-group-desc">Clean, prompt-first design. The central input dominates the UI with zero friction between idea and song. Instrumental toggle and Custom Mode are immediately accessible without burying settings.</p>
+    </div>
+    <div class="screenshot-frame">
+      <img src="/suno-audit/assets/suno_create_ui.png" alt="Suno Create Interface" loading="lazy"/>
+    </div>
+    <div class="screenshot-caption">
+      <div class="caption-dot"></div>
+      Create page — suno.com · Dark theme, prompt-first UI, generated song cards with genre tags and play controls
+    </div>
+  </div>
+
+  <div class="screenshot-group">
+    <div class="screenshot-group-header">
+      <div class="screenshot-group-label">02 — Premier Feature</div>
+      <h3 class="screenshot-group-title">Suno Studio — Generative DAW</h3>
+      <p class="screenshot-group-desc">The most ambitious bet in the product. A fully functional multitrack timeline where every stem can be swapped out with an AI-generated alternative. The "AI Generate" button lives right in the DAW toolbar — a product decision that redefines what a DAW is.</p>
+    </div>
+    <div class="screenshot-frame">
+      <img src="/suno-audit/assets/suno_studio_daw.png" alt="Suno Studio DAW" loading="lazy"/>
+    </div>
+    <div class="screenshot-caption">
+      <div class="caption-dot"></div>
+      Suno Studio 1.2 — Multitrack timeline, 6 stems, BPM control, Stem Library · Premier subscribers only
+    </div>
+  </div>
+
+  <div class="screenshot-two-col">
+    <div>
+      <div class="screenshot-group-header">
+        <div class="screenshot-group-label">03 — v5.5 Feature</div>
+        <h3 class="screenshot-group-title">Voices</h3>
+        <p class="screenshot-group-desc">Private voice capture with biometric verification — a thoughtful consent-first design that addresses the deep ethical concerns of voice cloning at the model level.</p>
+      </div>
+      <div class="screenshot-frame">
+        <img src="/suno-audit/assets/suno_voices_ui.png" alt="Suno Voices" loading="lazy"/>
+      </div>
+      <div class="screenshot-caption">
+        <div class="caption-dot"></div>
+        Voices — voice recording + phrase verification · Pro &amp; Premier
+      </div>
+    </div>
+    <div>
+      <div class="screenshot-group-header">
+        <div class="screenshot-group-label">04 — v5.5 Feature</div>
+        <h3 class="screenshot-group-title">My Taste</h3>
+        <p class="screenshot-group-desc">Personalization as a retention mechanic — the platform learns your taste over time, making it increasingly "sticky" and difficult to abandon in favor of a competitor.</p>
+      </div>
+      <div class="screenshot-frame">
+        <img src="/suno-audit/assets/suno_my_taste.png" alt="Suno My Taste" loading="lazy"/>
+      </div>
+      <div class="screenshot-caption">
+        <div class="caption-dot"></div>
+        My Taste — Genre radar + Sound DNA + Recently Loved · All users
+      </div>
+    </div>
+  </div>
+
+  <div class="screenshot-group" style="margin-top:80px;">
+    <div class="screenshot-group-header">
+      <div class="screenshot-group-label">05 — Pro+ Feature</div>
+      <h3 class="screenshot-group-title">Custom Models</h3>
+      <p class="screenshot-group-desc">Upload your existing catalog and fine-tune v5.5 on your specific sound. The "Training Your Model" onboarding flow is elegantly simple — and the result is a branded AI model that sounds specifically like you.</p>
+    </div>
+    <div class="screenshot-frame">
+      <img src="/suno-audit/assets/suno_custom_models.png" alt="Suno Custom Models" loading="lazy"/>
+    </div>
+    <div class="screenshot-caption">
+      <div class="caption-dot"></div>
+      Custom Models — Upload catalog, train AI on your style, generate songs in your sound · Pro &amp; Premier
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-label">Business Model</div>
+  <h2 class="section-title">Pricing &amp; Plans</h2>
+  <p class="section-desc">Credits-based freemium model. Free tier is generous enough to be usable but the most compelling features — Voices, Custom Models, Studio — are gated behind Pro and Premier.</p>
+
+  <div class="plans-grid">
+    <div class="plan-card">
+      <div class="plan-name">Free</div>
+      <div class="plan-price">$0</div>
+      <div class="plan-period">Forever free</div>
+      <ul class="plan-features">
+        <li>50 credits/day (10 songs)</li>
+        <li>Access to v4.5 model</li>
+        <li>Standard features only</li>
+        <li>Upload up to 8 min of audio</li>
+        <li>Shared generation queue</li>
+        <li>My Taste personalization</li>
+        <li>No commercial use rights</li>
+      </ul>
+    </div>
+    <div class="plan-card highlighted">
+      <div class="plan-name">Pro — Most Popular</div>
+      <div class="plan-price">$8</div>
+      <div class="plan-period">/month (annual)</div>
+      <ul class="plan-features">
+        <li>2,500 credits/month (500 songs)</li>
+        <li>Access to v5.5 model</li>
+        <li>Commercial use rights</li>
+        <li>Voices — your own voice</li>
+        <li>Up to 3 Custom Models</li>
+        <li>Stem splitting up to 12 tracks</li>
+        <li>Upload up to 30 min of audio</li>
+        <li>Priority queue · 10 songs at once</li>
+        <li>Early access to new features</li>
+      </ul>
+    </div>
+    <div class="plan-card">
+      <div class="plan-name">Premier</div>
+      <div class="plan-price">$24</div>
+      <div class="plan-period">/month (annual)</div>
+      <ul class="plan-features">
+        <li>10,000 credits/month (2,000 songs)</li>
+        <li>Access to v5.5 model</li>
+        <li>Suno Studio — generative DAW</li>
+        <li>Commercial use rights</li>
+        <li>Voices &amp; Custom Models</li>
+        <li>MIDI export from stems</li>
+        <li>Upload up to 30 min of audio</li>
+        <li>Priority queue · 10 songs at once</li>
+        <li>All Pro features included</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="margin-top:48px;">
+    <div class="screenshot-frame">
+      <img src="/suno-audit/assets/suno_pricing_plans.png" alt="Suno Pricing" loading="lazy"/>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- VERDICT -->
+<section id="verdict">
+  <div class="section-label">Analysis</div>
+  <h2 class="section-title">Verdict</h2>
+  <p class="section-desc">Suno is the clear market leader in consumer AI music, but its most aggressive bets — Voices, Custom Models, Studio — reveal where the product is headed and what the real moat looks like.</p>
+
+  <div class="verdict-grid">
+    <div class="verdict-card pro">
+      <div class="verdict-header">✦ Strengths</div>
+      <ul class="verdict-list">
+        <li>Best-in-class text-to-music quality at v5.5 — vocals are shockingly good</li>
+        <li>Voice cloning done with genuine consent architecture (biometric verification)</li>
+        <li>Suno Studio is a genuinely novel category — "generative DAW" didn't exist before</li>
+        <li>Personalization flywheel (My Taste + Custom Models) creates deep lock-in</li>
+        <li>WMG partnership signals mainstream music industry co-option, not conflict</li>
+        <li>$2.45B valuation with $250M Series C gives massive runway for model R&D</li>
+        <li>Free tier is generous — 10 songs/day is enough for casual viral growth</li>
+        <li>MIDI export bridges AI-native and traditional production workflows</li>
+      </ul>
+    </div>
+    <div class="verdict-card con">
+      <div class="verdict-header">✦ Weaknesses &amp; Risks</div>
+      <ul class="verdict-list">
+        <li>Studio is Premier-only — raises paywall just as the most interesting features ship</li>
+        <li>Active RIAA litigation creates existential legal risk to the whole business model</li>
+        <li>No collaborative or multiplayer creation mode — sessions are single-user only</li>
+        <li>Custom Model training requirements are opaque — unclear data and track minimums</li>
+        <li>No native mobile app — web-only while Udio and competitors ship iOS/Android</li>
+        <li>Lyrics quality remains inconsistent — AI-written choruses often feel generic</li>
+        <li>"My Taste" radar is beautiful but offers no user control to manually tune preferences</li>
+        <li>Credits economy is confusing — 5 credits/song but pricing shown as credits/month</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="margin-top:56px; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:48px;">
+    <div class="section-label" style="margin-bottom:16px;">Strategic Opportunity</div>
+    <p style="font-size:20px; font-weight:700; line-height:1.5; margin-bottom:16px;">
+      Suno is positioning AI music creation as a new instrument category — not software, not a service, but something you build a personal creative identity around.
+    </p>
+    <p style="font-size:15px; color:var(--muted); line-height:1.7;">
+      The Voices + Custom Models + My Taste combo is a deliberate identity stack. Each layer makes your Suno feel more like "your sound" and less like "a generic AI." This is the right long-term bet — but it requires Pro/Premier which will limit viral growth to the free tier's simpler experience.
+      <br><br>
+      The WMG partnership is the real wildcard. If Suno successfully co-opts major label infrastructure — using their catalogs to train better models and offering artist-specific personalization — they could become infrastructure for the music industry rather than a disruptive threat to it.
+    </p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div class="divider"></div>
+<footer>
+  <div class="footer-text">Suno Product Audit · April 2026 · Based on suno.com v5.5</div>
+  <a href="https://suno.com" class="footer-link" target="_blank">Visit Suno →</a>
+</footer>
+
+<script>
+  // Copy assets into place relative to the HTML file
+  // (They are served from /suno-audit/assets/ relative to the legacy static server)
+</script>
+
+</body>
+</html>

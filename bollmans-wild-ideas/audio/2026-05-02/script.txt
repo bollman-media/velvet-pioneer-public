@@ -1,0 +1,12 @@
+Alex: Welcome back to Wild Ideas! Today, May 2nd, Bollman's delivered some seriously cool concepts.
+Sarah: Indeed, Alex. Run #85 brought us five intriguing pitches, all leaning heavily into AI-powered social experiences for Gen Z.
+Alex: Kicking off with Bollman's Big Ideas itself, but then diving into VibeSync! Imagine an AI director for your friend group, turning spontaneous moments into perfectly scored "vibe reels." So collaborative!
+Sarah: It's a contrarian bet on low-friction, real-time AI orchestration for ephemeral group video, leveraging Gemini's multimodal capabilities for instant vibe interpretation.
+Alex: Then there's LoreLoop, letting friends build their own epic sagas! Daily AI-generated video narratives from your digital interactions.
+Sarah: This platform uses Gemini's extensive context window to transform a group's entire digital footprint into an evolving, shared mythology, fostering strong community identity.
+Alex: Glimpse is the ultimate anti-Instagram for your inner circle: raw camera roll moments, AI-stylized, and privately shared for just 24 hours. Intimacy over broad reach!
+Sarah: It addresses a niche for authentic, unpolished ephemeral video, with Gemini and Veo transforming unedited content into "vibe-matched" shorts instantly for trusted groups.
+Alex: And finally, FluxDuel! Live AI video showdowns where Gen Z creators battle it out, with instant prompts and editing help from Gemini. The audience votes!
+Sarah: This taps into the competitive content market, proposing raw, live, AI-assisted creative battles, where Gemini Live enables real-time multimodal assistance and dynamic content generation.
+Alex: Seriously, the sheer creativity is mind-blowing!
+Sarah: The pervasive integration of Gemini's multimodal AI across all these concepts is what truly stands out.

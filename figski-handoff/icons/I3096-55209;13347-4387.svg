@@ -1,0 +1,11 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<foreignObject x="-26" y="-26" width="92" height="92"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(14px);clip-path:url(#bgblur_0_0_65_clip_path);height:100%;width:100%"></div></foreignObject><g data-figma-bg-blur-radius="28">
+<g opacity="0.34">
+<rect x="2" y="2" width="36" height="36" rx="18" fill="white"/>
+</g>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M25.1259 13.8134C25.4188 13.5205 25.8936 13.5205 26.1865 13.8134C26.4794 14.1063 26.4794 14.5811 26.1865 14.874L21.0595 19.9999L26.1865 25.1269C26.4793 25.4198 26.4792 25.8945 26.1865 26.1874C25.8936 26.4803 25.4188 26.4803 25.1259 26.1874L19.999 21.0605L14.873 26.1874C14.5801 26.4803 14.1053 26.4803 13.8124 26.1874C13.5196 25.8945 13.5195 25.4198 13.8124 25.1269L18.9384 19.9999L13.8124 14.874C13.5196 14.5811 13.5195 14.1063 13.8124 13.8134C14.1053 13.5206 14.5801 13.5206 14.873 13.8134L19.999 18.9394L25.1259 13.8134Z" fill="black"/>
+</g>
+<defs>
+<clipPath id="bgblur_0_0_65_clip_path" transform="translate(26 26)"><path d="M2 20C2 10.0589 10.0589 2 20 2V2C29.9411 2 38 10.0589 38 20V20C38 29.9411 29.9411 38 20 38V38C10.0589 38 2 29.9411 2 20V20Z"/>
+</clipPath></defs>
+</svg>
